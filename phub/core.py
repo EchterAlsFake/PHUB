@@ -150,6 +150,13 @@ class Client:
         
         return classes.Video(client = self, url = url, preload = preload)
     
+    def get_user(self, name: str) -> classes.User:
+        '''
+        Attempt to fetch a user knowing its name (raw channel name).
+        '''
+        
+        return classes.User.get(self, name)
+    
     def search(self, query: str) -> classes.VideoIterator:
         '''
         Make a research for videos on PornHub servers.

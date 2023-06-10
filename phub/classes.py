@@ -17,16 +17,15 @@ from phub import consts
 from phub import parser
 
 
+@dataclass
 class User:
     '''
     Represents a PornHub account.
     '''
     
-    def __init__(self) -> None:
-        '''
-        Generate a new User object.
-        '''
-        pass
+    name: str
+    path: str = field(repr = False)
+    client: Client = field(repr = False)
     
     @classmethod
     def from_video(cls, video: Video) -> Self:
@@ -34,8 +33,40 @@ class User:
         Generate a User object from a Video object.
         '''
         
-        pass
+        title = video.title
+        
+        path = consts.re.findall(
+            pattern = title + consts.regexes.video_author_partial,
+            string = video.page,
+            flags = consts.re.IGNORECASE + consts.re.DOTALL
+        )[0]
+        
+        return cls(
+            name = path.split('/')[-1],
+            path = path,
+            client = video.client
+        )
     
+    @classmethod
+    def get(cls, client: Client, name: str) -> Self:
+        '''
+        Fetch a user knowing its channel name.
+        '''
+        
+        return cls(
+            name = name,
+            path = f'users/{name}',
+            client = client
+        )
+    
+    @property
+    def videos(self) -> VideoIterator:
+        '''
+        Get the list of videos published by this user.
+        '''
+        
+        raise NotImplemented
+
 
 @dataclass
 class Like:
@@ -97,7 +128,7 @@ class Video:
         
         if not self.data: self.refresh()
         return self.data
-
+    
     # ========= Download ========= #
 
     def get_M3U(self,
@@ -141,7 +172,8 @@ class Video:
         '''
         
         # Append name if path is directory
-        # if not os.path.isfile(path): path += utils.pathify(self.title) # TODO not working
+        if os.path.isdir(path):
+            path += ('' if path.endswith('/') else '/') + utils.pathify(self.title) + '.mp4'
         
         if not quiet: print('[+] Starting donwload for', self)
         
@@ -209,6 +241,18 @@ class Video:
         '''
         
         return list(map(int, self._lazy().get('hotspots')))
+
+    @property
+    def date(self) -> datetime:
+        '''
+        Get the publish date of the video.
+        
+        raw date format: 2019-07-17T19:28:53+00:00"
+        '''
+        
+        self._lazy()
+        raw: str = consts.regexes.extract_video_date(self.page)[0]
+        return datetime.strptime(raw, '%Y-%m-%dT%H:%M:%S%z')
 
 
 class VideoIterator:

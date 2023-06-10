@@ -9,11 +9,11 @@ from phub import classes
 # Shortcuts
 from phub.core import Client
 from phub.consts import Quality
-from phub.classes import Video, User # TODO create with classmethod + URL
+from phub.classes import Video, User
 
-# TODO Debug client argument (spread to sub objects)
-# TODO Finish Iterator generator
-# TODO Add video date
-# TODO threaded download
+# TODO - Finish Iterator generator                       - TODO #
+# TODO - Video iterator for User object                  - TODO #
+# TODO - Cache every property                            - TODO #
+# TODO - fix: consts.quality.BEST and others not working - TODO #
 
 # EOF
