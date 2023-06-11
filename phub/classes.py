@@ -4,18 +4,19 @@ Object representation for the PHUB package.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Self, Callable
 if TYPE_CHECKING: from phub.core import Client
 
 import os
 import json
 from datetime import datetime
+from functools import cached_property
 
 from phub import utils
 from phub import consts
 from phub import parser
-
+from phub.utils import log
 
 @dataclass
 class User:
@@ -33,17 +34,18 @@ class User:
         Generate a User object from a Video object.
         '''
         
-        title = video.title
+        log('users', 'Searching author of', video, level = 6)
+        video._lazy()
         
-        path = consts.re.findall(
-            pattern = title + consts.regexes.video_author_partial,
-            string = video.page,
-            flags = consts.re.IGNORECASE + consts.re.DOTALL
-        )[0]
+        name = consts.regexes.video_author(video.page)
+        
+        if not name:
+            log('users', 'Regex searching failed', level = 1)
+            return
         
         return cls(
-            name = path.split('/')[-1],
-            path = path,
+            name = name,
+            path = 'users/' + name,
             client = video.client
         )
     
@@ -52,6 +54,8 @@ class User:
         '''
         Fetch a user knowing its channel name.
         '''
+        
+        log('users', 'Initialising new user:', name, level = 6)
         
         return cls(
             name = name,
@@ -67,7 +71,6 @@ class User:
         
         raise NotImplemented
 
-
 @dataclass
 class Like:
     up: int
@@ -77,7 +80,6 @@ class Like:
 class Tag:
     name: str
     count: int = field(repr = False)
-
 
 class Video:
     '''
@@ -100,13 +102,16 @@ class Video:
         self.url = utils.basic(url, False)
         self.key = url.split('=')[-1]
         
+        log('video', 'Initialising new video:', self.key, level = 6)
+        
         # Video data
         self.client = client
         self.page: str = None
         self.data: dict = None
-        self.author = User.from_video(self)
         
-        if preload: self.refresh()
+        if preload:
+            log('video', 'Preloading video', self, level = 6)
+            self.refresh()
     
     def __repr__(self) -> str:
         return f'<phub.Video key={self.key}>'
@@ -116,11 +121,12 @@ class Video:
         Load of refresh video data.
         '''
         
+        log('video', 'Refreshing video', self, level = 4)
         response = self.client._call('GET', self.url)
         
         self.page = response.text
         self.data = parser.resolve(self.page)
-    
+        
     def _lazy(self) -> dict:
         '''
         Refresh the page through a cache system.
@@ -137,7 +143,7 @@ class Video:
         '''
         Get the raw M3U url for a certain quality.
         
-        parse
+        process
         True -> list of segmenst
         False -> M3U url
         '''
@@ -149,18 +155,22 @@ class Video:
                  if el['quality'] in ['1080', '720', '480', '240']}
         
         master = quality.select(quals)
+        log('video', 'Selecting quality', utils.shortify(master, 25), level = 4)
         
         # Fetch quality file
         res = self.client._call('GET', master, simple_url = False)
         
         url_base = master.split('master.m3u8')[0]
         url = utils.extract_urls(res.text)[0]
+        log('video', 'Extracted', len(url), level = 4)
         
         if not process: return url_base + url
         
         # Fetch and parse master file
         raw = self.client._call('GET', url_base + url, simple_url = False)
-        return [url_base + segment for segment in utils.extract_urls(raw.text)]
+        segments = [url_base + segment for segment in utils.extract_urls(raw.text)]
+        log('video', f'Parsed {len(segments)} video segments', level = 3)
+        return segments
 
     def download(self,
                  path: str,
@@ -171,11 +181,19 @@ class Video:
         Download the video to a path.
         '''
         
+        log('video', f'Downloading {self} at', path, level = 5)
+        
         # Append name if path is directory
         if os.path.isdir(path):
             path += ('' if path.endswith('/') else '/') + utils.pathify(self.title) + '.mp4'
+            log('video', f'Changing path to', path, level = 2)
         
-        if not quiet: print('[+] Starting donwload for', self)
+        
+        # Exceptionally allow debugging
+        is_logging = utils.DEBUG
+        if not quiet: utils.DEBUG = True
+        
+        log(' D L ', 'Starting video download for', self)
         
         segments = self.get_M3U(quality, process = True)
         
@@ -183,58 +201,61 @@ class Video:
         with open(path, 'wb') as output:
             
             for index, url in enumerate(segments):
-                if not quiet: print(f'\r[+] Downloading: {index + 1}/{len(segments)}', end = '')
+                log(' D L ', f'Downloading {index + 1}/{len(segments)}', level = 3, r = 1)
                 
                 for i in range(max_retries):
                     res = self.client._call('GET', url, simple_url = False, throw = False)
                     
-                    if not res.ok:
-                        if not quiet: print(f'\n[-] Failed, retrying ({i})...')
+                    if not res.ok:                        
+                        log(' D L ', f'Segment download failed, retrying ({i}/{max_retries})', level = 1)
                         continue
                     
                     output.write(res.content)
                     break
         
-        if not quiet: print('\n[+] Downloaded video at', path)
+        log(' D L ', 'Successfully downloaded video at', path)
+        
+        # Reset logging to previous
+        utils.DEBUG = is_logging
         return path
     
     # ======== Properties ======== #
     
-    @property
+    @cached_property
     def title(self) -> str: return self._lazy().get('video_title')
     
-    @property
+    @cached_property
     def image_url(self) -> str: return self._lazy().get('image_url')
     
-    @property
+    @cached_property
     def is_vertical(self) -> bool: return bool(self.lazy().get('isVertical'))
     
-    @property
+    @cached_property
     def duration(self) -> int:
         '''Video duration in seconds'''
         
         return self._lazy().get('video_duration')
     
-    @property
+    @cached_property
     def tags(self) -> list[Tag]:
         return [Tag(*tag.split(':')) for tag in
                 self._lazy().get('actionTags').split(',') if tag]
 
-    @property
+    @cached_property
     def like(self) -> Like:
         self._lazy()
         
         votes = {t.lower(): v for t, v in consts.regexes.video_likes(self.page)}
         return Like(votes['up'], votes['down'])
     
-    @property
+    @cached_property
     def views(self) -> int:
         self._lazy()
         
         raw = consts.regexes.video_interactions(self.page)[0]
         return int(json.loads(f'[{raw}]')[0]['userInteractionCount'].replace(' ', ''))
     
-    @property
+    @cached_property
     def hotspots(self) -> list[int]:
         '''
         List of hotspots (in seconds) of the video.
@@ -242,7 +263,7 @@ class Video:
         
         return list(map(int, self._lazy().get('hotspots')))
 
-    @property
+    @cached_property
     def date(self) -> datetime:
         '''
         Get the publish date of the video.
@@ -254,6 +275,13 @@ class Video:
         raw: str = consts.regexes.extract_video_date(self.page)[0]
         return datetime.strptime(raw, '%Y-%m-%dT%H:%M:%S%z')
 
+    @cached_property
+    def author(self) -> User:
+        '''
+        Get the video's author.
+        '''
+        
+        return User.from_video(self)
 
 class VideoIterator:
     '''
@@ -261,7 +289,7 @@ class VideoIterator:
     that will be gerenerated on demand.
     '''
     
-    def __init__(self, client: Client, url: str) -> None:
+    def __init__(self, client: Client, url: str, corrector: Callable = None) -> None:
         '''
         Generate a new video iterator object.
         '''
@@ -270,17 +298,18 @@ class VideoIterator:
         self.url = (url + '?&'['?' in url] + 'page=').replace(consts.ROOT, '')
         
         self._length: int = None
-        
+        self.index = 0
         self.page_index: int = None
         self.videos: list[str] = None
         self.page: str = None
+        self.corrector = corrector
     
     def __len__(self) -> int:
         return self.len
         
     def __getitem__(self, index: int) -> Video:
         return self.get(index)    
-        
+    
     @property
     def len(self) -> int:
         '''
@@ -303,13 +332,14 @@ class VideoIterator:
         page_index = index // 32
         
         # Fetch page if needed
-        if self.index != page_index:
+        if self.index != page_index or self.page is None:
             self._get_page(page_index)
         
         # Get the needed video
         key, title = self.videos[ index % 32 ]
+        url = consts.ROOT + f'view_video.php?viewkey={key}'
         
-        video = Video(key = key, preload = False)
+        video = Video(client = self.client, url = url, preload = False)
         video.data = {'video_title': title} # Inject title
         return video
 
@@ -334,5 +364,31 @@ class VideoIterator:
         self.page = raw
         self.page_index = index
         self.videos = consts.regexes.extract_videos(raw)
+        
+        # Correct videos
+        if self.corrector is not None:
+            self.videos = self.corrector(self.videos)
 
+    def __iter__(self) -> Self:
+        '''
+        Generator initialisation.
+        '''
+        
+        self.index = 0
+        return self
+
+    def __next__(self) -> Video:
+        '''
+        Generator iteration.
+        '''
+        
+        try:
+            result = self.get(self.index)
+        
+        except IndexError:
+            raise StopIteration
+        
+        self.index += 1
+        return result
+        
 # EOF

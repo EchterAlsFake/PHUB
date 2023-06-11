@@ -5,7 +5,7 @@ Constants for the PHUB package.
 import re
 from typing import Self
 
-from phub import utils
+from phub.utils import closest, log
 
 
 ROOT = 'https://www.pornhub.com/'
@@ -43,6 +43,8 @@ class Quality:
         Verify quality 
         '''
         
+        log('quals', 'Forging new quality:', value, level = 6)
+        
         assert isinstance(value, (str, int, Quality))
         
         # Error protection
@@ -73,12 +75,16 @@ class Quality:
     def __repr__(self) -> str:
         return f'<phub.Quality {self.value}>'
     
+    def __str__(self) -> str:
+        return str(self.vlaue)
+    
     def select(self, quals: dict) -> str:
         '''
         Make a choice among all possible qualities for a video.
         '''
         
         keys = list(quals.keys())
+        log('quals', f'Selecting {self.value} among {keys}', level = 6)
         
         if isinstance(self.value, str):
             # Get approximative quality
@@ -91,10 +97,15 @@ class Quality:
             # Get exact quality or nearest
             
             if (s:= str(self.value)) in keys: return quals[s]
-            else: return quals[utils.closest(keys, self.value)]
+            else: return quals[closest(keys, self.value)]
         
         # This should not happen
         raise TypeError('Internal error: quality type is', type(self.value))
+
+# Define presets as objects
+Quality.BEST = Quality(Quality.BEST)
+Quality.MIDDLE = Quality(Quality.MIDDLE)
+Quality.WORST = Quality(Quality.WORST)
 
 class regexes:
     '''
@@ -113,6 +124,8 @@ class regexes:
     video_datalayer      = re.compile( r'window\.dataLayer\.push\(({.*?})\);',                             re.DOTALL ).findall   # Get video advanced datalayer
     extract_video_date   = re.compile( r'\"uploadDate\": \"(.*?)\"'                                                  ).findall   # Extract video publish date
     
-    video_author_partial = r'</div>.*?href=\"(.*?)\"' # Partial regex to get publisher name (must be preceded by video title)
+    video_author         = re.compile( r"'video_uploader_name' : '(.*?)',"                                           ).findall   # Find video author
+    
+    video_author_partial =             r'</div>.*?href=\"(.*?)\"' # Partial regex to get publisher name (must be preceded by video title)
 
 # EOF

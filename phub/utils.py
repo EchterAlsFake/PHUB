@@ -2,8 +2,20 @@
 Utilities for the PHUB package.
 '''
 
-from phub import consts
+import sys
 from string import ascii_letters
+
+from typing import Callable
+from datetime import datetime
+
+from phub import consts
+
+# Debug settings
+DEBUG = False
+DEBUG_LEVELS = list(range( 100, 108 ))
+DEBUG_OVERRIDE: Callable[[str, str], None] = None
+DEBUG_RESET: bool = False
+DEBUG_FILE = sys.stdout
 
 def slash(string: str, form: str) -> str:
     '''
@@ -51,7 +63,9 @@ def closest(iter: list[int], value: int) -> int:
     '''
     
     difference = lambda input_list: abs(input_list - value)
-    return min(iter, key = difference)
+    response = min(iter, key = difference)
+    log('utils', f'Selecting closest value to {value}: {response}', level = 3)
+    return response
 
 def extract_urls(string: str) -> list[str]:
     '''
@@ -68,4 +82,38 @@ def pathify(string: str) -> str:
     
     return ''.join(c for c in string if c in ascii_letters + '- _()')
 
-# EOF
+def remove_video_ads(li: list) -> list:
+    '''
+    Remove trailling recommended videos from
+    some playlists.
+    '''
+    
+    return li[4:]
+
+def log(cls: str, *text, level: int = 1, r: bool = False) -> None:
+    '''
+    Homemade logging.
+    '''
+    
+    global DEBUG_RESET
+    
+    if not DEBUG: return
+    
+    text = ' '.join(map(str, text))
+    
+    if DEBUG_OVERRIDE: DEBUG_OVERRIDE(cls, text, level)
+    
+    color = DEBUG_LEVELS[level]
+    date = datetime.now().strftime('%H:%M:%S')
+    raw = f'\033[30m{date}\033[0m \033[{color}m {cls.upper()} \033[0m {text}'
+    
+    # TODO - Refactor
+    if r and not DEBUG_RESET:
+        print(raw, end = '', file = DEBUG_FILE)
+        DEBUG_RESET = True
+    
+    elif r and DEBUG_RESET: print(f'\r{raw}', end = '', file = DEBUG_FILE)
+    elif not r and DEBUG_RESET: print(f'\n{raw}', file = DEBUG_FILE)
+    else: print(raw, file = DEBUG_FILE)
+
+# EOFs

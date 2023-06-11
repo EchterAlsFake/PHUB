@@ -3,13 +3,17 @@ Core module of the PHUB package.
 '''
 
 from __future__ import annotations
-from typing import Self, Callable
+from io import TextIOWrapper
+from typing import Self
 
+import json
 import requests
+from functools import cached_property
 
 from phub import utils
 from phub import consts
 from phub import classes
+from phub.utils import log
 
 
 class Account:
@@ -25,6 +29,8 @@ class Account:
         
         if client._intents_to_login:
             return object.__new__(cls)
+        
+        log('accnt', 'Passing account creation')
     
     def __init__(self, client: Client) -> None:
         '''
@@ -34,25 +40,36 @@ class Account:
         self.client = client
         self.name = self.client.creds['username']
         
-        # Create partials
-        self.liked = self._partial_playlist(f'users/{self.name}/videos/favorites', 'liked')
-        self.watched = self._partial_playlist(f'users/{self.name}/videos/recent', 'watched')
-        self.recommended = self._partial_playlist('recommended', 'recommended')
+        log('accnt', 'Initialised new account', repr(self))
     
     def __repr__(self) -> str:
         return f'<phub.core.Account name={self.name}>'
     
-    def _partial_playlist(self, path: str, name: str) -> Callable[[], classes.VideoIterator]:
+    @cached_property
+    def recommended(self) -> classes.VideoIterator:
         '''
-        Create a partial property for a specific video playlist.
+        Get the recommended videos.
         '''
         
-        def func() -> classes.VideoIterator:
-            f'''Get the {name} videos of the account.'''
-            return classes.VideoIterator(self.client, consts.ROOT + path)
+        return classes.VideoIterator(self.client, consts.ROOT + 'recommended')
+        
+    @cached_property
+    def watched(self) -> classes.VideoIterator:
+        '''
+        get the account watched videos.
+        '''
+        
+        url = consts.ROOT + f'users/{self.name}/videos/recent'
+        return classes.VideoIterator(self.client, url, corrector = utils.remove_video_ads)
 
-        return func
-
+    @cached_property
+    def liked(self) -> classes.VideoIterator:
+        '''
+        get the account favorite videos.
+        '''
+        
+        url = consts.ROOT + f'users/{self.name}/videos/favorites'
+        return classes.VideoIterator(self.client, url, corrector = utils.remove_video_ads)
 
 class Client:
     '''
@@ -81,10 +98,38 @@ class Client:
         # Autologin
         self.logged = False
         if autologin: self.login()
-    
+        
+        log('client', 'Initialised new client', repr(self))
+
     def __repr__(self) -> str:
         status = 'anonymous', 'connect (' + ('not ', '')[self.logged] + 'logged)'
         return f'<phub.Client {status[self._intents_to_login]}>'
+    
+    @classmethod
+    def from_file(cls, data: str | dict | TextIOWrapper) -> Self:
+        '''
+        Generate a new client from credentials.
+        '''
+        
+        if isinstance(data, TextIOWrapper):
+            data = data.read()
+        
+        if isinstance(data, str):
+            try:
+                data = json.loads(data)
+            
+            except json.JSONDecodeError or AssertionError:
+                raise ValueError('Invalid json file.')
+        
+        if isinstance(data, dict):
+            if data.get('username') and data.get('password'):
+                
+                log('Initialising client from', type(data), level = 7)
+                return cls(**data)
+            
+            raise KeyError('Data must have username and password keys.')
+        
+        raise TypeError('Invalid type for data:', type(data))
     
     def _call(self,
               method: str,
@@ -100,12 +145,16 @@ class Client:
         url = consts.ROOT + utils.slash(func, '**') \
               if simple_url else func
         
+        log('client', f'Sending request at {utils.shortify(url, 25)}', level = 6)
+        
         response = self.session.request(
             method = method,
             url = url,
             headers = consts.HEADERS | headers,
             data = data
         )
+        
+        log('client', 'Request passed with status', response.status_code, level = 6)
         
         if throw and not response.ok:
             raise ConnectionError(f'Request `{func}` failed:',
@@ -122,18 +171,29 @@ class Client:
             throw: Raises an error if the connection fails.
         '''
         
+        log('client', 'Attempting loggin...', level = 6)
+        
         # Extract token
         home = self._call('GET', '/').text
         token = consts.regexes.extract_token(home)
+        log('client', 'Extracted token', token, level = 5)
         
         # Send credentials
+        log('client', 'Sending payload', level = 5)
         payload = consts.LOGIN_PAYLOAD | self.creds | {'token': token}
+        
         response = self._call('POST', 'front/authenticate', data = payload)
         success = int(response.json()['success'])
         
-        # Throw error
-        if throw and not success:
-            raise ConnectionRefusedError('Connection failed. Check credentials.')
+        if success:
+            log('client', 'Login successful!', level = 6)
+        
+        else:
+            log('client', 'Login failed', level = 2)
+            
+            # Throw error
+            if throw:
+                raise ConnectionRefusedError('Connection failed. Check credentials.')
         
         self.logged = success
         return success
@@ -155,6 +215,7 @@ class Client:
         Attempt to fetch a user knowing its name (raw channel name).
         '''
         
+        log('client', 'Fetching user', name, level = 6)
         return classes.User.get(self, name)
     
     def search(self, query: str) -> classes.VideoIterator:
@@ -162,6 +223,7 @@ class Client:
         Make a research for videos on PornHub servers.
         '''
         
+        log('client', 'Opening new search query:', query, level = 6)
         url = consts.ROOT + 'video/search?search=' + query
         return classes.VideoIterator(self.client, url)
 

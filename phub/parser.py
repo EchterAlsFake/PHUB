@@ -4,14 +4,17 @@ Parsing script for the PHUB package.
 
 import json
 from phub import consts
+from phub.utils import log
 
 def resolve(html: str) -> dict:
     '''
     Resolves obfuscation that hides PornHub video data.
     '''
     
+    log('parse', 'Resolving page JS script...', level = 5)
     flash, ctx = consts.regexes.video_flashvar(html)[0]
     script = html.split("flashvars_['nextVideo'];")[1].split('var nextVideoPlay')[0]
+    log('parse', 'Formating flash:', flash, level = 5)
     
     # Load context
     data: dict = json.loads(ctx)
@@ -23,5 +26,6 @@ def resolve(html: str) -> dict:
     
     # Execute the script
     exec(script)
+    log('parse', 'Execution successful, script resolved', level = 5)
     
     return data
