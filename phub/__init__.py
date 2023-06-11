@@ -2,13 +2,7 @@
 Initialises the PHUB package.
 '''
 
-from phub import (
-    core,
-    utils,
-    consts,
-    classes,
-    parser
-)
+from phub import ( core, utils, consts, classes, parser)
 
 # Shortcuts
 from phub.core import Client
@@ -16,12 +10,16 @@ from phub.consts import Quality
 from phub.classes import Video, User
 
 # Debugging controls
-import sys
+from sys import stdout
 from io import TextIOBase
 
-def debug(boolean: bool, file: TextIOBase = sys.stdout) -> None:
+def debug(boolean: bool, file: TextIOBase = stdout) -> None:
     '''
     Whether to log everything to stdout.
+    
+    Arguments
+        boolean: Value to set debug to.
+        file (optional): File to output logs to.
     '''
     
     utils.DEBUG = boolean
@@ -30,8 +28,6 @@ def debug(boolean: bool, file: TextIOBase = sys.stdout) -> None:
     utils.log('init_', 'Switching logging to', boolean)
 
 
-# TODO - Docstrings
-# TODO - error args for assertions
 # TODO - Handle user with * channels
 # TODO - Video iterator for User object
 

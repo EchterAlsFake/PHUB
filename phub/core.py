@@ -203,7 +203,7 @@ class Client:
         Get a specific video using an URL or a viewkey.
         '''
         
-        assert bool(url) ^ bool(key)
+        assert bool(url) ^ bool(key), 'Must specify exactly one of the URL and the viewkey'
         
         if key is not None:
             url = consts.ROOT + f'view_video.php?viewkey={key}'

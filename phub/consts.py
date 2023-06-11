@@ -45,7 +45,7 @@ class Quality:
         
         log('quals', 'Forging new quality:', value, level = 6)
         
-        assert isinstance(value, (str, int, Quality))
+        assert isinstance(value, (str, int, Quality)), 'Invalid raw quality type'
         
         # Error protection
         if isinstance(value, str) and value.lower() not in ('best', 'middle', 'worst'):

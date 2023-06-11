@@ -10,8 +10,8 @@ if TYPE_CHECKING: from phub.core import Client
 
 import os
 import json
-from datetime import datetime
 from functools import cached_property
+from datetime import datetime, timedelta
 
 from phub import utils
 from phub import consts
@@ -32,6 +32,9 @@ class User:
     def from_video(cls, video: Video) -> Self:
         '''
         Generate a User object from a Video object.
+        
+        Arguments
+            video: Video the user has been grabed from.
         '''
         
         log('users', 'Searching author of', video, level = 6)
@@ -53,6 +56,10 @@ class User:
     def get(cls, client: Client, name: str) -> Self:
         '''
         Fetch a user knowing its channel name.
+        
+        Arguments
+            client: Client that handles requests.
+            name: Name of the user.
         '''
         
         log('users', 'Initialising new user:', name, level = 6)
@@ -73,11 +80,21 @@ class User:
 
 @dataclass
 class Like:
+    '''
+    Dataclass representing 'up' and 'down'
+    thumbs for a video.
+    '''
+    
     up: int
     down: int
 
 @dataclass
 class Tag:
+    '''
+    Dataclass equivalent to one video tag,
+    with its 'name' and 'count' (apparitions on PH).
+    '''
+    
     name: str
     count: int = field(repr = False)
 
@@ -94,9 +111,14 @@ class Video:
                  preload: bool = False) -> None:
         '''
         Generate a new Video object.
+        
+        Arguments
+            client: Client to inherit from.
+            url: The video URL.
+            preload (optional): Whether to send the video page request.
         '''
         
-        assert consts.regexes.is_valid_video_url(url)
+        assert consts.regexes.is_valid_video_url(url), 'Invalid URL'
         
         # Build URL
         self.url = utils.basic(url, False)
@@ -118,7 +140,7 @@ class Video:
     
     def refresh(self) -> None:
         '''
-        Load of refresh video data.
+        Load of refresh video page and data.
         '''
         
         log('video', 'Refreshing video', self, level = 4)
@@ -126,7 +148,7 @@ class Video:
         
         self.page = response.text
         self.data = parser.resolve(self.page)
-        
+    
     def _lazy(self) -> dict:
         '''
         Refresh the page through a cache system.
@@ -146,9 +168,14 @@ class Video:
         process
         True -> list of segmenst
         False -> M3U url
+        
+        Arguments
+            quality: Desired quality.
+            process (optional): Whether to fetch and parse the file
+                                or just return its URL.
         '''
         
-        assert isinstance(quality, consts.Quality)
+        assert isinstance(quality, consts.Quality), 'Quality must be Quality object'
         
         quals = {int(el['quality']): el['videoUrl']
                  for el in self._lazy()['mediaDefinitions']
@@ -174,11 +201,20 @@ class Video:
 
     def download(self,
                  path: str,
-                 quality: consts.Quality = None,
+                 quality: consts.Quality,
                  quiet: bool = False,
                  max_retries: int = 5) -> str:
         '''
         Download the video to a path.
+        
+        Arguments
+            path: Directory or file to write to.
+            quality: Desired video quality.
+            quiet: Whether to enable logs to view download progress.
+            max_retries: Maximum retries per segment request.
+        
+        Returns
+            The path of the file it wrote to.
         '''
         
         log('video', f'Downloading {self} at', path, level = 5)
@@ -222,27 +258,53 @@ class Video:
     # ======== Properties ======== #
     
     @cached_property
-    def title(self) -> str: return self._lazy().get('video_title')
-    
-    @cached_property
-    def image_url(self) -> str: return self._lazy().get('image_url')
-    
-    @cached_property
-    def is_vertical(self) -> bool: return bool(self.lazy().get('isVertical'))
-    
-    @cached_property
-    def duration(self) -> int:
-        '''Video duration in seconds'''
+    def title(self) -> str:
+        '''
+        The title of the video.
+        '''
         
-        return self._lazy().get('video_duration')
+        return self._lazy().get('video_title')
+    
+    @cached_property
+    def image_url(self) -> str:
+        '''
+        Thumbnail URL of the video. Use client.session.get to download.
+        '''
+        
+        return self._lazy().get('image_url')
+    
+    @cached_property
+    def is_vertical(self) -> bool:
+        '''
+        Whether the video is in vertial mode.
+        '''
+        
+        return bool(self.lazy().get('isVertical'))
+    
+    @cached_property
+    def duration(self) -> timedelta:
+        '''
+        Video duration as a timedelta object.
+        '''
+        
+        secs = self._lazy().get('video_duration')
+        return timedelta(seconds = secs)
     
     @cached_property
     def tags(self) -> list[Tag]:
+        '''
+        Tags of the video.
+        '''
+        
         return [Tag(*tag.split(':')) for tag in
                 self._lazy().get('actionTags').split(',') if tag]
 
     @cached_property
     def like(self) -> Like:
+        '''
+        Positive and negative likes of the video.
+        '''
+        
         self._lazy()
         
         votes = {t.lower(): v for t, v in consts.regexes.video_likes(self.page)}
@@ -250,6 +312,10 @@ class Video:
     
     @cached_property
     def views(self) -> int:
+        '''
+        How many times the video has been watched.
+        '''
+        
         self._lazy()
         
         raw = consts.regexes.video_interactions(self.page)[0]
@@ -266,9 +332,7 @@ class Video:
     @cached_property
     def date(self) -> datetime:
         '''
-        Get the publish date of the video.
-        
-        raw date format: 2019-07-17T19:28:53+00:00"
+        The publish date of the video as a datetime object.
         '''
         
         self._lazy()
@@ -278,7 +342,7 @@ class Video:
     @cached_property
     def author(self) -> User:
         '''
-        Get the video's author.
+        Get the author of the video.
         '''
         
         return User.from_video(self)
@@ -286,13 +350,20 @@ class Video:
 class VideoIterator:
     '''
     Represents a playlist of Video objects
-    that will be gerenerated on demand.
+    that will be generated on demand.
     '''
     
     def __init__(self, client: Client, url: str, corrector: Callable = None) -> None:
         '''
         Generate a new video iterator object.
+        
+        Arguments
+            client: The client to inherit and make requests from.
+            url: The URL of the page that contains the playlist.
+            corrector: Function to call to correct parsing in edge cases.
         '''
+        
+        log('viter', 'Initialising new Video Iterator', level = 6)
         
         self.client = client
         self.url = (url + '?&'['?' in url] + 'page=').replace(consts.ROOT, '')
@@ -313,7 +384,7 @@ class VideoIterator:
     @property
     def len(self) -> int:
         '''
-        Get the amount of distributed videos.
+        Get the amount of distributed videos, .
         '''
         
         # Load a page to get the counter
@@ -325,6 +396,8 @@ class VideoIterator:
         Get a specific video using an index.
         Can also be addressed with __getitem__.
         '''
+        
+        log('viter', 'Getting video at index', index, level = 5)
         
         # Handle relative indexes
         if index < 0: index += len(self)
@@ -340,6 +413,7 @@ class VideoIterator:
         url = consts.ROOT + f'view_video.php?viewkey={key}'
         
         video = Video(client = self.client, url = url, preload = False)
+        log('viter', 'Generated video object')
         video.data = {'video_title': title} # Inject title
         return video
 
@@ -351,14 +425,20 @@ class VideoIterator:
         # If cached, avoid scrapping again
         if self.page_index == index: return
         
+        log('viter', 'Fetching page at index', index, level = 4)
         raw = self.client._call('GET', self.url + str(index + 1)).text
         
         # Define counter
         if self._length is None:
             counter = consts.regexes.video_search_counter(raw)
             
-            if not counter: self._length = 0 # did not found counter TODO
-            else: self._length = int(counter[0])
+            if not counter:
+                log('viter', 'Counter collection failed', level = 2)
+                self._length = 0 # did not found counter TODO
+            
+            else:
+                self._length = int(counter[0])
+                log('viter', 'Collected counter:', self._length, level = 4)
         
         # Parse videos
         self.page = raw
@@ -367,7 +447,10 @@ class VideoIterator:
         
         # Correct videos
         if self.corrector is not None:
+            log('viter', 'Correcting video regex parsing', level = 6)
             self.videos = self.corrector(self.videos)
+            
+        log('viter', f'Collected {len(self.videos)} videos', level = 6)
 
     def __iter__(self) -> Self:
         '''
@@ -386,6 +469,7 @@ class VideoIterator:
             result = self.get(self.index)
         
         except IndexError:
+            log('viter', 'Reached end of generation')
             raise StopIteration
         
         self.index += 1
