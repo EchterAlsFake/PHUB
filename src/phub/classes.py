@@ -210,7 +210,7 @@ class Video:
         ----------------------------------------------------
         
         Arguments:
-        - `quality` -- The desired quality as an object.
+        - `quality`           -- The desired quality as an object.
         - `process` (=`True`) -- Whether to parse the file.
         
         ----------------------------------------------------
@@ -421,8 +421,8 @@ class VideoIterator:
         -----------------------------------------------
         
         Arguments:
-        - `client` -- The client to base from.
-        - `url` -- The URL of the page that contains the playlist.
+        - `client`              -- The client to base from.
+        - `url`                 -- The URL of the page that contains the playlist.
         - `corrector` (=`None`) -- Function to call to correct parsing in edge cases.
         '''
         
