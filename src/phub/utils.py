@@ -123,7 +123,7 @@ def pathify(string: str) -> str:
     ---------------------------------------
     
     Arguments:
-    - ``string` -- The string.
+    - `string` -- The string.
     
     ---------------------------------------
     Returns a path-safe string.
