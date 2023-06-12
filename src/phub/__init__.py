@@ -17,11 +17,12 @@ from io import TextIOBase
 
 def debug(boolean: bool, file: TextIOBase = stdout) -> None:
     '''
-    Whether to log everything to stdout.
+    #### Whether to log everything to stdout. ####
+    ----------------------------------------------
     
-    Arguments
-        boolean: Value to set debug to.
-        file (optional): File to output logs to.
+    Arguments:
+    - `boolean`          -- Value to set debug to.
+    - `file` (=`stdout`) -- File to output logs to.
     '''
     
     utils.DEBUG = boolean
