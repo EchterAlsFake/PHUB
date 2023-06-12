@@ -104,8 +104,8 @@ class Client:
         - `password`   (=`None`) -- Account to connect to password.
         - `session`    (=`None`) -- Recovery requests session.
         - `autologin` (=`False`) -- Whether to login after initialisation.
-        -----------------------------------
         
+        -----------------------------------
         Returns a `Client` object.
         '''
         
@@ -146,8 +146,8 @@ class Client:
         Arguments:
         - `data` -- Dictionnary, JSON file or JSON string to get
                     username and password from.
-        -------------------------------------------------
         
+        -------------------------------------------------
         Returns a `Client` object.
         '''
         
