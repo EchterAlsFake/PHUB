@@ -36,9 +36,7 @@ for video in record:
 ```
 
 ## Documentation
-TODO
+See the [wiki](https://github.com/Egsagon/PHUB/wiki).
 
 ## Why?
 This project was made as an enhancement for [pfetch](https://github.com/Egsagon/pornhub-fetch), which aimed at downloading videos from PornHub.
-
-I do not plan to maintain this much, so if there are any errors clone the repository and update the regexes in `src/phub/consts` in the `regexes` class.
