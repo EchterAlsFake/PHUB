@@ -246,6 +246,7 @@ class Video:
                  path: str,
                  quality: utils.Quality,
                  quiet: bool = False,
+                 callback: Callable = None,
                  max_retries: int = 5) -> str:
         '''
         #### Download the video locally. ####
@@ -255,11 +256,13 @@ class Video:
         - `path`               -- Directory or file to write to.
         - `quality`            -- Desired video quality.
         - `quiet`   (=`False`) -- Whether to enable logs to view download progress.
+        - `callback` (=`None`) -- Function to call to update download progress.
         - `max_retries` (=`5`) -- Maximum retries per segment request.
         
         NOTE 1 - If `path` is a directory, will create a new file in that directory
                  with the name of the video.
         NOTE 2 - Slow download. To use threaded downloads, call `get_M3U` instead.
+        NOTE 3 - Glitchy logs.
         -------------------------------------
         Returns the path of the file.
         '''
@@ -270,7 +273,6 @@ class Video:
         if os.path.isdir(path):
             path += ('' if path.endswith('/') else '/') + utils.pathify(self.title) + '.mp4'
             log('video', f'Changing path to', path, level = 2)
-        
         
         # Exceptionally allow debugging
         is_logging = utils.DEBUG
@@ -284,7 +286,8 @@ class Video:
         with open(path, 'wb') as output:
             
             for index, url in enumerate(segments):
-                log(' D L ', f'Downloading {index + 1}/{len(segments)}', level = 3, r = 1)
+                log(' D L ', f'Downloading {index + 1}/{len(segments)}', level = 3, r = 0) # TODO
+                if callback: callback(index + 1, len(segments))
                 
                 for i in range(max_retries):
                     res = self.client._call('GET', url, simple_url = False, throw = False)

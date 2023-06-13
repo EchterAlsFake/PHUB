@@ -307,6 +307,6 @@ class Client:
         
         log('client', 'Opening new search query:', query, level = 6)
         url = consts.ROOT + 'video/search?search=' + query
-        return classes.VideoIterator(self.client, url)
+        return classes.VideoIterator(self, url)
 
 # EOF
