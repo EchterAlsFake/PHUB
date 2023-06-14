@@ -3,6 +3,8 @@
 # PHUB - An API for `pornhub.com`.
 PHUB is an API wrapper for PornHub. It is able to fetch, search and download videos and supports account connections, achieved with efficient web scrapping using requests and regexes.
 
+> :warning: **Early development: bugs may occur** (also i'm a terrible programer)
+
 ## Installation
 - Install using pip:
 ```sh
