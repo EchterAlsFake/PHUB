@@ -1,6 +1,6 @@
 ![PHUB](https://github.com/Egsagon/PHUB/blob/master/assets/banner.png)
 
-# PHUB - An API for `pornhub.com`.
+# PHUB - An API for PornHub.
 PHUB is an API wrapper for PornHub. It is able to fetch, search and download videos and supports account connections, achieved with efficient web scrapping using requests and regexes.
 
 > :warning: **Early development: bugs may occur** (also i'm a terrible programer)
