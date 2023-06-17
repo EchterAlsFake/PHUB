@@ -235,7 +235,7 @@ class Quality:
         return f'<phub.Quality {self.value}>'
     
     def __str__(self) -> str:
-        return str(self.vlaue)
+        return str(self.value)
     
     def select(self, quals: dict) -> str:
         '''
@@ -255,9 +255,10 @@ class Quality:
         if isinstance(self.value, str):
             # Get approximative quality
             
-            if self.value == Quality.BEST: return quals[max(keys)]
-            elif self.value == Quality.WORST: return quals[min(keys)]
-            else: return quals[ keys[ len(keys) // 2 ] ]
+            if self.value == Quality.BEST.value: return quals[max(keys)]
+            elif self.value == Quality.WORST.value: return quals[min(keys)]
+            else:
+                return quals[ sorted(keys)[ len(keys) // 2 ] ]
         
         elif isinstance(self.value, int):
             # Get exact quality or nearest
