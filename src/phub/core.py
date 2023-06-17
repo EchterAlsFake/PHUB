@@ -94,16 +94,18 @@ class Client:
                  username: str = None,
                  password: str = None,
                  session: requests.Session = None,
+                 language: str = 'en,en-US',
                  autologin: bool = False) -> None:
         '''
         #### Initialise a new client. #####
         -----------------------------------
         
         Arguments
-        - `username`   (=`None`) -- Account to connect to username.
-        - `password`   (=`None`) -- Account to connect to password.
-        - `session`    (=`None`) -- Recovery requests session.
-        - `autologin` (=`False`) -- Whether to login after initialisation.
+        - `username`     (=`None`) -- Account to connect to username.
+        - `password`     (=`None`) -- Account to connect to password.
+        - `session`      (=`None`) -- Recovery requests session.
+        - `language` (=`en,en-US`) -- Language of the client session.
+        - `autologin`   (=`False`) -- Whether to login after initialisation.
         
         -----------------------------------
         Returns a `Client` object.
@@ -115,6 +117,7 @@ class Client:
         
         self.creds = {'username': username, 'password': password}
         self._intents_to_login = bool(username)
+        self.language = {'Accept-Language': language}
         
         # Connect Account object
         self.account: Account | None = Account(self)
@@ -202,7 +205,7 @@ class Client:
         response = self.session.request(
             method = method,
             url = url,
-            headers = consts.HEADERS | headers,
+            headers = consts.HEADERS | headers | self.language,
             data = data
         )
         
