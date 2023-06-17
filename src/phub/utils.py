@@ -257,8 +257,7 @@ class Quality:
             
             if self.value == Quality.BEST.value: return quals[max(keys)]
             elif self.value == Quality.WORST.value: return quals[min(keys)]
-            else:
-                return quals[ sorted(keys)[ len(keys) // 2 ] ]
+            else: return quals[ sorted(keys)[ len(keys) // 2 ] ]
         
         elif isinstance(self.value, int):
             # Get exact quality or nearest
