@@ -359,17 +359,17 @@ class Video:
         
         votes = {t.lower(): v for t, v in consts.regexes.video_likes(self.page)}
         return Like(votes['up'], votes['down'])
-    
+
     @cached_property
     def views(self) -> int:
         '''
         How many times the video has been watched.
         '''
-        
+
         self._lazy()
-        
+
         raw = consts.regexes.video_interactions(self.page)[0]
-        return int(json.loads(f'[{raw}]')[0]['userInteractionCount'].replace(' ', ''))
+        return int(json.loads(f'[{raw}]')[0]['userInteractionCount'].replace(' ', '').replace(',', ''))
     
     @cached_property
     def hotspots(self) -> list[int]:
