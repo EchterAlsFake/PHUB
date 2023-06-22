@@ -16,7 +16,19 @@ pip install --upgrade phub
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git
 ```
 
-## Usage
+## CLI usage
+You can use phub like so form the terminal to start a small downloading script:
+(Assuming `py` represents your python executable, on linux use `python3`)
+```sh
+py -m phub --help
+```
+
+Example for downloading a video knowing its url, in the best available quality:
+```sh
+py -m phub --url https://... -q 'best'
+````
+
+## Package usage
 Example video download usage:
 ```python
 import phub
