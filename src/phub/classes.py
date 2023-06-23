@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 from phub import utils
 from phub import consts
 from phub import parser
-from phub.utils import log
+from phub.utils import log, download_presets as dlp
 
 # Errors
 class UserNotFoundError(Exception): pass
@@ -245,8 +245,7 @@ class Video:
     def download(self,
                  path: str,
                  quality: utils.Quality,
-                 quiet: bool = False,
-                 callback: Callable = None,
+                 callback: Callable = dlp.bar(),
                  max_retries: int = 5) -> str:
         '''
         #### Download the video locally. ####
@@ -255,7 +254,6 @@ class Video:
         Arguments:
         - `path`               -- Directory or file to write to.
         - `quality`            -- Desired video quality.
-        - `quiet`   (=`False`) -- Whether to enable logs to view download progress.
         - `callback` (=`None`) -- Function to call to update download progress.
         - `max_retries` (=`5`) -- Maximum retries per segment request.
         
@@ -273,10 +271,6 @@ class Video:
         if os.path.isdir(path):
             path += ('' if path.endswith('/') else '/') + utils.pathify(self.title) + '.mp4'
             log('video', f'Changing path to', path, level = 2)
-        
-        # Exceptionally allow debugging
-        is_logging = utils.DEBUG
-        if not quiet: utils.DEBUG = True
         
         log(' D L ', 'Starting video download for', self)
         
@@ -299,10 +293,8 @@ class Video:
                     output.write(res.content)
                     break
         
+        # Stop
         log(' D L ', 'Successfully downloaded video at', path)
-        
-        # Reset logging to previous
-        utils.DEBUG = is_logging
         return path
     
     # ======== Properties ======== #
