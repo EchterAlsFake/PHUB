@@ -14,7 +14,8 @@ import click
 
 def main(url: str, key: str, quality: str, output: str, noconfirm: str) -> None:
     '''
-    Main script.
+    Small downloading CLI script for PHUB.
+    See https://github.com/Egsagon/PHUB.
     '''
     
     if not any((url, key)):
