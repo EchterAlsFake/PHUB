@@ -5,6 +5,7 @@
 import sys
 from string import ascii_letters
 
+import tqdm
 from datetime import datetime
 from typing import Callable, Self
 
@@ -170,6 +171,68 @@ def log(cls: str, *text, level: int = 1, r: bool = False) -> None:
     elif r and DEBUG_RESET: print(f'\r{raw}', end = '', file = DEBUG_FILE)
     elif not r and DEBUG_RESET: print(f'\n{raw}', file = DEBUG_FILE)
     else: print(raw, file = DEBUG_FILE)
+
+
+class download_presets:
+    '''
+    Callback presets for displaying download progress.
+    '''
+    
+    @staticmethod
+    def progress(color: bool = True) -> Callable:
+        '''
+        Print current process on one line.
+        '''
+        
+        tem = 'Downloading: {percent}% [{cur}/{total}]'
+        if color:
+            tem = 'Downloading: \033[92m{percent}%\033[0m [\033[93m{cur}\033[0m/\033[93m{total}\033[0m]'
+        
+        def wrapper(cur: int, total: int) -> None:
+            percent = round( (cur / total) * 100 )
+        
+            print(tem.format(percent = percent, cur = cur, total = total),
+                  end = '\n' if percent >= 100 else '')
+        
+        return wrapper
+    
+    @staticmethod
+    def bar(*args, **kwargs) -> Callable:
+        '''
+        Display current progress a a bar.
+        '''
+        
+        bar = tqdm.tqdm(*args, **kwargs)
+        
+        def wrapper(current: int, total: int) -> None:
+            
+            bar.total = total
+            bar.update(1)
+            if current == total: bar.close()
+        
+        return wrapper
+    
+    @staticmethod
+    def std(file = sys.stdout) -> Callable:
+        '''
+        Output progress as percentage to a file.
+        '''
+        
+        def wrapper(cur: int, total: int) -> None:
+            print(round( (cur / total) * 100 ), file = file)
+            
+        return wrapper
+    
+    @staticmethod
+    def percent(callback: Callable) -> Callable:
+        '''
+        Link a function to the percentage output of the progress.
+        '''
+        
+        def wrapper(cur: int, total: int) -> None:
+            callback(round( (cur / total) * 100 ))
+        
+        return wrapper
 
 
 class Quality:
