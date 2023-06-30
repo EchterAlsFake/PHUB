@@ -148,7 +148,13 @@ def remove_video_ads(li: list) -> list:
 
 def log(cls: str, *text, level: int = 1, r: bool = False) -> None:
     '''
-    Homemade logging.
+    #### Homemade logging. ####
+    ---------------------------
+    
+    Arguments:
+    - `*`            -- Log content.
+    - `level` (=`1`) -- Log level.
+    - `r` (=`False`) -- Wether log is inline.
     '''
     
     global DEBUG_RESET
@@ -171,6 +177,22 @@ def log(cls: str, *text, level: int = 1, r: bool = False) -> None:
     elif r and DEBUG_RESET: print(f'\r{raw}', end = '', file = DEBUG_FILE)
     elif not r and DEBUG_RESET: print(f'\n{raw}', file = DEBUG_FILE)
     else: print(raw, file = DEBUG_FILE)
+
+def hard_strip(text: str, sep: str = ' ') -> str:
+    '''
+    #### Remove all useless spaces from a text. ####
+    ------------------------------------------------
+    
+    Arguments:
+    - `text`       -- The text to strip.
+    - `sep` (=` `) -- Separator between each words.
+    
+    ------------------------------------------------
+    Returns a stripped version of the text.
+    '''
+    
+    if not text: return
+    return sep.join(text.split())
 
 
 class download_presets:
@@ -202,9 +224,12 @@ class download_presets:
         Display current progress a a bar.
         '''
         
-        bar = tqdm.tqdm(*args, **kwargs)
+        bar = tqdm.tqdm = None
         
         def wrapper(current: int, total: int) -> None:
+            
+            if bar is None:
+                bar = tqdm.tqdm(*args, **kwargs)
             
             bar.total = total
             bar.update(1)

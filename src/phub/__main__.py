@@ -13,7 +13,12 @@ import click
 @click.option('--noconfirm', '-n', help = 'Prevent confirming things.')
 @click.option('ui',         '-ui', help = 'Start in UI mode.', default = False)
 
-def main(url: str, key: str, quality: str, output: str, noconfirm: str, ui: str) -> None:
+def main(url: str = None,
+         key: str = None,
+         quality: str = None,
+         output: str = None,
+         noconfirm: str = None,
+         ui: str = None) -> None:
     '''
     Small downloading CLI script for PHUB.
     See https://github.com/Egsagon/PHUB.

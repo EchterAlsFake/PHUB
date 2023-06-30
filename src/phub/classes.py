@@ -5,13 +5,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Self, Callable
+from typing import TYPE_CHECKING, Self, Callable, Generator
 if TYPE_CHECKING: from phub.core import Client
 
 import os
 import json
 from functools import cached_property
 from datetime import datetime, timedelta
+
+from bs4 import BeautifulSoup as Soup
 
 from phub import utils
 from phub import consts
@@ -550,5 +552,114 @@ class VideoIterator:
         
         self.index += 1
         return result
+    
+    def range(self, start: int, stop: int, step: int = 1) -> Generator[Video , None, None]:
+        '''
+        #### Emit a generator containing a slice of videos. ####
+        --------------------------------------------------------
+        Arguments:
+        - `start`       -- Start index.
+        - `stop`        -- Stop index.
+        - `step` (=`1`) -- Step.
         
+        --------------------------------------------------------
+        Yields `Video` objects.
+        '''
+        
+        for index in range(start, stop, step):
+            yield self[index]
+
+@dataclass
+class FeedItem:
+    type: consts.FeedType
+    content: str = field(repr = False)
+    author: str = field(repr = False)
+    url: str = field(repr = False)
+    date: str = field(repr = False)
+
+class Feed:
+    
+    def __init__(self, client: Client) -> None:
+        '''
+        #### Generate a new feed object. ####
+        -------------------------------------
+        
+        Arguments:
+        - `client` -- Client object to use.
+        '''
+
+        self.client = client
+        self.cache: dict[int, list[FeedItem]] = {}
+    
+    def _get_page(self, page: int) -> list[FeedItem]:
+        '''
+        #### Fetch a specific feed page. ####
+        -------------------------------------
+        
+        Arguments:
+        - `page` -- Page index.
+        
+        -------------------------------------
+        Returns a list of 14 `FeedItem` elements.
+        '''
+        
+        # Fetch and parse page
+        url = 'feeds'
+        if page > 0: url += f'_ajax?ajax=1&page={page + 1}'
+        raw = self.client._call('GET', url).text
+        
+        soup = Soup(raw, 'html.parser')
+        sections: list[Soup] = soup.find_all('section', {'class': 'feedItemSection'})
+        
+        items = []
+        for section in sections:
+            
+            badge = section.find('span', {'class': 'usernameBadgesWrapper'})
+            stream = section.find('a', {'class': 'stream_link'})
+            
+            author = None
+            if badge:
+                author = User.get(client = self.client,
+                                  url = badge.find('a').get('href'))
+            
+            url = date = None
+            if stream:
+                url = stream.get('href')
+                date = stream.text
+            
+            content = section.find('div', {'class': 'feedInfo'}).text
+            if date: content = content.replace(date, '')
+            
+            items += [FeedItem(
+                type = section.get('data-table'),
+                content = utils.hard_strip(content),
+                author = author,
+                url = url,
+                date = utils.hard_strip(date)
+            )]
+        
+        # Save to cache
+        self.cache[page] = items
+        return items
+
+    def get(self, index: int) -> FeedItem:
+        '''
+        #### Get a specific feed item. ####
+        -----------------------------------
+        
+        Arguments:
+        - `index` -- The feed element index.
+        
+        -------------------------------------
+        Returns a `FeedItem` object.
+        '''
+        
+        page_index = index // 14
+        
+        page = self.cache.get(page_index)
+        if page is None:
+            page = self._get_page(page_index)
+        
+        return page[ index % 14 ]
+
 # EOF

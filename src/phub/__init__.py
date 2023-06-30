@@ -1,5 +1,5 @@
 '''
-## PHUB - A light API for interacting with PornHub. ##
+#### PHUB - A light API for interacting with PornHub. ####
 
 See https://github.com/Egsagon/PHUB for documentation.
 '''

@@ -85,6 +85,16 @@ class Account:
         return classes.VideoIterator(self.client, url,
                                      corrector = utils.remove_video_ads)
 
+    @cached_property
+    def feed(self) -> classes.Feed:
+        '''
+        #### Get the account feed. ####
+        -------------------------------
+        Returns a `Feed` object.
+        '''
+        
+        return classes.Feed(self.client)
+
 class Client:
     '''
     Represents a Client capable of interacting with PornHub.

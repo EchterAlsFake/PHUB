@@ -53,4 +53,17 @@ class regexes:
     # Old
     # video_model          = re.compile( r'<span class=\"usernameBadgesWrapper\"><a rel=\"\" href=\"(.*?)\"  class=\"bolded\">(.*?)</a>').findall # Get video author if model
 
+class FeedType:
+    '''
+    Types representation (most) feed elements.
+    '''
+    
+    SUBSCRIBED  = 'stream_subscriptions_pornstars'
+    ACHIEVEMENT = 'stream_achievements'
+    UPLOAD      = 'stream_videos_uploaded'
+    SITE_UPLOAD = 'stream_sites_subscriptions'
+    COMMENTED   = 'stream_grouped_comments_videos'
+    # TODO more stream types
+
+
 # EOF
