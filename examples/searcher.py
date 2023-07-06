@@ -12,8 +12,7 @@ while 1:
     
     print('[+] Found results:')
     
-    for i in range(10):
-        try: print(f'* {i} -- {record[i].title}')
-        except IndexError: break
+    for video in record.range(0, 10):
+        print(video.title)
 
 # EOF

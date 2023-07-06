@@ -129,10 +129,10 @@ class App(tk.Tk):
         threading.Thread(target = self.download, args = [url]).start()
 
 
-def main(client) -> None:
-    App(client).mainloop()
+def main() -> None:
+    App(phub.Client()).mainloop()
 
 if __name__ == '__main__':
-    main(phub.Client())
+    main()
 
 # EOF

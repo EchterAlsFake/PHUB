@@ -1,56 +1,52 @@
 '''
-Main PHUB script.
+PHUB CLI script.
 '''
 
 import phub
 import click
 
-@click.command()
-@click.option('--url',       '-u', help = 'URL of the video.')
-@click.option('--key',       '-k', help = 'Viewkey of the video.')
-@click.option('--quality',   '-q', help = 'Video quality (default=best)', default = 'best')
-@click.option('--output',    '-o', help = 'File output', default = '.')
-@click.option('--noconfirm', '-n', help = 'Prevent confirming things.')
-@click.option('ui',         '-ui', help = 'Start in UI mode.', default = False)
+@click.group()
+def cli() -> None:
+    pass
 
-def main(url: str = None,
-         key: str = None,
-         quality: str = None,
-         output: str = None,
-         noconfirm: str = None,
-         ui: str = None) -> None:
+@cli.command()
+def ui():
     '''
-    Small downloading CLI script for PHUB.
-    See https://github.com/Egsagon/PHUB.
+    Run in UI mode.
+    '''
+    
+    from phub import phub_ui
+    phub_ui.main()
+
+@cli.command()
+@click.option('--url',     '-u', help = 'Video URL')
+@click.option('--quality', '-q', help = 'Video quality', default = 'best')
+@click.option('--output',  '-o', help = 'Output video file', default = '.')
+def download(url, quality, output):
+    '''
+    Donload videos from Pornhub.
     '''
     
     client = phub.Client()
     
-    # Run in UI mode
-    if ui:
-        import phub_ui
-        return phub_ui.main(client)
-    
-    if not any((url, key)):
-        return click.secho('Error: Specify either --url or --key', fg = 'red', err = 1)
-    
-    video = client.get(url, key)
-    
-    if not bool(noconfirm):
-        if not click.confirm('Download ' + click.style(video, fg = 'green'), default = 1):
-            return click.secho('Download aborted', fg = 'red', err = 1)
-    
-    # Download
     try:
-        path = video.download(path = output, quality = phub.Quality(quality))
+        video = client.get(url)
     
     except Exception as err:
-        return click.secho(f'Error: {type(err)} {err}', fg = 'red', err = 1)
+        return click.secho(f'[ERR] Could not fetch video: {err}', fg = 'red')
     
-    return click.echo('\rDownloaded video at ' + click.style(path, fg = 'green'))
-
+    try:
+        path = video.download(path = output,
+                              quality = phub.Quality(quality))
+    
+    except Exception as err:
+        return click.secho(f'[ERR] Could not download video: {err}', fg = 'red')
+    
+    click.secho('Downloaded video at:\n\t' + path, fg = 'green')
 
 if __name__ == '__main__':
-    main()
+    
+    cli()
+
 
 # EOF
