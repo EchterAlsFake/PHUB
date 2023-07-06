@@ -3,7 +3,7 @@
 # PHUB - An API for PornHub.
 PHUB is an API wrapper for PornHub. It is able to fetch, search and download videos and supports account connections, achieved with efficient web scrapping using requests and regexes.
 
-> :warning: **Early development: bugs may occur** (also i'm a terrible programer)
+> :warning: **Early development + not maintained a lot** don't hesitate to submit issues and PRs
 
 ## Installation
 - Install using pip:
@@ -17,16 +17,20 @@ pip install --upgrade git+https://github.com/Egsagon/PHUB.git
 ```
 
 ## CLI usage
-You can use phub like so form the terminal to start a small downloading script:
-(Assuming `py` represents your python executable, on linux use `python3`)
+You can use phub like so from the terminal as as CLI script:
 ```sh
-py -m phub --help
+python3 -m phub
 ```
 
 Example for downloading a video knowing its url, in the best available quality:
 ```sh
-py -m phub --url https://... -q 'best'
-````
+py -m phub download --url https://www.pornhub.com/view_video.php?viewkey=xxx -q 'best'
+```
+
+You can also use the provided UI if you have `tkinter` installed:
+```sh
+py -m phub ui
+```
 
 ## Package usage
 Example video download usage:
@@ -45,7 +49,7 @@ Example searching for videos:
 record = client.search('enter query here')
 
 # Display all videos (careful if there is a lot of results)
-for video in record:
+for video in record.range(0, 10):
   print(video.title)
 ```
 
