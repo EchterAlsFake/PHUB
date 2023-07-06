@@ -247,7 +247,7 @@ class Video:
     def download(self,
                  path: str,
                  quality: utils.Quality,
-                 callback: Callable = dlp.bar(),
+                 callback: Callable = dlp.bar,
                  max_retries: int = 5) -> str:
         '''
         #### Download the video locally. ####
@@ -278,12 +278,15 @@ class Video:
         
         segments = self.get_M3U(quality, process = True)
         
+        # Initialise callback
+        callback_wrapper = callback()
+        
         # Start downloading
         with open(path, 'wb') as output:
             
             for index, url in enumerate(segments):
                 log(' D L ', f'Downloading {index + 1}/{len(segments)}', level = 3, r = 0) # TODO
-                if callback: callback(index + 1, len(segments))
+                callback_wrapper(index + 1, len(segments))
                 
                 for i in range(max_retries):
                     res = self.client._call('GET', url, simple_url = False, throw = False)
@@ -296,6 +299,7 @@ class Video:
                     break
         
         # Stop
+        callback_wrapper(len(segments), len(segments)) # Make sure full progress is registered
         log(' D L ', 'Successfully downloaded video at', path)
         return path
     

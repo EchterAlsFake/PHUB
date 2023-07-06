@@ -5,6 +5,8 @@ PHUB CLI script.
 import phub
 import click
 
+from phub.utils import download_presets as dlp
+
 @click.group()
 def cli() -> None:
     pass
@@ -24,20 +26,23 @@ def ui():
 @click.option('--output',  '-o', help = 'Output video file', default = '.')
 def download(url, quality, output):
     '''
-    Donload videos from Pornhub.
+    Download a specific video.
     '''
     
+    # Initialise client
     client = phub.Client()
     
+    # Fetch the video
     try:
         video = client.get(url)
     
     except Exception as err:
         return click.secho(f'[ERR] Could not fetch video: {err}', fg = 'red')
     
+    # Download video
     try:
-        path = video.download(path = output,
-                              quality = phub.Quality(quality))
+        path = video.download(path = output, quality = phub.Quality(quality),
+                              callback = dlp.bar(desc = 'Downloading ' + video.key))
     
     except Exception as err:
         return click.secho(f'[ERR] Could not download video: {err}', fg = 'red')

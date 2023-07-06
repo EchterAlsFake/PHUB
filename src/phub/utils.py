@@ -221,20 +221,17 @@ class download_presets:
     @staticmethod
     def bar(*args, **kwargs) -> Callable:
         '''
-        Display current progress a a bar.
+        Display current progress as a tqdm bar.
         '''
         
-        bar = tqdm.tqdm = None
+        bar = tqdm.tqdm(*args, **kwargs)
         
         def wrapper(current: int, total: int) -> None:
-            
-            if bar is None:
-                bar = tqdm.tqdm(*args, **kwargs)
             
             bar.total = total
             bar.update(1)
             if current == total: bar.close()
-        
+            
         return wrapper
     
     @staticmethod
