@@ -42,9 +42,10 @@ def download(url, quality, output):
     # Download video
     try:
         path = video.download(path = output, quality = phub.Quality(quality),
-                              callback = dlp.bar(desc = 'Downloading ' + video.key))
+                              callback = dlp.bar, desc = 'Downloading ' + video.key)
     
     except Exception as err:
+        raise err
         return click.secho(f'[ERR] Could not download video: {err}', fg = 'red')
     
     click.secho('Downloaded video at:\n\t' + path, fg = 'green')

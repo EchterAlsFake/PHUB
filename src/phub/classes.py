@@ -248,16 +248,18 @@ class Video:
                  path: str,
                  quality: utils.Quality,
                  callback: Callable = dlp.bar,
-                 max_retries: int = 5) -> str:
+                 max_retries: int = 5,
+                 **callback_arguments) -> str:
         '''
         #### Download the video locally. ####
         -------------------------------------
         
         Arguments:
-        - `path`               -- Directory or file to write to.
-        - `quality`            -- Desired video quality.
-        - `callback` (=`None`) -- Function to call to update download progress.
-        - `max_retries` (=`5`) -- Maximum retries per segment request.
+        - `path`                 -- Directory or file to write to.
+        - `quality`              -- Desired video quality.
+        - `callback`   (=`None`) -- Function to call to update download progress.
+        - `max_retries`   (=`5`) -- Maximum retries per segment request.
+        - `**callback_arguments` --Arguments to be passed to the callback on creation.
         
         NOTE 1 - If `path` is a directory, will create a new file in that directory
                  with the name of the video.
@@ -274,25 +276,25 @@ class Video:
             path += ('' if path.endswith('/') else '/') + utils.pathify(self.title) + '.mp4'
             log('video', f'Changing path to', path, level = 2)
         
-        log(' D L ', 'Starting video download for', self)
+        log('downl', 'Starting video download for', self)
         
         segments = self.get_M3U(quality, process = True)
         
         # Initialise callback
-        callback_wrapper = callback()
+        callback_wrapper = callback(**callback_arguments)
         
         # Start downloading
         with open(path, 'wb') as output:
             
             for index, url in enumerate(segments):
-                log(' D L ', f'Downloading {index + 1}/{len(segments)}', level = 3, r = 0) # TODO
+                log('downl', f'Downloading {index + 1}/{len(segments)}', level = 3, r = 0) # TODO
                 callback_wrapper(index + 1, len(segments))
                 
                 for i in range(max_retries):
                     res = self.client._call('GET', url, simple_url = False, throw = False)
                     
                     if not res.ok:                        
-                        log(' D L ', f'Segment download failed, retrying ({i}/{max_retries})', level = 1)
+                        log('downl', f'Segment download failed, retrying ({i}/{max_retries})', level = 1)
                         continue
                     
                     output.write(res.content)
@@ -300,7 +302,7 @@ class Video:
         
         # Stop
         callback_wrapper(len(segments), len(segments)) # Make sure full progress is registered
-        log(' D L ', 'Successfully downloaded video at', path)
+        log('downl', 'Successfully downloaded video at', path)
         return path
     
     # ======== Properties ======== #

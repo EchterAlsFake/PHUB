@@ -136,7 +136,7 @@ class Client:
         self.logged = False
         if autologin: self.login()
         
-        log('client', 'Initialised new client', repr(self))
+        log('clien', 'Initialised new client', repr(self))
 
     def __repr__(self) -> str:
         '''
@@ -177,7 +177,7 @@ class Client:
         if isinstance(data, dict):
             if data.get('username') and data.get('password'):
                 
-                log('Initialising client from', type(data), level = 7)
+                log('clien', 'Initialising client from', type(data), level = 7)
                 return cls(**data)
             
             raise KeyError('Data must have username and password keys.')
@@ -210,7 +210,7 @@ class Client:
         url = consts.ROOT + utils.slash(func, '**') \
               if simple_url else func
         
-        log('client', f'Sending request at {utils.shortify(url, 25)}', level = 6)
+        log('clien', f'Sending request at {utils.shortify(url, 25)}', level = 6)
         
         response = self.session.request(
             method = method,
@@ -219,7 +219,7 @@ class Client:
             data = data
         )
         
-        log('client', 'Request passed with status', response.status_code, level = 6)
+        log('clien', 'Request passed with status', response.status_code, level = 6)
         
         if throw and not response.ok:
             raise ConnectionError(f'Request `{func}` failed:' + \
@@ -244,20 +244,20 @@ class Client:
         # Extract token
         home = self._call('GET', '/').text
         token = consts.regexes.extract_token(home)
-        log('client', 'Extracted token', token, level = 5)
+        log('clien', 'Extracted token', token, level = 5)
         
         # Send credentials
-        log('client', 'Sending payload', level = 5)
+        log('clien', 'Sending payload', level = 5)
         payload = consts.LOGIN_PAYLOAD | self.creds | {'token': token}
         
         response = self._call('POST', 'front/authenticate', data = payload)
         success = int(response.json()['success'])
         
         if success:
-            log('client', 'Login successful!', level = 6)
+            log('clien', 'Login successful!', level = 6)
         
         else:
-            log('client', 'Login failed', level = 2)
+            log('clien', 'Login failed', level = 2)
             
             # Throw error
             if throw:
@@ -302,7 +302,7 @@ class Client:
         Returns a `User` object.
         '''
         
-        log('client', 'Fetching user', name, level = 6)
+        log('clien', 'Fetching user', name, level = 6)
         
         return classes.User.get(self, url, name)
     
@@ -318,7 +318,7 @@ class Client:
         Returns a `VideoIterator` object.
         '''
         
-        log('client', 'Opening new search query:', query, level = 6)
+        log('clien', 'Opening new search query:', query, level = 6)
         url = consts.ROOT + 'video/search?search=' + query
         return classes.VideoIterator(self, url)
 
