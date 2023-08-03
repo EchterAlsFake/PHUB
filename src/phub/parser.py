@@ -32,7 +32,7 @@ def resolve(html: str) -> dict:
     script = script.replace(flash.replace('var', ''), 'data')
     
     # Execute the script
-    exec(script)
+    exec(script) # In case you ask, what we are doing here is converting the obfuscated Pornhub JS code into python code so that we can execute it and directly get the video M3U file.
     log('parse', 'Execution successful, script resolved', level = 5)
     
     return data
