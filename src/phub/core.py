@@ -52,37 +52,37 @@ class Account:
         return f'<phub.core.Account name={self.name}>'
     
     @cached_property
-    def recommended(self) -> classes.VideoIterator:
+    def recommended(self) -> classes.Query:
         '''
         #### Get the recommended videos for the user. ####
         --------------------------------------------------
-        Returns a `VideoIterator` object.
+        Returns a `Query` object.
         '''
         
-        return classes.VideoIterator(self.client, consts.ROOT + 'recommended')
+        return classes.Query(self.client, consts.ROOT + 'recommended')
         
     @cached_property
-    def watched(self) -> classes.VideoIterator:
+    def watched(self) -> classes.Query:
         '''
         #### Get the history of the user. ####
         --------------------------------------
-        Returns a `VideoIterator` object.
+        Returns a `Query` object.
         '''
         
         url = consts.ROOT + f'users/{self.name}/videos/recent'
-        return classes.VideoIterator(self.client, url,
+        return classes.Query(self.client, url,
                                      corrector = utils.remove_video_ads)
 
     @cached_property
-    def liked(self) -> classes.VideoIterator:
+    def liked(self) -> classes.Query:
         '''
         #### Get the favorite videos of the account. ####
         -------------------------------------------------
-        Returns a `VideoIterator` object.
+        Returns a `Query` object.
         '''
         
         url = consts.ROOT + f'users/{self.name}/videos/favorites'
-        return classes.VideoIterator(self.client, url,
+        return classes.Query(self.client, url,
                                      corrector = utils.remove_video_ads)
 
     @cached_property
@@ -306,7 +306,7 @@ class Client:
         
         return classes.User.get(self, url, name)
     
-    def search(self, query: str) -> classes.VideoIterator:
+    def search(self, query: str) -> classes.Query:
         '''
         #### Search for videos on PornHub servers. ####
         -----------------------------------------------
@@ -315,11 +315,11 @@ class Client:
         - `query` -- Sentence to send to the servers.
         
         -----------------------------------------------
-        Returns a `VideoIterator` object.
+        Returns a `Query` object.
         '''
         
         log('clien', 'Opening new search query:', query, level = 6)
         url = consts.ROOT + 'video/search?search=' + query
-        return classes.VideoIterator(self, url)
+        return classes.Query(self, url)
 
 # EOF

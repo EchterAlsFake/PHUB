@@ -103,11 +103,11 @@ class User:
             raise UserNotFoundError(f'User `{name}` not found.')
     
     @property
-    def videos(self) -> VideoIterator:
+    def videos(self) -> Query:
         '''
         #### Get the list of videos published by this user. ####
         --------------------------------------------------------
-        Returns a `VideoIterator` object.
+        Returns a `Query` object.
         '''
         
         url = consts.regexes.sub_root('', self.path)
@@ -115,7 +115,7 @@ class User:
         
         print(url)
         
-        return VideoIterator(
+        return Query(
             client = self.client,
             url = url,
             corrector = utils.remove_video_ads
@@ -397,14 +397,14 @@ class Video:
         
         return User.from_video(self)
 
-class VideoIterator:
+class Query:
     '''
     Represent a generator with list-like properties that
     contains `Video` objects.
     
     Example usage:
     ```python
-    record = VideoIterator(...)
+    record = Query(...)
     
     first = record[0] # list-like index searching
     count = len(record) # Get length of the record
@@ -457,7 +457,7 @@ class VideoIterator:
         
         -----------------------------------------------
         Returns an `ìnt` containing the amount of videos
-        in the `VideoIterator` object.
+        in the `Query` object.
         '''
         
         # Load a page to get the counter

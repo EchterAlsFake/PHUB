@@ -1,33 +1,52 @@
-An attempt at documenting PHUB
-==============================
+PHUB documentation
+==================
 
-.. image:: https://github.com/Egsagon/PHUB/blob/master/assets/banner-stripped.jpg?raw=true
+..
+    Note - This documentation format is
+    mostly stolen from bain3/pronotepy
+    because i don't know how to write RST.
 
+.. image:: images/banner.jpg
+    :align: center
 
+Introduction
+^^^^^^^^^^^^
 
-**PHUB** is python API for PornHub (refered as PH).
-It is able of many interactions with the website,
-like searching for videos or downloading them.
+PHUB is an API wrapper for Pornhub (PH).
+It is able to communicate with most used PH
+features such as video searching, downloading,
+account connection, etc.
 
-.. Disclaimer::
+.. note:: **Early dev** + i don't plan to
+    maintain this often so don't hesitate
+    to submit issues or requests through the
+    project's `github page`_.
 
-    I don't really have the time to maintain this
-    project. If you want to help, don't hesitate
-    to submit an issue or start a discussion on 
-    the project `github page<https://github.com/Egsagon/PHUB>`__.
+.. _github page: https://github.com/Egsagon/PHUB
 
-Contents table
---------------
+Dependencies
+^^^^^^^^^^^^
+
+* ``requests``
+* ``click``
+* ``tqdm``
+
+.. note:: Disclaimer: This project is probably
+    against Pornhub TOS. Use at your own risks.
+
+Guides
+------
 
 .. toctree::
 
-    Setup
-    CLI Usage
-    Get started
+    quickstart
+    cli
+    searching
+    accounts
 
-Why?
-----
+API docs
+--------
 
-Originally, you could download PH videos using
-``ytdl`` locally, but (as of now) it does not
-work anymore. 
+.. toctree::
+
+    api/index
