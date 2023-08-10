@@ -54,7 +54,7 @@ for video in record.range(0, 10):
 ```
 
 ## Documentation
-See the [wiki](https://github.com/Egsagon/PHUB/wiki).
+See [here](https://phub.readthedocs.io).
 
 ## Why?
 This project was made as an enhancement for [pfetch](https://github.com/Egsagon/pornhub-fetch), which aimed at downloading videos from PornHub.
