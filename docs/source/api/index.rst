@@ -6,3 +6,5 @@ This is the main API documentation.
 .. toctree::
 
     classes
+    data
+    exceptions
