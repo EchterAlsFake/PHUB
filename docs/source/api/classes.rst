@@ -6,42 +6,42 @@ API objects
 This is the main documentation
 on all PHUB objects.
 
-.. autoclass:: Client
+.. autoclass:: core.Client
     :members:
     :undoc-members:
     :show-inheritance:
     :private-members:
     :special-members:
 
-.. autoclass:: Account
+.. autoclass:: core.Account
     :members:
     :undoc-members:
     :show-inheritance:
     :private-members:
     :special-members:
 
-.. autoclass:: User
+.. autoclass:: classes.User
     :members:
     :undoc-members:
     :show-inheritance:
     :private-members:
     :special-members:
 
-.. autoclass:: Video
+.. autoclass:: classes.Video
     :members:
     :undoc-members:
     :show-inheritance:
     :private-members:
     :special-members:
 
-.. autoclass:: Query
+.. autoclass:: classes.Query
     :members:
     :undoc-members:
     :show-inheritance:
     :private-members:
     :special-members:
 
-.. autoclass:: Feed
+.. autoclass:: classes.Feed
     :members:
     :undoc-members:
     :show-inheritance:
