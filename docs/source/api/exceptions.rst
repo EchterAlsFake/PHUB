@@ -6,3 +6,8 @@ be raised by PHUB in case of
 errors.
 
 .. autoexception:: UserNotFoundError
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :private-members:
+    :special-members:
