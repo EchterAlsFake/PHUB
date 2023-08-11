@@ -198,6 +198,12 @@ def hard_strip(text: str, sep: str = ' ') -> str:
 class download_presets:
     '''
     Callback presets for displaying download progress.
+    
+    Presets, or any function that contain a '__wrapper__' wrapper
+    will be initialised by `Video.download` when the download starts.
+    This is mainly because some functions need initialisation, like
+    tqdm functions, but in some cases we don't have a global context,
+    so that's why there is 2 layers of wrappers.
     '''
     
     @staticmethod
@@ -206,17 +212,21 @@ class download_presets:
         Print current process on one line.
         '''
         
-        tem = 'Downloading: {percent}% [{cur}/{total}]'
-        if color:
-            tem = 'Downloading: \033[92m{percent}%\033[0m [\033[93m{cur}\033[0m/\033[93m{total}\033[0m]'
+        def __wrapper__():
+            
+            tem = 'Downloading: {percent}% [{cur}/{total}]'
+            if color:
+                tem = 'Downloading: \033[92m{percent}%\033[0m [\033[93m{cur}\033[0m/\033[93m{total}\033[0m]'
+            
+            def wrapper(cur: int, total: int) -> None:
+                percent = round( (cur / total) * 100 )
+            
+                print(tem.format(percent = percent, cur = cur, total = total),
+                    end = '\n' if percent >= 100 else '')
+            
+            return wrapper
         
-        def wrapper(cur: int, total: int) -> None:
-            percent = round( (cur / total) * 100 )
-        
-            print(tem.format(percent = percent, cur = cur, total = total),
-                  end = '\n' if percent >= 100 else '')
-        
-        return wrapper
+        return __wrapper__
     
     @staticmethod
     def bar(**kwargs) -> Callable:
@@ -224,37 +234,34 @@ class download_presets:
         Display current progress as a tqdm bar.
         '''
         
-        bar = tqdm.tqdm(**kwargs)
+        def __wrapper__():
         
-        def wrapper(current: int, total: int) -> None:
-            
-            bar.total = total
-            bar.update(1)
-            if current == total: bar.close()
-            
-        return wrapper
-    
+            bar = tqdm.tqdm(**kwargs)
+        
+            def wrapper(current: int, total: int) -> None:
+                
+                bar.total = total
+                bar.update(1)
+                if current == total: bar.close()
+                
+            return wrapper
+        
+        return __wrapper__
+        
     @staticmethod
     def std(file = sys.stdout) -> Callable:
         '''
         Output progress as percentage to a file.
         '''
         
-        def wrapper(cur: int, total: int) -> None:
-            print(round( (cur / total) * 100 ), file = file)
+        def __wrapper__():
             
-        return wrapper
-    
-    @staticmethod
-    def percent(callback: Callable) -> Callable:
-        '''
-        Link a function to the percentage output of the progress.
-        '''
+            def wrapper(cur: int, total: int) -> None:
+                print(round( (cur / total) * 100 ), file = file)
+            
+            return wrapper
         
-        def wrapper(cur: int, total: int) -> None:
-            callback(round( (cur / total) * 100 ))
-        
-        return wrapper
+        return __wrapper__
 
 
 class Quality:

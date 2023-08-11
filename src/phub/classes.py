@@ -201,24 +201,26 @@ class Video:
         return self.data
     
     # ========= Download ========= #
-
+    
     def get_M3U(self,
-                quality: utils.Quality,
+                quality: utils.Quality | str | int,
                 process: bool = True) -> str | list[str]:
         '''
-        #### Get the raw M3U url for a certain quality. ####
-        ----------------------------------------------------
+        #### Get the M3U file for a certain quality. ####
+        -------------------------------------------------
         
         Arguments:
         - `quality`           -- The desired quality as an object.
         - `process` (=`True`) -- Whether to parse the file.
         
-        ----------------------------------------------------
+        -------------------------------------------------
         Returns a list of segment URLs if `process` is `True`,
-        else the URL of the M3U file.
+        otherwise the raw M3U file (with full pathes).
         '''
         
-        assert isinstance(quality, utils.Quality), 'Quality must be Quality object'
+        # Try to create a quality object (if the param is already an object
+        # it gets immediatly returned)
+        quality = utils.Quality(quality)
         
         quals = {int(el['quality']): el['videoUrl']
                  for el in self._lazy()['mediaDefinitions']
@@ -234,35 +236,38 @@ class Video:
         url = utils.extract_urls(res.text)[0]
         log('video', 'Extracted', len(url), level = 4)
         
-        if not process: return url_base + url
+        # Fetch the master file
+        raw = self.client._call('GET', url_base + url, simple_url = False).text
         
-        # Fetch and parse master file
-        raw = self.client._call('GET', url_base + url, simple_url = False)
-        segments = [url_base + segment for segment in utils.extract_urls(raw.text)]
+        if not process:
+            # Just inject the URLs and return the file
+            choice = (url_base, '')
+            return '\n'.join(choice[line.startswith('#')] + line
+                             for line in raw.split('\n') if line)
+        
+        # Parse all URLs
+        segments = [url_base + segment for segment in utils.extract_urls(raw)]
         log('video', f'Parsed {len(segments)} video segments', level = 3)
         return segments
 
     def download(self,
                  path: str,
-                 quality: utils.Quality,
-                 callback: Callable = dlp.bar,
-                 max_retries: int = 5,
-                 **callback_arguments) -> str:
+                 quality: utils.Quality | str | int,
+                 callback: Callable = dlp.bar(),
+                 max_retries: int = 5) -> str:
         '''
         #### Download the video locally. ####
         -------------------------------------
         
         Arguments:
-        - `path`                 -- Directory or file to write to.
-        - `quality`              -- Desired video quality.
-        - `callback`   (=`None`) -- Function to call to update download progress.
-        - `max_retries`   (=`5`) -- Maximum retries per segment request.
-        - `**callback_arguments` --Arguments to be passed to the callback on creation.
+        - `path`                    -- Directory or file to write to.
+        - `quality`                 -- Desired video quality.
+        - `callback` (=`dlp.bar()`) -- Function to call to update download progress.
+        - `max_retries`      (=`5`) -- Maximum retries per segment request.
         
         NOTE 1 - If `path` is a directory, will create a new file in that directory
                  with the name of the video.
-        NOTE 2 - Slow download. To use threaded downloads, call `get_M3U` instead.
-        NOTE 3 - Glitchy logs.
+        
         -------------------------------------
         Returns the path of the file.
         '''
@@ -278,15 +283,16 @@ class Video:
         
         segments = self.get_M3U(quality, process = True)
         
-        # Initialise callback
-        callback_wrapper = callback(**callback_arguments)
+        # Unwrap callback if nescessarry
+        if callback.__name__ == '__wrapper__':
+            callback = callback()
         
         # Start downloading
         with open(path, 'wb') as output:
             
             for index, url in enumerate(segments):
                 log('downl', f'Downloading {index + 1}/{len(segments)}', level = 3, r = 0) # TODO
-                callback_wrapper(index + 1, len(segments))
+                callback(index + 1, len(segments))
                 
                 for i in range(max_retries):
                     res = self.client._call('GET', url, simple_url = False, throw = False)
@@ -299,7 +305,7 @@ class Video:
                     break
         
         # Stop
-        callback_wrapper(len(segments), len(segments)) # Make sure full progress is registered
+        callback(len(segments), len(segments)) # Make sure full progress is registered
         log('downl', 'Successfully downloaded video at', path)
         return path
     
