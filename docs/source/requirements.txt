@@ -1,1 +1,1 @@
-insegel
+sphinx_pdj_theme
