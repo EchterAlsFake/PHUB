@@ -35,7 +35,7 @@ class regexes:
     extract_video_date   = re.compile( r'\"uploadDate\": \"(.*?)\"'                                                  ).findall   # Extract video publish date
     
     # Searching regexes
-    video_search_counter = re.compile( r'showingCounter\">.*? (\d+) +</',                                  re.DOTALL ).findall   # Extract video counter from research responses
+    video_search_counter = re.compile( r'showingCounter.*?\">.*?(\d+)\s+</',                               re.DOTALL ).findall   # Extract video counter from search responses
     video_likes          = re.compile( r'span class=\"votes(Up|Down)\" data-rating.*?>(.*?)<'                        ).findall   # Extract likes from a video page
     video_interactions   = re.compile( r'interactionStatistic\": \[(.*?)\]',                               re.DOTALL ).findall   # Find interaction stats from a video page
     video_flashvar       = re.compile( r'var (flashvars_\d*) = ({.*});\n'                                            ).findall   # Video obfuscation script part
@@ -64,6 +64,17 @@ class FeedType:
     SITE_UPLOAD = 'stream_sites_subscriptions'
     COMMENTED   = 'stream_grouped_comments_videos'
     # TODO more stream types
+
+
+# Exceptions
+
+class CounterNotFound(Exception):
+    '''
+    The video counter wasn't found in the query,
+    or is badly parsed.
+    '''
+    
+    pass
 
 
 # EOF

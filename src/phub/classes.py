@@ -102,7 +102,7 @@ class User:
         else:
             raise UserNotFoundError(f'User `{name}` not found.')
     
-    @property
+    @cached_property
     def videos(self) -> Query:
         '''
         #### Get the list of videos published by this user. ####
@@ -112,8 +112,6 @@ class User:
         
         url = consts.regexes.sub_root('', self.path)
         if '/model' in self.path: url += '/videos'
-        
-        print(url)
         
         return Query(
             client = self.client,
@@ -429,7 +427,7 @@ class Query:
         - `corrector` (=`None`) -- Function to call to correct parsing in edge cases.
         '''
         
-        log('viter', 'Initialising new Video Iterator', level = 6)
+        log('query', 'Initialising new Query object', level = 6)
         
         self.client = client
         self.url = (url + '?&'['?' in url] + 'page=').replace(consts.ROOT, '')
@@ -442,32 +440,44 @@ class Query:
         self.corrector = corrector
     
     def __len__(self) -> int:
-        return self.len
-        
-    def __getitem__(self, index: int) -> Video:
-        return self.get(index)    
-    
-    @property
-    def len(self) -> int:
         '''
         #### Get the amount of distributed videos. ####
-        Can also be called using the `len()` built-in.
-        
-        NOTE - Implemented only for `client.search()`.
         
         -----------------------------------------------
         Returns an `ìnt` containing the amount of videos
         in the `Query` object.
         '''
         
-        # Load a page to get the counter
-        if self._length is None: self._get_page(0)
+        if self._length: return self._length
+        
+        # Load 1st page to get the counter
+        if self.page is None:
+            self._get_page(0)
+        
+        # Try to find the counter
+        counter = consts.regexes.video_search_counter(self.page)
+        log('query', 'Collected counters:', counter, level = 4)
+        
+        if len(counter) != 1: raise consts.CounterNotFound()
+        self._length = int(counter[0]) 
         return self._length
+    
+    def __getitem__(self, index: int | slice) -> Video | Generator[Video, None, None]:
+                
+        if isinstance(index, int):
+            return self.get(index)
+        
+        def wrapper(): # We need to wrap this, otherwise the whole __getitem__ will be
+                       # Interpreted as a generator.
+            
+            for i in index.indices(self.length):
+                yield self.get(i)
+        
+        return wrapper()
     
     def get(self, index: int) -> Video:
         '''
         #### Get a specific video using an index. ####
-        Can also be addressed with __getitem__.
         
         ----------------------------------------------
         Arguments:
@@ -477,7 +487,7 @@ class Query:
         Returns a `Video` object.
         '''
         
-        log('viter', 'Getting video at index', index, level = 5)
+        log('query', 'Getting video at index', index, level = 5)
         
         # Handle relative indexes
         if index < 0: index += len(self)
@@ -493,7 +503,7 @@ class Query:
         url = consts.ROOT + f'view_video.php?viewkey={key}'
         
         video = Video(client = self.client, url = url, preload = False)
-        log('viter', 'Generated video object')
+        log('query', 'Generated video object')
         video.data = {'video_title': title} # Inject title
         return video
 
@@ -509,20 +519,8 @@ class Query:
         # If cached, avoid scrapping again
         if self.page_index == index: return
         
-        log('viter', 'Fetching page at index', index, level = 4)
+        log('query', 'Fetching page at index', index, level = 4)
         raw = self.client._call('GET', self.url + str(index + 1)).text
-        
-        # Define counter
-        if self._length is None:
-            counter = consts.regexes.video_search_counter(raw)
-            
-            if not counter:
-                log('viter', 'Counter collection failed', level = 2)
-                self._length = 0 # did not found counter TODO
-            
-            else:
-                self._length = int(counter[0])
-                log('viter', 'Collected counter:', self._length, level = 4)
         
         # Parse videos
         self.page = raw
@@ -531,10 +529,10 @@ class Query:
         
         # Correct videos
         if self.corrector is not None:
-            log('viter', 'Correcting video regex parsing', level = 6)
+            log('query', 'Correcting video regex parsing', level = 6)
             self.videos = self.corrector(self.videos)
             
-        log('viter', f'Collected {len(self.videos)} videos', level = 6)
+        log('query', f'Collected {len(self.videos)} videos', level = 6)
 
     def __iter__(self) -> Self:
         '''
@@ -553,27 +551,11 @@ class Query:
             result = self.get(self.index)
         
         except IndexError:
-            log('viter', 'Reached end of generation')
+            log('query', 'Reached end of generation')
             raise StopIteration
         
         self.index += 1
         return result
-    
-    def range(self, start: int, stop: int, step: int = 1) -> Generator[Video , None, None]:
-        '''
-        #### Emit a generator containing a slice of videos. ####
-        --------------------------------------------------------
-        Arguments:
-        - `start`       -- Start index.
-        - `stop`        -- Stop index.
-        - `step` (=`1`) -- Step.
-        
-        --------------------------------------------------------
-        Yields `Video` objects.
-        '''
-        
-        for index in range(start, stop, step):
-            yield self[index]
 
 @dataclass
 class FeedItem:
