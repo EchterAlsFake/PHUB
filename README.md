@@ -46,10 +46,10 @@ video.download('.', quality = phub.Quality.BEST)
 
 Example searching for videos:
 ```python
-record = client.search('enter query here')
+query = client.search('enter query here')
 
-# Display all videos (careful if there is a lot of results)
-for video in record.range(0, 10):
+# Display videos from 0 to 10
+for video in query[:10]:
   print(video.title)
 ```
 
