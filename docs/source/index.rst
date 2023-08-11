@@ -50,3 +50,5 @@ API docs
 .. toctree::
 
     api/index
+
+.. autoclass:: phub.Client
