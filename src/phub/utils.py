@@ -21,19 +21,20 @@ DEBUG_FILE = sys.stdout
 
 def slash(string: str, form: str) -> str:
     '''
-    #### Properly add or remove trailling slashes from an URL. ####
-    ---------------------------------------------------------------
+    Properly add or remove trailling slashes from an URL.
     
-    Arguments:
-    - `string` -- The string to transform.
-    - `form`   -- Slash template, e.g.:
-        - `**` -> No slash
-        - `//` -> Both slashes
-        - `/*` -> Start slash and not end slash
-        - `*/` -> End slash and not start slash
+    Slash templates examples:
+    `**` -> No slash
+    `//` -> Both slashes
+    `/*` -> Start slash and not end slash
+    `*/` -> End slash and not start slash
     
-    ---------------------------------------------------------------
-    Returns the formated string.
+    Args:
+        string: The string to transform.
+        form: Slash template.
+        
+    Returns:
+        str: The formated URL.
     '''
     
     assert isinstance(string, str)
@@ -43,16 +44,14 @@ def slash(string: str, form: str) -> str:
     start, end = form.replace('*', ' ')
     return (start + string.strip('/') + end).strip()
 
-def shortify(string: str, max: int = 100) -> str:
+def shortify(string: str, max: int = 180) -> str:
     '''
-    #### Shorten a string for display purposes. ####
-    ------------------------------------------------
+    Shorten a string for display purposes.
     
-    Arguments:
-    - `string`       -- The string to shorten.
-    - `max` (=`100`) -- Maximum string length.
+    Args:
+        string (str): The string to shorten.
+        max (int): Maximum string length.
     
-    ------------------------------------------------
     Returns the shorten string.
     '''
     
@@ -67,15 +66,14 @@ def shortify(string: str, max: int = 100) -> str:
 
 def basic(string: str, inc: bool) -> str:
     '''
-    #### Set or remove root from an URL. ####
-    -----------------------------------------
+    Set or remove root from an URL.
     
-    Arguments:
-    - `string` -- The URL.
-    - `inc`    -- Wether to add or remove the root.
+    Args:
+        string (str): The URL.
+        inc (bool): Wether to add or remove the root.
     
-    -----------------------------------------
-    Returns a string containing the URL.
+    Returns:
+        str: The formated URL. 
     '''
     
     assert isinstance(string, str)
@@ -86,16 +84,15 @@ def basic(string: str, inc: bool) -> str:
 
 def closest(iter: list[int], value: int) -> int:
     '''
-    #### Pick the closest value in a list. ####
+    Pick the closest value in a list.
     From www.entechin.com/find-nearest-value-list-python/
     
-    -------------------------------------------
-    Arguments:
-    - `iter`  -- List of possible values.
-    - `value` -- Value to pick closest to.
+    Args:
+        iter (list[int]): List of possible values.
+        value (int): Value to pick closest to.
     
-    -------------------------------------------
-    Returns one of the value of `iter`.
+    Returns:
+        int: _description_
     '''
     
     difference = lambda input_list: abs(input_list - value)
@@ -105,14 +102,13 @@ def closest(iter: list[int], value: int) -> int:
 
 def extract_urls(string: str) -> list[str]:
     '''
-    #### Extract URLs from a M3U file. ####
-    ---------------------------------------
+    Extract URLs from a M3U file.
     
-    Arguments:
-    - `string` -- The raw file content.
+    Args:
+        string (str): The raw file content.
     
-    ---------------------------------------
-    Returns a list of URLs.
+    Returns:
+        list[str]: _description_
     '''
     
     return [line for line in string.split('\n')
@@ -120,41 +116,39 @@ def extract_urls(string: str) -> list[str]:
 
 def pathify(string: str) -> str:
     '''
-    #### Set a string to be path safe. ####
-    ---------------------------------------
+    Set a string to be path safe.
     
-    Arguments:
-    - `string` -- The string.
+    Args:
+        string: The string.
     
-    ---------------------------------------
-    Returns a path-safe string.
+    Returns:
+        str: a path safe string.
     '''
     
     return ''.join(c for c in string if c in ascii_letters + '- _()')
 
 def remove_video_ads(li: list) -> list:
     '''
-    #### Remove leading video ads from playlists. ####
-    --------------------------------------------------
+    Remove leading video ads from playlists.
     
-    Arguments:
-    - `li` -- A list of video URLs.
+    Args:
+        li (list): A list of video URLs.
     
-    --------------------------------------------------
-    Returns a sanitized list of video URLs.
+    Returns:
+        list: A sanitized list of video URLs.
     '''
     
     return li[4:]
 
 def log(cls: str, *text, level: int = 1, r: bool = False) -> None:
     '''
-    #### Homemade logging. ####
-    ---------------------------
+    Homemade logging.
     
-    Arguments:
-    - `*`            -- Log content.
-    - `level` (=`1`) -- Log level.
-    - `r` (=`False`) -- Wether log is inline.
+    Args:
+        cls (str): Calling class
+        text: Log content.
+        level (int): Log level.
+        r (bool): Wether log is inline.
     '''
     
     global DEBUG_RESET
@@ -180,15 +174,14 @@ def log(cls: str, *text, level: int = 1, r: bool = False) -> None:
 
 def hard_strip(text: str, sep: str = ' ') -> str:
     '''
-    #### Remove all useless spaces from a text. ####
-    ------------------------------------------------
+    Remove all useless spaces from a text.
     
-    Arguments:
-    - `text`       -- The text to strip.
-    - `sep` (=` `) -- Separator between each words.
+    Args:
+        text (str): The text to strip.
+        sep (str): Separator between each words.
     
-    ------------------------------------------------
-    Returns a stripped version of the text.
+    Returns:
+        str: A stripped version of text.
     '''
     
     if not text: return
@@ -305,11 +298,10 @@ class Quality:
     
     def __init__(self, value: str | int | Self) -> None:
         '''
-        #### Generate a new Quality object. ####
-        ----------------------------------------
+        Generate a new Quality object.
         
-        Arguments:
-        - `value` -- The value to create quality from.
+        Args:
+            value (str | int | Quality): The value to create quality from.
         '''
         
         self.value = value
@@ -331,14 +323,13 @@ class Quality:
     
     def select(self, quals: dict) -> str:
         '''
-        #### Select among a list of qualities. ####
-        -------------------------------------------
+        Select among a list of qualities.
         
-        Arguments:
-        - `quals` -- A dict containing qualities and URLs.
+        Args:
+            quals (dict): A dict containing qualities and URLs.
         
-        -------------------------------------------
-        Returns the correspondant M3U URL.
+        Returns:
+            str: The chosen quality URL.
         '''
         
         keys = list(quals.keys())

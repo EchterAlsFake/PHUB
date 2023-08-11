@@ -37,14 +37,13 @@ class User:
     @classmethod
     def from_video(cls, video: Video) -> Self:
         '''
-        #### Generate a User object from a Video object. ####
-        -----------------------------------------------------
+        Generate a User object from a Video object.
         
-        Arguments:
-        - `video` -- Video the user has been grabbed from.
+        Args:
+            video (Video): Video the user has been grabbed from.
         
-        -----------------------------------------------------
-        Returns a `User` object.
+        Returns:
+            User: The video author.
         '''
         
         log('users', 'Searching author of', video, level = 6)
@@ -68,16 +67,15 @@ class User:
             url: str = None,
             name: str = None) -> Self:
         '''
-        #### Fetch a user knowing its channel name. ####
-        ------------------------------------------------
+        Fetch a user knowing its channel name.
         
-        Arguments:
-        - `client`         -- Client that handles requests.
-        - `url`  (=`None`) -- URL of the user info.
-        - `name` (=`None`) -- Name of the user (Will guess user type) (experimental).
+        Args:
+            client (Client): Client that handles requests.
+            url (str): The URL of the user's channel.
+            name (str): The name of the user (experimental).
         
-        ------------------------------------------------
-        Returns a `User` object.
+        Returns:
+            User: The fetched user.
         '''
         
         log('users', 'Initialising new user:', name or url, level = 6)
@@ -105,9 +103,9 @@ class User:
     @cached_property
     def videos(self) -> Query:
         '''
-        #### Get the list of videos published by this user. ####
-        --------------------------------------------------------
-        Returns a `Query` object.
+        Get the list of videos published by this user.
+        Returns:
+            Query: The received query.
         '''
         
         url = consts.regexes.sub_root('', self.path)
@@ -150,13 +148,12 @@ class Video:
                  url: str,
                  preload: bool = False) -> None:
         '''
-        #### Generate a new Video object. ####
-        --------------------------------------
+        Generate a new Video object.
         
-        Arguments:
-        - `client`             -- Client to inherit from.
-        - `url`                -- The video URL.
-        - `preload` (=`False`) -- Whether to send the video page request.
+        Args:
+            client (Client): The session client.
+            url (str): The video URL.
+            preload (bool): Wether to load the video page.
         '''
         
         assert consts.regexes.is_valid_video_url(url), 'Invalid URL'
@@ -181,7 +178,7 @@ class Video:
     
     def refresh(self) -> None:
         '''
-        #### Load of refresh video page and data. ####
+        Load of refresh video page and data.
         '''
         
         log('video', 'Refreshing video', self, level = 4)
@@ -192,9 +189,10 @@ class Video:
     
     def _lazy(self) -> dict:
         '''
-        #### Refresh the video data or get it from the cache. ####
-        ----------------------------------------------------------
-        Returns a `dict` object containing the parsed video data.
+        Refresh the video data or get it from the cache.
+        
+        Returns:
+            dict: Parsed video data, fresh from Pornhub.
         '''
         
         if not self.data: self.refresh()
@@ -206,16 +204,15 @@ class Video:
                 quality: utils.Quality | str | int,
                 process: bool = True) -> str | list[str]:
         '''
-        #### Get the M3U file for a certain quality. ####
-        -------------------------------------------------
+        Get the M3U file for a certain quality.
         
-        Arguments:
-        - `quality`           -- The desired quality as an object.
-        - `process` (=`True`) -- Whether to parse the file.
+        Args:
+            quality (utils.Quality): Desired video quality.
+            process (bool): Wether to parse the file.
         
-        -------------------------------------------------
-        Returns a list of segment URLs if `process` is `True`,
-        otherwise the raw M3U file (with full pathes).
+        Returns:
+            str: The raw M3U file if process was False.
+            list[str]: The list of video URLs.
         '''
         
         # Try to create a quality object (if the param is already an object
@@ -256,20 +253,19 @@ class Video:
                  callback: Callable = dlp.bar(),
                  max_retries: int = 5) -> str:
         '''
-        #### Download the video locally. ####
-        -------------------------------------
+        Download the video locally.
         
-        Arguments:
-        - `path`                    -- Directory or file to write to.
-        - `quality`                 -- Desired video quality.
-        - `callback` (=`dlp.bar()`) -- Function to call to update download progress.
-        - `max_retries`      (=`5`) -- Maximum retries per segment request.
+        Note - If path is a directory, it will create a new
+        file in that directory with the video title.
         
-        NOTE 1 - If `path` is a directory, will create a new file in that directory
-                 with the name of the video.
+        Args:
+            path (str): Directory or file to write to.
+            quality (utils.Quality): Desired video quality.
+            callback (Callable): Function to call for progrss updates.
+            max_retries (int): Maximum retries per segment until we skip it.
         
-        -------------------------------------
-        Returns the path of the file.
+        Returns:
+            str: The path of the created file.
         '''
         
         log('video', f'Downloading {self} at', path, level = 5)
@@ -424,13 +420,12 @@ class Query:
     
     def __init__(self, client: Client, url: str, corrector: Callable = None) -> None:
         '''
-        #### Generate a new video iterator object. ####
-        -----------------------------------------------
+        Generate a new video iterator object.
         
-        Arguments:
-        - `client`              -- The client to base from.
-        - `url`                 -- The URL of the page that contains the playlist.
-        - `corrector` (=`None`) -- Function to call to correct parsing in edge cases.
+        Args:
+            client (Client): The session client.
+            url (str): The query page URL.
+            corrector (Callable): Parsing corrector.
         '''
         
         log('query', 'Initialising new Query object', level = 6)
@@ -447,11 +442,10 @@ class Query:
     
     def __len__(self) -> int:
         '''
-        #### Get the amount of distributed videos. ####
+        Get the amount of videos.
         
-        -----------------------------------------------
-        Returns an `ìnt` containing the amount of videos
-        in the `Query` object.
+        Returns:
+            int: The amount of videos in the `Query` object.
         '''
         
         if self._length: return self._length
@@ -469,7 +463,17 @@ class Query:
         return self._length
     
     def __getitem__(self, index: int | slice) -> Video | Generator[Video, None, None]:
-                
+        '''
+        Get a specific video or a slice of them.
+        
+        Args:
+            index (int | slice): The index or slice.
+        
+        Returns:
+            Video: A specific video
+            Generator: A generator containing videos.
+        '''   
+
         if isinstance(index, int):
             return self.get(index)
         
@@ -483,14 +487,13 @@ class Query:
     
     def get(self, index: int) -> Video:
         '''
-        #### Get a specific video using an index. ####
+        Get a specific video using an index.
+
+        Args:
+            index (int): The index of the video.
         
-        ----------------------------------------------
-        Arguments:
-        - `index` -- The index of the video.
-        
-        ----------------------------------------------
-        Returns a `Video` object.
+        Returns:
+            Video: The specific video.
         '''
         
         log('query', 'Getting video at index', index, level = 5)
@@ -515,11 +518,10 @@ class Query:
 
     def _get_page(self, index: int) -> None:
         '''
-        #### Get a specific page by index. ####
-        ---------------------------------------
+        Load a page to the temporary query cache.
         
-        Arguments:
-        - `index` -- The index of the page.
+        Args:
+            index: The index of the page.
         '''
         
         # If cached, avoid scrapping again
@@ -575,11 +577,10 @@ class Feed:
     
     def __init__(self, client: Client) -> None:
         '''
-        #### Generate a new feed object. ####
-        -------------------------------------
+        Generate a new feed object.
         
-        Arguments:
-        - `client` -- Client object to use.
+        Args:
+            client: The session client.
         '''
 
         self.client = client
@@ -587,14 +588,13 @@ class Feed:
     
     def _get_page(self, page: int) -> list[FeedItem]:
         '''
-        #### Fetch a specific feed page. ####
-        -------------------------------------
+        Fetch a specific feed page.
         
-        Arguments:
-        - `page` -- Page index.
+        Args:
+            page: The page index.
         
-        -------------------------------------
-        Returns a list of 14 `FeedItem` elements.
+        Returns:
+            list: A list of exactly 14 Feed items.
         '''
         
         # Fetch and parse page
@@ -638,14 +638,13 @@ class Feed:
 
     def get(self, index: int) -> FeedItem:
         '''
-        #### Get a specific feed item. ####
-        -----------------------------------
+        Get a specific feed item.
         
-        Arguments:
-        - `index` -- The feed element index.
+        Args:
+            index: The feed element index.
         
-        -------------------------------------
-        Returns a `FeedItem` object.
+        Returns:
+            FeedItem: The feed item object.
         '''
         
         page_index = index // 14

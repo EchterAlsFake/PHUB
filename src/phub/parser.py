@@ -8,14 +8,13 @@ from phub.utils import log
 
 def resolve(html: str) -> dict:
     '''
-    #### Resolves obfuscation that protect PornHub video M3U files. ####
-    --------------------------------------------------------------------
+    Resolves obfuscation that protect PornHub video M3U files.
     
-    Arguments:
-    - `html` -- The raw HTML file of the video.
+    Args:
+        html (str): The raw HTML file of the video.
     
-    --------------------------------------------------------------------
-    Returns a `dict` object containing un-obsucated video data.
+    Returns:
+        dict: A dictionnary containing clean video data, fresh from PH.
     '''
     
     log('parse', 'Resolving page JS script...', level = 5)
@@ -36,3 +35,5 @@ def resolve(html: str) -> dict:
     log('parse', 'Execution successful, script resolved', level = 5)
     
     return data
+
+# EOF

@@ -27,6 +27,12 @@ class Account:
         '''
         Verify that user has entered credentials.
         Returns None if no account used.
+        
+        Args:
+            client: The client session.
+        
+        Returns:
+            Account: An account if the connection is etablished.
         '''
         
         if client._intents_to_login:
@@ -36,11 +42,10 @@ class Account:
     
     def __init__(self, client: Client) -> None:
         '''
-        #### Generate a new Account object. ####
-        ----------------------------------------
+        Generate a new Account object.
         
-        Arguments:
-        - `client` -- The client to base the account from.
+        Args:
+            client: The client session.
         '''
         
         self.client = client
@@ -54,19 +59,21 @@ class Account:
     @cached_property
     def recommended(self) -> classes.Query:
         '''
-        #### Get the recommended videos for the user. ####
-        --------------------------------------------------
-        Returns a `Query` object.
+        Get the recommended videos for the user.
+
+        Returns:
+            Query: The resulting query object.
         '''
         
         return classes.Query(self.client, consts.ROOT + 'recommended')
-        
+    
     @cached_property
     def watched(self) -> classes.Query:
         '''
-        #### Get the history of the user. ####
-        --------------------------------------
-        Returns a `Query` object.
+        Get the history of the user.
+        
+        Returns:
+            Query: The resulting query object.
         '''
         
         url = consts.ROOT + f'users/{self.name}/videos/recent'
@@ -76,9 +83,10 @@ class Account:
     @cached_property
     def liked(self) -> classes.Query:
         '''
-        #### Get the favorite videos of the account. ####
-        -------------------------------------------------
-        Returns a `Query` object.
+        Get the favorite videos of the account.
+        
+        Returns:
+            Query: The resulting query object.
         '''
         
         url = consts.ROOT + f'users/{self.name}/videos/favorites'
@@ -88,9 +96,10 @@ class Account:
     @cached_property
     def feed(self) -> classes.Feed:
         '''
-        #### Get the account feed. ####
-        -------------------------------
-        Returns a `Feed` object.
+        Get the account feed.
+
+        Returns:
+            Feed: The feed object.
         '''
         
         return classes.Feed(self.client)
@@ -107,18 +116,14 @@ class Client:
                  language: str = 'en,en-US',
                  autologin: bool = False) -> None:
         '''
-        #### Initialise a new client. #####
-        -----------------------------------
+        Initialise a new client.
         
-        Arguments
-        - `username`     (=`None`) -- Account to connect to username.
-        - `password`     (=`None`) -- Account to connect to password.
-        - `session`      (=`None`) -- Recovery requests session.
-        - `language` (=`en,en-US`) -- Language of the client session.
-        - `autologin`   (=`False`) -- Whether to login after initialisation.
-        
-        -----------------------------------
-        Returns a `Client` object.
+        Args:
+            username (str): Account to connect to username.
+            password (str): Account to connect to password.
+            session (request.Session): Recovery requests session.
+            language (str): Language of the client session.
+            autologin (bool): Whether to login after initialisation.
         '''
         
         # Initialise session
@@ -153,15 +158,10 @@ class Client:
     @classmethod
     def from_file(cls, data: str | dict | TextIOWrapper) -> Self:
         '''
-        #### Generate a new client from credentials. ####
-        -------------------------------------------------
+        Generate a new client from credentials.
         
-        Arguments:
-        - `data` -- Dictionnary, JSON file or JSON string to get
-                    username and password from.
-        
-        -------------------------------------------------
-        Returns a `Client` object.
+        Args:
+            data (str | dict | TextIO): Dictionnary, JSON file or JSON string to get username and password from.
         '''
         
         if isinstance(data, TextIOWrapper):
@@ -188,23 +188,22 @@ class Client:
               method: str,
               func: str,
               headers = {},
-              data = None,
+              data: dict = None,
               simple_url: bool = True,
               throw: bool = True) -> requests.Response:
         '''
-        #### Handle sending and receiving custom requests from PornHub servers. ####
-        ----------------------------------------------------------------------------
+        Handle sending and receiving custom requests from PornHub servers.
         
-        Arguments:
-        - `method`               -- Request method (GET, POST, PUT, etc.).
-        - `func`                 -- Name and arguments of the PornHub function.
-        - `headers`      (=`{}`) -- Optional headers to add.
-        - `data`       (=`None`) -- Optional payload to send.
-        - `simple_url` (=`True`) -- Whether to consider `func` as a simple Pornhub.
-        - `throw`      (=`True`) -- Whether to handle HTTP related errors.
+        Args:
+            method (str): Request method (GET, POST, PUT, etc.).
+            func (str): Name and arguments of the PornHub function.
+            headers (dict): Optional headers to add.
+            data (dict): Optional payload to send.
+            simple_url (bool): Whether to consider `func` as a simple Pornhub.
+            throw (bool): Whether to handle HTTP related errors.
         
-        ----------------------------------------------------------------------------
-        Returns a `requests.Response` object.
+        Returns:
+            requests.Response: The response to that request.
         '''
         
         url = consts.ROOT + utils.slash(func, '**') \
@@ -229,14 +228,13 @@ class Client:
     
     def login(self, throw: bool = False) -> bool:
         '''
-        #### Attempt to login to PornHub. #### 
-        ---------------------------------------
+        Attempt to login to PornHub.
         
-        Arguments:
-        - `throw` (=`False`) -- Raise errors in case of HTTP errors.
+        Args:
+            throw (bool): Raise errors in case of HTTP errors.
         
-        ---------------------------------------
-        Returns whether the operation was successful.
+        Returns:
+            bool: whether the operation was successful.
         '''
         
         log('client', 'Attempting loggin...', level = 6)
@@ -268,16 +266,15 @@ class Client:
 
     def get(self, url: str = None, key: str = None, preload: bool = True) -> classes.Video:
         '''
-        #### Get a specific video using an URL or a viewkey. ####
-        ---------------------------------------------------------
+        Get a specific video using an URL or a viewkey.
         
-        Arguments:
-        - `url`      (=`None`) -- URL of the video.
-        - `key`      (=`None`) -- Viewkey of the video (13 or 15 chars).
-        - `preload` (=`False`) -- Whether to load the video page in advance.
+        Args:
+            url (str): URL of the video.
+            key (str): Viewkey of the video (13 or 15 chars).
+            preload (bool): Whether to load the video page in advance.
         
-        ---------------------------------------------------------
-        Returns a `Video` object.
+        Returns:
+            Video: The fetched video object.
         '''
         
         assert bool(url) ^ bool(key), 'Must specify exactly one of the URL and the viewkey'
@@ -289,17 +286,14 @@ class Client:
     
     def get_user(self, url: str = None, name: str = None) -> classes.User:
         '''
-        #### Attempt to fetch a PornHub user or channel. ####
-        -----------------------------------------------------
+        Attempt to fetch a PornHub user or channel.
         
-        Arguments:
-        - `url`  (=`None`) -- URL of the user page.
-        - `name` (=`None`) -- The name of the user.
+        Args:
+        url (str): URL of the user page.
+        name (str): The name of the user (experimental).
         
-        NOTE - `name` parameter is experimental.
-        
-        -----------------------------------------------------
-        Returns a `User` object.
+        Returns:
+            User: The fetched user object.
         '''
         
         log('clien', 'Fetching user', name, level = 6)
@@ -308,14 +302,13 @@ class Client:
     
     def search(self, query: str) -> classes.Query:
         '''
-        #### Search for videos on PornHub servers. ####
-        -----------------------------------------------
+        Search for videos on PornHub servers.
         
-        Arguments:
-        - `query` -- Sentence to send to the servers.
+        Args:
+            query (str): Sentence to send to the server.
         
-        -----------------------------------------------
-        Returns a `Query` object.
+        Returns:
+            Query: The fetched query object.
         '''
         
         log('clien', 'Opening new search query:', query, level = 6)

@@ -17,12 +17,11 @@ from io import TextIOBase
 
 def debug(boolean: bool, file: TextIOBase = stdout) -> None:
     '''
-    #### Whether to log everything to stdout. ####
-    ----------------------------------------------
+    Activate PHUB logs.
     
-    Arguments:
-    - `boolean`          -- Value to set debug to.
-    - `file` (=`stdout`) -- File to output logs to.
+    Args:
+        boolean (bool): Wether to set debug on.
+        file (TextIO): File to send logs to (defaults: stdout).
     '''
     
     utils.DEBUG = boolean
