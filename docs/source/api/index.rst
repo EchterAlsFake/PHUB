@@ -9,6 +9,4 @@ This is the main API documentation.
     data
     exceptions
 
-.. automodule:: io
-
 .. automodule:: phub
