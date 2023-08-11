@@ -113,16 +113,10 @@ In that case, you can fetch the M3U file
 :meth:`.Video.get_M3U`. It takes a single argument, wether
 to process the file.
 
-.. note:: A M3U file is (basically) just a list of URLs to call
-    to reconstituate the video. It also has comments on stuff
-    like bandwith, resolution, timing, etc.
+.. note:: A M3U file is (basically) just a list of URLs to call to reconstituate the video. It also has comments on stuff like bandwith, resolution, timing, etc.
 
 * If ``True``, The M3U file will be parsed and returned as a python list of URLs.
-* Else, the M3U file URL will be given.
-
-.. note:: If you choose to work with the raw M3U file, keep
-    in mind that the given URLs are relatives, you will have
-    to get and add the CDN root to each of them.
+* Else, the M3U file will be given as is, except with adjusted URL pathes.
 
 Here is an exemple to process that file and handling it to
 FFMPEG, which is able to download videos from M3U files.
@@ -131,33 +125,15 @@ FFMPEG, which is able to download videos from M3U files.
 
     import os
     import phub
-    from phub import Quality
-
+    
     client = phub.Client()
     video = client.get(key = 'xxx')
-
-    url = video.get_M3U(quality = Quality.BEST,
-                        process = False)
-
-    # Get CDN dir
-    root = url.split('master.m3u8')[0]
-
-    # Get the content of the M3U file
-    M3U = client._call('GET', url, simple_url = False)
 
     # Write to a temp file
     with open('file.m3u8', 'w') as file:
 
-        # For each line, if the line isn't a comment,
-        # We write the URL root before writing the line. 
-        for line in M3U.content.split('\n'):
-            if not line.startswith('#'):
-                file.write(root)
-        
-        file.write(line + '\n')
+        file.write( video.get_M3U(quality = Quality.BEST,
+                                  process = False) )
     
-    # Then we can call FFMPEG
-    os.popen('ffmpeg -i file.m3u8 my-video.mp4')
-
-.. note:: Ik this is more complicated than it should, i'll
-    try to simplify it in the future.
+    # Then we can call FFMPEG (i think this should work)
+    # ffmpeg -i file.m3u8 my-video.mp4
