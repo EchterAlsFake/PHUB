@@ -8,3 +8,7 @@ This is the main API documentation.
     classes
     data
     exceptions
+
+.. automodule:: io
+
+.. automodule:: phub
