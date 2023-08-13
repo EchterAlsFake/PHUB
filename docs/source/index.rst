@@ -39,7 +39,7 @@ Guides
     :maxdepth: 2
 
     quickstart
-    cli
+    CLI
     downloading
     searching
     accounts

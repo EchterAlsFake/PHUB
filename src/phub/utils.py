@@ -263,6 +263,7 @@ class Quality:
     Represents a custom quality, e.g.:
     
     .. code-block:: python
+    
         # Using constants
         Quality.BEST
         Quality.MIDDLE

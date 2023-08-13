@@ -69,6 +69,7 @@ PHUB comes with some presets for easy progress display.
 Theses presets can be found by importing download_presets.
 
 .. code-block:: python
+    
     from phub.utils import download_presets as dlp 
 
 .. note::
