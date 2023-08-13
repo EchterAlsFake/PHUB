@@ -5,10 +5,10 @@
 import sys
 from string import ascii_letters
 
-import math
 import tqdm
 from datetime import datetime
-from typing import Callable, Self
+from typing import Callable, Self, Literal
+from dataclasses import dataclass, field
 
 from phub import consts
 
@@ -257,7 +257,7 @@ class download_presets:
         
         return __wrapper__
 
-
+"""
 class Quality:
     '''
     Represents a custom quality, e.g.:
@@ -286,6 +286,8 @@ class Quality:
         
         log('quals', 'Forging new quality:', value, level = 6)
         
+        print('Received object:', value, type(value))
+        
         assert isinstance(value, (str, int, Quality)), 'Invalid raw quality type'
         
         # Error protection
@@ -306,6 +308,7 @@ class Quality:
         '''
         
         self.value = value
+        print('init value', value)
         self.frozen = True
     
     def __setattr__(self, *_) -> None:
@@ -339,8 +342,55 @@ class Quality:
         if isinstance(self.value, str):
             # Get approximative quality
             
-            if self.value == Quality.BEST.value: return quals[max(keys)]
-            elif self.value == Quality.WORST.value: return quals[min(keys)]
+            if self.value == Quality.BEST: return quals[max(keys)]
+            elif self.value == Quality.WORST: return quals[min(keys)]
+            else: return quals[ sorted(keys)[ len(keys) // 2 ] ]
+        
+        elif isinstance(self.value, int):
+            # Get exact quality or nearest
+            
+            if (s:= str(self.value)) in keys: return quals[s]
+            else: return quals[closest(keys, self.value)]
+        
+        # This should not happen
+        raise TypeError('Internal error: quality type is', type(self.value))
+"""
+
+@dataclass
+class BaseQuality:
+    
+    value: Literal['best', 'half', 'worst'] | int | Self
+    
+    def __post_init__(self) -> None:
+        '''
+        Verify quality type and value.
+        '''
+        
+        if isinstance(self.value, BaseQuality):
+            self.value = self.value.value
+        
+        if isinstance(self.value, str):
+            assert self.value.lower() in ('best', 'half', 'worst')
+    
+    def select(self, quals: dict) -> str:
+        '''
+        Select among a list of qualities.
+        
+        Args:
+            quals (dict): A dict containing qualities and URLs.
+        
+        Returns:
+            str: The chosen quality URL.
+        '''
+        
+        keys = list(quals.keys())
+        log('quals', f'Selecting {self.value} among {keys}', level = 6)
+        
+        if isinstance(self.value, str):
+            # Get approximative quality
+            
+            if self.value == 'best': return quals[max(keys)]
+            elif self.value == 'worst': return quals[min(keys)]
             else: return quals[ sorted(keys)[ len(keys) // 2 ] ]
         
         elif isinstance(self.value, int):
@@ -353,9 +403,10 @@ class Quality:
         raise TypeError('Internal error: quality type is', type(self.value))
 
 
-# Define presets as objects
-Quality.BEST = Quality(Quality.BEST)
-Quality.MIDDLE = Quality(Quality.MIDDLE)
-Quality.WORST = Quality(Quality.WORST)
+class Quality(BaseQuality):
+    BEST = BaseQuality('best')
+    HALF = BaseQuality('half')
+    WORST = BaseQuality('worst')
+
 
 # EOF
