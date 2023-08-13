@@ -156,7 +156,7 @@ class Video:
             preload (bool): Wether to load the video page.
         '''
         
-        assert consts.regexes.is_valid_video_url(url), 'Invalid URL'
+        # assert consts.regexes.is_valid_video_url(url), 'Invalid URL' # TODO - DOES NOT WORK FOR CERTAIN VIDS
         
         # Build URL
         self.url = utils.basic(url, False)
@@ -185,7 +185,7 @@ class Video:
         response = self.client._call('GET', self.url)
         
         self.page = response.text
-        self.data = parser.resolve(self.page)
+        self.data = parser.resolve(self)
     
     def _lazy(self) -> dict:
         '''

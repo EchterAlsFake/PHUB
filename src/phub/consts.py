@@ -33,6 +33,7 @@ class regexes:
     extract_token        = re.compile( r'token *?= \"(.*?)\",'                                                       ).findall   # Extract session token from the home page
     extract_videos       = re.compile( r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?title=\"(.*?)\"', re.DOTALL ).findall   # Extract videos from a page
     extract_video_date   = re.compile( r'\"uploadDate\": \"(.*?)\"'                                                  ).findall   # Extract video publish date
+    # extract_html_comment = re.compile( r'<!--(.*?)//-->',                                                  re.DOTALL ).findall   # Extract content of HTML comments
     
     # Searching regexes
     video_search_counter = re.compile( r'showingCounter.*?\">.*?(\d+)\s+</',                               re.DOTALL ).findall   # Extract video counter from search responses
@@ -42,6 +43,8 @@ class regexes:
     video_datalayer      = re.compile( r'window\.dataLayer\.push\(({.*?})\);',                             re.DOTALL ).findall   # Get video advanced datalayer
     video_channel        = re.compile( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<'          ).findall   # Get video author if channel
     video_model          = re.compile( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' ).findall   # Get video author if model
+    
+    video_renew_connect  = re.compile( r'<!--(.*?);\n{ doc.*?s\+"(.*?);',                                  re.DOTALL ).findall   # Find all infos to build renewing conn cookie
     
     # Substraction regexes
     sub_js_comments      = re.compile( r'\/\*.*?\*\/'                                                                ).sub       # Remove js comments
@@ -76,5 +79,12 @@ class CounterNotFound(Exception):
     
     pass
 
+class ParsingError(Exception):
+    '''
+    The parser failed to properly resolve the script
+    for this element.
+    '''
+    
+    pass
 
 # EOF

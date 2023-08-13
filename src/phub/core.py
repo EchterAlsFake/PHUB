@@ -10,6 +10,7 @@ from typing import Self
 
 import json
 import requests
+from time import sleep
 from functools import cached_property
 
 from phub import utils
@@ -114,7 +115,8 @@ class Client:
                  password: str = None,
                  session: requests.Session = None,
                  language: str = 'en,en-US',
-                 autologin: bool = False) -> None:
+                 autologin: bool = False,
+                 delay: bool = False) -> None:
         '''
         Initialise a new client.
         
@@ -142,6 +144,9 @@ class Client:
         if autologin: self.login()
         
         log('clien', 'Initialised new client', repr(self))
+        
+        self.delay = (0, .5)[delay]
+        self._has_called = False
 
     def __repr__(self) -> str:
         '''
@@ -206,6 +211,9 @@ class Client:
             requests.Response: The response to that request.
         '''
         
+        # Delay if needed
+        if self._has_called: sleep(self.delay)
+        
         url = consts.ROOT + utils.slash(func, '**') \
               if simple_url else func
         
@@ -224,6 +232,7 @@ class Client:
             raise ConnectionError(f'Request `{func}` failed:' + \
                 utils.shortify(response.text))
         
+        self._has_called = True
         return response
     
     def login(self, throw: bool = False) -> bool:

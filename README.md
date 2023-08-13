@@ -54,7 +54,7 @@ for video in query[:10]:
 ```
 
 ## Documentation
-See [here](https://phub.readthedocs.io).
+See [here](https://phub.readthedocs.io) (working on it).
 
 ## Why?
 This project was made as an enhancement for [pfetch](https://github.com/Egsagon/pornhub-fetch), which aimed at downloading videos from PornHub.

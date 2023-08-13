@@ -1,5 +1,6 @@
 '''
-### Parsing script for the PHUB package. ###
+REFACTORING ATTEMPT FOR PHUB.PARSER
+DO NOT USE
 '''
 
 from __future__ import annotations
@@ -9,33 +10,33 @@ import js2py
 from phub import consts
 from phub.utils import log
 
-from sys import getsizeof
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING: from classes import Video
+
+
+RENEW_CONNECTION_MAX_ATTEMPTS = 3
+
 
 def renew(video: Video) -> None:
     '''
     Attempt to renew the connection with Pornhub.
     
     Args:
-        video (Video): The object that called the parser.
+        video (Video): The object that called a resolving.
     '''
-    
-    # TODO - REFACTOR with regexes
     
     # Get script and cookie part
     log('parse', 'Attempting to renew connection')
     
-    javascript = video.page.split('<!--')[1].split('//-->')[0]  
-    script, cookies = javascript.split('document.cookie=')
+    # Calculate variables
+    script, end = consts.regexes.video_renew_connect(video.page)[0]
     
-    func = script[:-2] + 'return [n, p, s];}'
+    func = script + ';return [n, p, s];}'
+    print(f'{func = }')
+    
     n, p, s = js2py.eval_js(func)()
     
     # Build the cookie
-    cookie_string = cookies.split(';\n')[0]
-    end = cookie_string.split('s+":')[1].split(';path')[0]
     cookie = f'{n}*{p / n}:{s}:{end}'
     log('parse', 'Injecting calculated cookie:', cookie)
     
@@ -48,7 +49,7 @@ def resolve(video: Video) -> dict:
     Resolves obfuscation that protect PornHub video M3U files.
     
     Args:
-        video (Video): The object that called the parser.
+        video (Video): The object that called a resolving.
     
     Returns:
         dict: A dictionnary containing clean video data, fresh from PH.
@@ -56,23 +57,18 @@ def resolve(video: Video) -> dict:
     
     log('parse', 'Resolving page JS script...', level = 5)
     
-    # TODO - REFACTOR
-    
     try:
         flash, ctx = consts.regexes.video_flashvar(video.page)[0]
     
     except:
-        # Invalid response, try to renew connection
+        
         renew(video)
         
-        print(video.client.session.cookies)
-        
-        try:
-            flash, ctx = consts.regexes.video_flashvar(video.page)[0]
-        
-        except:
-            raise consts.ParsingError()
-
+        flash, ctx = consts.regexes.video_flashvar(video.page)[0]
+    
+    # else:
+    #     raise consts.ParsingError('Exceeded max attempts at renewing connection.')
+    
     script = video.page.split("flashvars_['nextVideo'];")[1].split('var nextVideoPlay')[0]
     log('parse', 'Formating flash:', flash, level = 5)
     
