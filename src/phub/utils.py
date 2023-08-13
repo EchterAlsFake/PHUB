@@ -339,8 +339,8 @@ class Quality:
         if isinstance(self.value, str):
             # Get approximative quality
             
-            if self.value == Quality.BEST.value: return quals[max(keys)]
-            elif self.value == Quality.WORST.value: return quals[min(keys)]
+            if self.value == Quality.BEST: return quals[max(keys)]
+            elif self.value == Quality.WORST: return quals[min(keys)]
             else: return quals[ sorted(keys)[ len(keys) // 2 ] ]
         
         elif isinstance(self.value, int):
@@ -351,11 +351,5 @@ class Quality:
         
         # This should not happen
         raise TypeError('Internal error: quality type is', type(self.value))
-
-
-# Define presets as objects
-Quality.BEST = Quality(Quality.BEST)
-Quality.MIDDLE = Quality(Quality.MIDDLE)
-Quality.WORST = Quality(Quality.WORST)
 
 # EOF
