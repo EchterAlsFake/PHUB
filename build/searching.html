@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>PHUB :: Searching</title>
+  
+
+  <link rel="icon" type="image/png" sizes="32x32" href="_static/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="_static/img/favicon-16x16.png">
+  <link rel="index" title="Index" href="genindex.html"/>
+
+  <link rel="stylesheet" href="_static/css/insegel.css"/>
+  <link rel="stylesheet" href="_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/sphinx_highlight.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="insegel-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>PHUB</h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+    </header>
+
+    <div id="content-container">
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="searching">
+<h1>Searching<a class="headerlink" href="#searching" title="Permalink to this heading">¶</a></h1>
+<p>One feature of PHUB is that it is able to
+send and receive queries.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">phub</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">phub</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+
+<span class="c1"># Create a custom query</span>
+<span class="n">query</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;minecraft speedrun&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This query is a <a class="reference internal" href="api/classes.html#phub.classes.Query" title="phub.classes.Query"><code class="xref py py-class docutils literal notranslate"><span class="pre">Query</span></code></a> object.
+It behaves like a list while being a generator,
+which means it will only fetch the asked videos
+if needed. You can access its content like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get a specific video</span>
+<span class="n">first_video</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Iterate through a range of videos</span>
+<span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">query</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+
+<span class="c1"># Iterate through *all* videos</span>
+<span class="c1"># Warning: can be quite suspicious and detectable</span>
+<span class="c1"># by PH if there are a lot of videos.</span>
+<span class="k">for</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">video</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unlike <a class="reference internal" href="api/classes.html#phub.Client.get" title="phub.Client.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Client.get()</span></code></a>, by default the content
+of the video is not fetched yet, unless you ask for it
+(by calling <code class="docutils literal notranslate"><span class="pre">video.title</span></code> for example).</p>
+</div>
+</section>
+
+
+        </div>
+      </div>
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+
+          
+  
+    
+  
+  
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#initialising-a-session">Initialising a session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#fetching-a-video">Fetching a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#accessing-video-data">Accessing video data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#downloading-a-video">Downloading a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#advanced-downloading">Advanced downloading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI USage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#downloading-a-video">Downloading a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#using-the-ui">Using the UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#other-features">Other features</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Searching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="accounts.html">Accounts handling</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/classes.html">API objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.core.Account"><code class="docutils literal notranslate"><span class="pre">Account</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.Video"><code class="docutils literal notranslate"><span class="pre">Video</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.classes.Query"><code class="docutils literal notranslate"><span class="pre">Query</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.classes.Feed"><code class="docutils literal notranslate"><span class="pre">Feed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/data.html">API Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.classes.Like"><code class="docutils literal notranslate"><span class="pre">Like</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.classes.Tag"><code class="docutils literal notranslate"><span class="pre">Tag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.classes.FeedItem"><code class="docutils literal notranslate"><span class="pre">FeedItem</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html">Error handling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#phub.classes.UserNotFoundError"><code class="docutils literal notranslate"><span class="pre">UserNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#phub.consts.CounterNotFound"><code class="docutils literal notranslate"><span class="pre">CounterNotFound</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#phub.consts.ParsingError"><code class="docutils literal notranslate"><span class="pre">ParsingError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  
+
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="_sources/searching.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Egsagon
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
+
+        </div>
+    </div>
+
+    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+    <script type="text/javascript">
+      $("#menu-toggle").click(function() {
+        $("#menu-toggle").toggleClass("toggled");
+        $("#side-menu-container").slideToggle(300);
+      });
+    </script>
+
+</footer> 
+
+</div>
+
+</body>
+</html>

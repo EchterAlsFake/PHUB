@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>PHUB :: Video downloading</title>
+  
+
+  <link rel="icon" type="image/png" sizes="32x32" href="_static/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="_static/img/favicon-16x16.png">
+  <link rel="index" title="Index" href="genindex.html"/>
+
+  <link rel="stylesheet" href="_static/css/insegel.css"/>
+  <link rel="stylesheet" href="_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/sphinx_highlight.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="insegel-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>PHUB</h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+    </header>
+
+    <div id="content-container">
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="video-downloading">
+<h1>Video downloading<a class="headerlink" href="#video-downloading" title="Permalink to this heading">¶</a></h1>
+<section id="downloading-a-video">
+<h2>Downloading a video<a class="headerlink" href="#downloading-a-video" title="Permalink to this heading">¶</a></h2>
+<p>A video can be downloaded via its <a class="reference internal" href="api/classes.html#phub.Video.download" title="phub.Video.download"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.download()</span></code></a>
+method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">phub</span>
+<span class="kn">from</span> <span class="nn">phub</span> <span class="kn">import</span> <span class="n">Quality</span>
+
+<span class="n">video</span> <span class="o">=</span> <span class="o">...</span>
+
+<span class="n">video</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;my-video.mp4&#39;</span><span class="p">,</span>
+               <span class="n">quality</span> <span class="o">=</span> <span class="n">Quality</span><span class="o">.</span><span class="n">BEST</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="video-download-arguments">
+<h2><a class="reference internal" href="api/classes.html#phub.Video.download" title="phub.Video.download"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.download()</span></code></a> Arguments<a class="headerlink" href="#video-download-arguments" title="Permalink to this heading">¶</a></h2>
+<section id="output-path">
+<h3>Output path<a class="headerlink" href="#output-path" title="Permalink to this heading">¶</a></h3>
+<p>The video output path can be either a path to a file, in which
+case the given file will be erased, or a directory. If that is
+the case,</p>
+<p>The final path of the file can be found by capturing the output of
+the <a class="reference internal" href="api/classes.html#phub.Video.download" title="phub.Video.download"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.download()</span></code></a> method.</p>
+</section>
+<section id="video-quality">
+<h3>Video quality<a class="headerlink" href="#video-quality" title="Permalink to this heading">¶</a></h3>
+<p>The quality of the video can be designed as:</p>
+<ul class="simple">
+<li><p>A constant from <cite>phub.Quality</cite>, e.g. <cite>phub.Quality.BEST</cite>;</p></li>
+<li><p>An absolute value (<cite>int</cite>): 1080, 720, etc.</p></li>
+<li><p>A string representing <cite>phub.Quality</cite> constants, like <cite>best</cite>, <cite>half</cite>, <cite>worst</cite>.</p></li>
+</ul>
+</section>
+<section id="progress-callback">
+<h3>Progress callback<a class="headerlink" href="#progress-callback" title="Permalink to this heading">¶</a></h3>
+<p>A function used to be called to communicate the progress of the
+downloads. Ideally, the function takes two arguments of type <cite>int</cite>:
+The current segment being processed, and the total of segments.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">current</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Downloading:&#39;</span><span class="p">,</span> <span class="n">current</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">total</span><span class="p">)</span>
+
+<span class="n">video</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                <span class="n">quality</span> <span class="o">=</span> <span class="s1">&#39;best&#39;</span><span class="p">,</span>
+                <span class="n">callback</span> <span class="o">=</span> <span class="n">callback</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This code block will print a new line each time progress is made.</p>
+<section id="presets">
+<h4>Presets<a class="headerlink" href="#presets" title="Permalink to this heading">¶</a></h4>
+<p>PHUB comes with some presets for easy progress display.
+Theses presets can be found by importing download_presets.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Theses presets use wrappers, so you have to actually <em>call</em> the
+preset function inside <a class="reference internal" href="api/classes.html#phub.Video.download" title="phub.Video.download"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.download()</span></code></a>.
+This is because most of those presets don’t have contexts.</p>
+</div>
+<ul>
+<li><p><cite>dlp.bar</cite></p>
+<blockquote>
+<div><p>The default preset. It uses a <a href="#id1"><span class="problematic" id="id2">`tqdm`_</span></a> bar to display progress.
+You can pass arguments to this function, they will be passed to
+the tqdm bar initiator, e.g.:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">video</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callback</span> <span class="o">=</span> <span class="n">dlp</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">desc</span> <span class="o">=</span> <span class="s1">&#39;Downloading&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Downloading<span class="w"> </span><span class="m">100</span>%<span class="p">|</span>███████████████████████████████▉<span class="p">|</span><span class="w"> </span><span class="m">8014</span>/8014<span class="w"> </span><span class="o">[</span>...<span class="o">]</span>
+</pre></div>
+</div>
+<p>You can find out more parameters in the <a class="reference external" href="https://tqdm.github.io/docs/tqdm/#tqdm-objects">tqdm docs</a>.</p>
+</div></blockquote>
+</li>
+</ul>
+<ul>
+<li><p><cite>dlp.progress</cite></p>
+<blockquote>
+<div><p>Simple download progress that calculates a percentage.
+You can control wether to use ANSI color codes to decorate
+the progress.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">video</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callback</span> <span class="o">=</span> <span class="n">dlp</span><span class="o">.</span><span class="n">progress</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Downloading:<span class="w"> </span><span class="m">100</span>%<span class="w"> </span><span class="o">[</span><span class="m">8014</span>/8014<span class="o">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p><cite>dlp.std</cite></p>
+<blockquote>
+<div><p>This is the simplest default callback; In fact, it is so simple
+that you might forget that it exists and write your own callback
+for it.</p>
+<p>It is meant to be used by other softwares, in the style of a bash
+script or a EWW widget. It simply adds a new line to the console
+each time there is a progress in the download and dispays the
+percentage.
+You can control in which file the progress must be displayed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">video</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">callback</span> <span class="o">=</span> <span class="n">dlp</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">))</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+</section>
+<section id="maximum-retries">
+<h3>Maximum retries<a class="headerlink" href="#maximum-retries" title="Permalink to this heading">¶</a></h3>
+<p>If you have a low connection and you know some parts of the video
+might fail to download, you can insist by setting this value higher.</p>
+<p>More precisely, <cite>max_retries</cite> determines how many times the downloader
+should try to download the same segment before moving on to the next
+one.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">video</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">max_retries</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="advanced-downloading">
+<h2>Advanced downloading<a class="headerlink" href="#advanced-downloading" title="Permalink to this heading">¶</a></h2>
+<p>The <a class="reference internal" href="api/classes.html#phub.Video.download" title="phub.Video.download"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.download()</span></code></a> method is really simple: It
+requests each video segment one at a time and concatenate it
+on the fly to a video file. While this is ok for downloading
+one or more video, you might want extra speed in certain
+scenarios.</p>
+<p>In that case, you can fetch the M3U file
+<a class="reference internal" href="api/classes.html#phub.Video.get_M3U" title="phub.Video.get_M3U"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.get_M3U()</span></code></a>. It takes a single argument, wether
+to process the file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A M3U file is (basically) just a list of URLs to call to reconstituate the video. It also has comments on stuff like bandwith, resolution, timing, etc.</p>
+</div>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, The M3U file will be parsed and returned as a python list of URLs.</p></li>
+<li><p>Else, the M3U file will be given as is, except with adjusted URL pathes.</p></li>
+</ul>
+<p>Here is an exemple to process that file and handling it to
+FFMPEG, which is able to download videos from M3U files.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">phub</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">phub</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
+<span class="n">video</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;xxx&#39;</span><span class="p">)</span>
+
+<span class="c1"># Write to a temp file</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;file.m3u8&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+
+    <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">video</span><span class="o">.</span><span class="n">get_M3U</span><span class="p">(</span><span class="n">quality</span> <span class="o">=</span> <span class="n">Quality</span><span class="o">.</span><span class="n">BEST</span><span class="p">,</span>
+                              <span class="n">process</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="c1"># Then we can call FFMPEG (i think this should work)</span>
+<span class="c1"># ffmpeg -i file.m3u8 my-video.mp4</span>
+</pre></div>
+</div>
+<p>You can also use ay kind of threaded downloaders.</p>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+
+          
+  
+    
+  
+  
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#initialising-a-session">Initialising a session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#fetching-a-video">Fetching a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#accessing-video-data">Accessing video data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#downloading-a-video">Downloading a video</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#downloading-a-video">Downloading a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#using-the-ui">Using the UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#other-features">Other features</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Video downloading</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#downloading-a-video">Downloading a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#video-download-arguments"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.download()</span></code> Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#output-path">Output path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#video-quality">Video quality</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#progress-callback">Progress callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#maximum-retries">Maximum retries</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-downloading">Advanced downloading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="searching.html">Searching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="accounts.html">Accounts handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="long-usage.html">Long term usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="long-usage.html#todo">TODO</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/classes.html">API objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.core.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.core.Account"><code class="docutils literal notranslate"><span class="pre">Account</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.Video"><code class="docutils literal notranslate"><span class="pre">Video</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.classes.Query"><code class="docutils literal notranslate"><span class="pre">Query</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.classes.Feed"><code class="docutils literal notranslate"><span class="pre">Feed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/data.html">API Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.classes.Like"><code class="docutils literal notranslate"><span class="pre">Like</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.classes.Tag"><code class="docutils literal notranslate"><span class="pre">Tag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.classes.FeedItem"><code class="docutils literal notranslate"><span class="pre">FeedItem</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.utils.Quality"><code class="docutils literal notranslate"><span class="pre">Quality</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html">Error handling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#phub.consts.UserNotFoundError"><code class="docutils literal notranslate"><span class="pre">UserNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#phub.consts.CounterNotFound"><code class="docutils literal notranslate"><span class="pre">CounterNotFound</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#phub.consts.ParsingError"><code class="docutils literal notranslate"><span class="pre">ParsingError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  
+
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="_sources/downloading.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Egsagon
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
+
+        </div>
+    </div>
+
+    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+    <script type="text/javascript">
+      $("#menu-toggle").click(function() {
+        $("#menu-toggle").toggleClass("toggled");
+        $("#side-menu-container").slideToggle(300);
+      });
+    </script>
+
+</footer> 
+
+</div>
+
+</body>
+</html>

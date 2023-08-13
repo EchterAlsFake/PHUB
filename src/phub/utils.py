@@ -262,16 +262,15 @@ class Quality:
     '''
     Represents a custom quality, e.g.:
     
-    ```python
-    # Using constants
-    Quality.BEST
-    Quality.MIDDLE
-    Quality.WORST
-    
-    # Using absolute value
-    Quality(1080) # Represents closest to 1080p
-    Quality('best') # Equivalent to Quality.BEST
-    ```
+    .. code-block:: python
+        # Using constants
+        Quality.BEST
+        Quality.MIDDLE
+        Quality.WORST
+        
+        # Using absolute value
+        Quality(1080) # Represents closest to 1080p
+        Quality('best') # Equivalent to Quality.BEST
     '''
     
     # Presets

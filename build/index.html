@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>PHUB :: PHUB documentation</title>
+  
+
+  <link rel="icon" type="image/png" sizes="32x32" href="_static/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="_static/img/favicon-16x16.png">
+  <link rel="index" title="Index" href="genindex.html"/>
+
+  <link rel="stylesheet" href="_static/css/insegel.css"/>
+  <link rel="stylesheet" href="_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/sphinx_highlight.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="insegel-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>PHUB</h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+    </header>
+
+    <div id="content-container">
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="phub-documentation">
+<h1>PHUB documentation<a class="headerlink" href="#phub-documentation" title="Permalink to this heading">¶</a></h1>
+<img alt="_images/banner.jpg" class="align-center" src="_images/banner.jpg" />
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<p>PHUB is an API wrapper for Pornhub (PH).
+It is able to communicate with most used PH
+features such as video searching, downloading,
+account connection, etc.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Early dev</strong> + i don’t plan to
+maintain this often so don’t hesitate
+to submit issues or requests through the
+project’s <a class="reference external" href="https://github.com/Egsagon/PHUB">github page</a>.</p>
+</div>
+</section>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://pypi.org/project/requests/">requests</a></p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/click/">click</a></p></li>
+<li><p><a class="reference external" href="https://pypi.org/project/tqdm/">tqdm</a></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Disclaimer: This project is probably against Pornhub TOS. Use at your own risks.</p>
+</div>
+<section id="guides">
+<h3>Guides<a class="headerlink" href="#guides" title="Permalink to this heading">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#initialising-a-session">Initialising a session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#fetching-a-video">Fetching a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#accessing-video-data">Accessing video data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#downloading-a-video">Downloading a video</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#downloading-a-video">Downloading a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#using-the-ui">Using the UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#other-features">Other features</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="downloading.html">Video downloading</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="downloading.html#downloading-a-video">Downloading a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="downloading.html#video-download-arguments"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.download()</span></code> Arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="downloading.html#advanced-downloading">Advanced downloading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="searching.html">Searching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="accounts.html">Accounts handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="long-usage.html">Long term usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="long-usage.html#todo">TODO</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="api-docs">
+<h3>API docs<a class="headerlink" href="#api-docs" title="Permalink to this heading">¶</a></h3>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/classes.html">API objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/data.html">API Dataclasses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html">Error handling</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+            <input type="text" name="q" placeholder="Search..." />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+
+          
+  
+    
+  
+  
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#initialising-a-session">Initialising a session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#fetching-a-video">Fetching a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#accessing-video-data">Accessing video data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html#downloading-a-video">Downloading a video</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">CLI Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#downloading-a-video">Downloading a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#using-the-ui">Using the UI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#other-features">Other features</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="downloading.html">Video downloading</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="downloading.html#downloading-a-video">Downloading a video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="downloading.html#video-download-arguments"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.download()</span></code> Arguments</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="downloading.html#output-path">Output path</a></li>
+<li class="toctree-l3"><a class="reference internal" href="downloading.html#video-quality">Video quality</a></li>
+<li class="toctree-l3"><a class="reference internal" href="downloading.html#progress-callback">Progress callback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="downloading.html#maximum-retries">Maximum retries</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="downloading.html#advanced-downloading">Advanced downloading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="searching.html">Searching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="accounts.html">Accounts handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="long-usage.html">Long term usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="long-usage.html#todo">TODO</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/classes.html">API objects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.core.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.core.Account"><code class="docutils literal notranslate"><span class="pre">Account</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.Video"><code class="docutils literal notranslate"><span class="pre">Video</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.classes.Query"><code class="docutils literal notranslate"><span class="pre">Query</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/classes.html#phub.classes.Feed"><code class="docutils literal notranslate"><span class="pre">Feed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/data.html">API Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.classes.Like"><code class="docutils literal notranslate"><span class="pre">Like</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.classes.Tag"><code class="docutils literal notranslate"><span class="pre">Tag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.classes.FeedItem"><code class="docutils literal notranslate"><span class="pre">FeedItem</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#phub.utils.Quality"><code class="docutils literal notranslate"><span class="pre">Quality</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html">Error handling</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#phub.consts.UserNotFoundError"><code class="docutils literal notranslate"><span class="pre">UserNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#phub.consts.CounterNotFound"><code class="docutils literal notranslate"><span class="pre">CounterNotFound</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/exceptions.html#phub.consts.ParsingError"><code class="docutils literal notranslate"><span class="pre">ParsingError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  
+
+
+        </div>
+
+        
+
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="_sources/index.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Egsagon
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
+
+        </div>
+    </div>
+
+    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+    <script type="text/javascript">
+      $("#menu-toggle").click(function() {
+        $("#menu-toggle").toggleClass("toggled");
+        $("#side-menu-container").slideToggle(300);
+      });
+    </script>
+
+</footer> 
+
+</div>
+
+</body>
+</html>

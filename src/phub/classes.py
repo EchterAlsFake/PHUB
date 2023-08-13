@@ -20,9 +20,6 @@ from phub import consts
 from phub import parser
 from phub.utils import log, download_presets as dlp
 
-# Errors
-class UserNotFoundError(Exception): pass
-
 
 @dataclass
 class User:
@@ -98,7 +95,7 @@ class User:
                 return cls(name = name, path = url, client = client)
         
         else:
-            raise UserNotFoundError(f'User `{name}` not found.')
+            raise consts.UserNotFoundError(f'User `{name}` not found.')
     
     @cached_property
     def videos(self) -> Query:
@@ -403,19 +400,21 @@ class Query:
     contains `Video` objects.
     
     Example usage:
-    ```python
-    record = Query(...)
     
-    first = record[0] # list-like index searching
-    count = len(record) # Get length of the record
+    .. code-block:: python
     
-    # Using generation
-    for video in record:
-        print(video.title)
+        query = client.search('hello, world!')
         
-    # Get all videos
-    everything = list(record)
-    ```
+        # Get a specific video
+        first_result = query[0]
+        
+        # Get a range of videos
+        for video in query[:10]:
+            print(video.title)
+        
+        # List all videos
+        for video in query:
+            print(video.title)
     '''
     
     def __init__(self, client: Client, url: str, corrector: Callable = None) -> None:

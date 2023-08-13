@@ -87,4 +87,11 @@ class ParsingError(Exception):
     
     pass
 
+class UserNotFoundError(Exception):
+    '''
+    Failed to find a PH user account.
+    '''
+    
+    pass
+
 # EOF
