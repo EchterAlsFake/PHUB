@@ -13,7 +13,12 @@ import json
 from functools import cached_property
 from datetime import datetime, timedelta
 
-from bs4 import BeautifulSoup as Soup
+Soup = None
+try:
+    from bs4 import BeautifulSoup as Soup
+
+except ModuleNotFoundError:
+    print('Warning: BS4 not installed. Feed features will not be available.')
 
 from phub import utils
 from phub import consts
