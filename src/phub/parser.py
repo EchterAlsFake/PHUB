@@ -9,10 +9,10 @@ import js2py
 from phub import consts
 from phub.utils import log
 
-from sys import getsizeof
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING: from classes import Video
+
+RENEW_MAX_ATTEMPTS = 3
 
 def renew(video: Video) -> None:
     '''
@@ -22,21 +22,13 @@ def renew(video: Video) -> None:
         video (Video): The object that called the parser.
     '''
     
-    # TODO - REFACTOR with regexes
-    
-    # Get script and cookie part
+    # Fetch numbers
     log('parse', 'Attempting to renew connection')
-    
-    javascript = video.page.split('<!--')[1].split('//-->')[0]  
-    script, cookies = javascript.split('document.cookie=')
-    
-    func = script[:-2] + 'return [n, p, s];}'
-    n, p, s = js2py.eval_js(func)()
+    script, end = consts.regexes.video_renew_connect(video.page)[0]
+    n, p, s = js2py.eval_js(script + ';return [n, p, s];}')()
     
     # Build the cookie
-    cookie_string = cookies.split(';\n')[0]
-    end = cookie_string.split('s+":')[1].split(';path')[0]
-    cookie = f'{n}*{p / n}:{s}:{end}'
+    cookie = f'{n}*{p / n}:{s}{end}'
     log('parse', 'Injecting calculated cookie:', cookie)
     
     # Send cookie and reload page
@@ -56,23 +48,20 @@ def resolve(video: Video) -> dict:
     
     log('parse', 'Resolving page JS script...', level = 5)
     
-    # TODO - REFACTOR
+    for i in range(RENEW_MAX_ATTEMPTS):
+        
+        response = consts.regexes.video_flashvar(video.page)
+        
+        if not len(response):
+            renew(video)
+            continue
+        
+        flash, ctx = response[0]
+        break
     
-    try:
-        flash, ctx = consts.regexes.video_flashvar(video.page)[0]
+    else:
+        raise consts.ParsingError('Max renew attempts exceeded.')
     
-    except:
-        # Invalid response, try to renew connection
-        renew(video)
-        
-        print(video.client.session.cookies)
-        
-        try:
-            flash, ctx = consts.regexes.video_flashvar(video.page)[0]
-        
-        except:
-            raise consts.ParsingError()
-
     script = video.page.split("flashvars_['nextVideo'];")[1].split('var nextVideoPlay')[0]
     log('parse', 'Formating flash:', flash, level = 5)
     
