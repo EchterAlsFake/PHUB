@@ -51,6 +51,6 @@ exclude_patterns = []
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-html_theme = "insegel"
+html_theme = "furo"
 
 intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
