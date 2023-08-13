@@ -7,8 +7,8 @@ from string import ascii_letters
 
 import tqdm
 from datetime import datetime
+from dataclasses import dataclass
 from typing import Callable, Self, Literal
-from dataclasses import dataclass, field
 
 from phub import consts
 
@@ -309,6 +309,5 @@ class Quality(BaseQuality):
     BEST = BaseQuality('best')
     HALF = BaseQuality('half')
     WORST = BaseQuality('worst')
-
 
 # EOF
