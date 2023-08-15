@@ -8,3 +8,4 @@ This is the main API documentation.
     classes
     data
     exceptions
+    utils

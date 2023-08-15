@@ -1,66 +1,234 @@
-<!DOCTYPE html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Error handling" href="exceptions.html" /><link rel="prev" title="API objects" href="classes.html" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#2D2D2D" />
+    <!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
+        <title>API Dataclasses - PHUB documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=362ab14a" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --color-brand-primary: #f00;
+  --color-brand-content: #7C4DFF;
+  --color-foreground-primary: #fff;
+  --color-background-primary: #000;
+  --color-background-secondary: #000;
+  --color-background-hover: #000;
+  --color-highlighted-background: #f0f;
+  ----color-highlight-on-target: #f0f;
   
-  <title>PHUB :: API Dataclasses</title>
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
-
-  <link rel="icon" type="image/png" sizes="32x32" href="../_static/img/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="../_static/img/favicon-16x16.png">
-  <link rel="index" title="Index" href="../genindex.html"/>
-
-  <link rel="stylesheet" href="../_static/css/insegel.css"/>
-  <link rel="stylesheet" href="../_static/css/custom.css"/>
-
-  <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-      <script type="text/javascript" src="../_static/documentation_options.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
 
-  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
-</head>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
 
-<body>
-  <div id="insegel-container">
-    <header>
-      <div id="logo-container">
-          
-          <h1>PHUB</h1>
-          
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">PHUB  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
       </div>
-      <div id="project-container">
-        
-        <h1>Documentation</h1>
-        
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">PHUB  documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli-usage.html">CLI Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../video-data.html">Exploiting video data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../downloading.html">Video downloading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../searching.html">Searching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../accounts.html">Accounts handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../long-usage.html">Long term usage</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">API</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="classes.html">API objects</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">API Dataclasses</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Error handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">API utilities</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
       </div>
-    </header>
-
-    <div id="content-container">
-
-      <div id="main-content-container">
-        <div id="main-content" role="main">
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
           
-  <section id="api-dataclasses">
-<h1>API Dataclasses<a class="headerlink" href="#api-dataclasses" title="Permalink to this heading">¶</a></h1>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="api-dataclasses">
+<h1>API Dataclasses<a class="headerlink" href="#api-dataclasses" title="Permalink to this heading">#</a></h1>
 <p>These classes are provided
 by other PHUB objects.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="phub.User">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="classes.html#phub.core.Client" title="phub.core.Client"><span class="pre">Client</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.User" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="classes.html#phub.core.Client" title="phub.core.Client"><span class="pre">Client</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.User" title="Permalink to this definition">#</a></dt>
 <dd><p>Represents a PornHub account.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.User.client">
-<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="classes.html#phub.core.Client" title="phub.core.Client"><span class="pre">Client</span></a></em><a class="headerlink" href="#phub.User.client" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">client</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="classes.html#phub.core.Client" title="phub.core.Client"><span class="pre">Client</span></a></em><a class="headerlink" href="#phub.User.client" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phub.User.from_video">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="classes.html#phub.Video" title="phub.classes.Video"><span class="pre">Video</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.11)"><span class="pre">Self</span></a></span></span><a class="headerlink" href="#phub.User.from_video" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="classes.html#phub.Video" title="phub.classes.Video"><span class="pre">Video</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.11)"><span class="pre">Self</span></a></span></span><a class="headerlink" href="#phub.User.from_video" title="Permalink to this definition">#</a></dt>
 <dd><p>Generate a User object from a Video object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -77,7 +245,7 @@ by other PHUB objects.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="phub.User.get">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="classes.html#phub.core.Client" title="phub.core.Client"><span class="pre">Client</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#phub.User.get" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="classes.html#phub.core.Client" title="phub.core.Client"><span class="pre">Client</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Self</span></span></span><a class="headerlink" href="#phub.User.get" title="Permalink to this definition">#</a></dt>
 <dd><p>Fetch a user knowing its channel name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -98,17 +266,17 @@ by other PHUB objects.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.User.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.User.name" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.User.name" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.User.path">
-<span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.User.path" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.User.path" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="phub.User.videos">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">videos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="classes.html#phub.classes.Query" title="phub.classes.Query"><span class="pre">Query</span></a></em><a class="headerlink" href="#phub.User.videos" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">videos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="classes.html#phub.classes.Query" title="phub.classes.Query"><span class="pre">Query</span></a></em><a class="headerlink" href="#phub.User.videos" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the list of videos published by this user.
 :returns: The received query.
 :rtype: Query</p>
@@ -118,258 +286,192 @@ by other PHUB objects.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="phub.classes.Like">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.classes.</span></span><span class="sig-name descname"><span class="pre">Like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">up</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">down</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.classes.Like" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.classes.</span></span><span class="sig-name descname"><span class="pre">Like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">up</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">down</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.classes.Like" title="Permalink to this definition">#</a></dt>
 <dd><p>Dataclass representing ‘up’ and ‘down’ thumbs for a video.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.classes.Like.down">
-<span class="sig-name descname"><span class="pre">down</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#phub.classes.Like.down" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">down</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#phub.classes.Like.down" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.classes.Like.up">
-<span class="sig-name descname"><span class="pre">up</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#phub.classes.Like.up" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">up</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#phub.classes.Like.up" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="phub.classes.Tag">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.classes.</span></span><span class="sig-name descname"><span class="pre">Tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.classes.Tag" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.classes.</span></span><span class="sig-name descname"><span class="pre">Tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.classes.Tag" title="Permalink to this definition">#</a></dt>
 <dd><p>Dataclass equivalent to one video tag,
 with its ‘name’ and ‘count’ (apparitions on PH).</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.classes.Tag.count">
-<span class="sig-name descname"><span class="pre">count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#phub.classes.Tag.count" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#phub.classes.Tag.count" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.classes.Tag.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.Tag.name" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.Tag.name" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="phub.classes.FeedItem">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.classes.</span></span><span class="sig-name descname"><span class="pre">FeedItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'consts.FeedType'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.classes.FeedItem" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.classes.</span></span><span class="sig-name descname"><span class="pre">FeedItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'consts.FeedType'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.classes.FeedItem" title="Permalink to this definition">#</a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="phub.classes.FeedItem.author">
-<span class="sig-name descname"><span class="pre">author</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.FeedItem.author" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">author</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.FeedItem.author" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.classes.FeedItem.content">
-<span class="sig-name descname"><span class="pre">content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.FeedItem.content" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.FeedItem.content" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.classes.FeedItem.date">
-<span class="sig-name descname"><span class="pre">date</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.FeedItem.date" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">date</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.FeedItem.date" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.classes.FeedItem.type">
-<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">FeedType</span></em><a class="headerlink" href="#phub.classes.FeedItem.type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">FeedType</span></em><a class="headerlink" href="#phub.classes.FeedItem.type" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.classes.FeedItem.url">
-<span class="sig-name descname"><span class="pre">url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.FeedItem.url" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><a class="headerlink" href="#phub.classes.FeedItem.url" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="phub.utils.Quality">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.utils.</span></span><span class="sig-name descname"><span class="pre">Quality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.11)"><span class="pre">Self</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.utils.Quality" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represents a custom quality, e.g.:</p>
-<dl class="py attribute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">phub.utils.</span></span><span class="sig-name descname"><span class="pre">Quality</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.11)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'best'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'half'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'worst'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.11)"><span class="pre">Self</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#phub.utils.Quality" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py attribute">
 <dt class="sig sig-object py" id="phub.utils.Quality.BEST">
-<span class="sig-name descname"><span class="pre">BEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;phub.Quality</span> <span class="pre">best&gt;</span></em><a class="headerlink" href="#phub.utils.Quality.BEST" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BaseQuality(value='best')</span></em><a class="headerlink" href="#phub.utils.Quality.BEST" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="phub.utils.Quality.MIDDLE">
-<span class="sig-name descname"><span class="pre">MIDDLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;phub.Quality</span> <span class="pre">middle&gt;</span></em><a class="headerlink" href="#phub.utils.Quality.MIDDLE" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="phub.utils.Quality.HALF">
+<span class="sig-name descname"><span class="pre">HALF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BaseQuality(value='half')</span></em><a class="headerlink" href="#phub.utils.Quality.HALF" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="phub.utils.Quality.WORST">
-<span class="sig-name descname"><span class="pre">WORST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;phub.Quality</span> <span class="pre">worst&gt;</span></em><a class="headerlink" href="#phub.utils.Quality.WORST" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">WORST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">BaseQuality(value='worst')</span></em><a class="headerlink" href="#phub.utils.Quality.WORST" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="phub.utils.Quality.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.11)"><span class="pre">Self</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.11)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#phub.utils.Quality.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a new Quality object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><a class="reference internal" href="#phub.utils.Quality" title="phub.utils.Quality"><em>Quality</em></a>) – The value to create quality from.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="phub.utils.Quality.__new__">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.11)"><span class="pre">Self</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Self" title="(in Python v3.11)"><span class="pre">Self</span></a></span></span><a class="headerlink" href="#phub.utils.Quality.__new__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Verify quality type.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="phub.utils.Quality.select">
-<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#phub.utils.Quality.select" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select among a list of qualities.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>quals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – A dict containing qualities and URLs.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The chosen quality URL.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
-</dd>
-</dl>
-</dd></dl>
 
 </dd></dl>
 
 </section>
 
-
-        </div>
+        </article>
       </div>
-
-      <div id="side-menu-container">
-
-        <div id="search" role="search">
-        <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-            <input type="text" name="q" placeholder="Search..." />
-            <input type="hidden" name="check_keywords" value="yes" />
-            <input type="hidden" name="area" value="default" />
-        </form>
-</div>
-
-        <div id="side-menu" role="navigation">
-
-          
-  
-    
-  
-  
-    <ul>
-<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#initialising-a-session">Initialising a session</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#fetching-a-video">Fetching a video</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#accessing-video-data">Accessing video data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#downloading-a-video">Downloading a video</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../cli.html">CLI Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#downloading-a-video">Downloading a video</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#using-the-ui">Using the UI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../cli.html#other-features">Other features</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../downloading.html">Video downloading</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../downloading.html#downloading-a-video">Downloading a video</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../downloading.html#video-download-arguments"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Video.download()</span></code> Arguments</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../downloading.html#output-path">Output path</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../downloading.html#video-quality">Video quality</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../downloading.html#progress-callback">Progress callback</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../downloading.html#maximum-retries">Maximum retries</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../downloading.html#advanced-downloading">Advanced downloading</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../searching.html">Searching</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../accounts.html">Accounts handling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../long-usage.html">Long term usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../long-usage.html#todo">TODO</a></li>
-</ul>
-</li>
-</ul>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="classes.html">API objects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#phub.core.Client"><code class="docutils literal notranslate"><span class="pre">Client</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#phub.core.Account"><code class="docutils literal notranslate"><span class="pre">Account</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#phub.Video"><code class="docutils literal notranslate"><span class="pre">Video</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#phub.classes.Query"><code class="docutils literal notranslate"><span class="pre">Query</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="classes.html#phub.classes.Feed"><code class="docutils literal notranslate"><span class="pre">Feed</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">API Dataclasses</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#phub.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#phub.classes.Like"><code class="docutils literal notranslate"><span class="pre">Like</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#phub.classes.Tag"><code class="docutils literal notranslate"><span class="pre">Tag</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#phub.classes.FeedItem"><code class="docutils literal notranslate"><span class="pre">FeedItem</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#phub.utils.Quality"><code class="docutils literal notranslate"><span class="pre">Quality</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="exceptions.html">Error handling</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="exceptions.html#phub.consts.UserNotFoundError"><code class="docutils literal notranslate"><span class="pre">UserNotFoundError</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="exceptions.html#phub.consts.CounterNotFound"><code class="docutils literal notranslate"><span class="pre">CounterNotFound</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="exceptions.html#phub.consts.ParsingError"><code class="docutils literal notranslate"><span class="pre">ParsingError</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-
-  
-
-
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="exceptions.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Error handling</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="classes.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">API objects</div>
+                
+              </div>
+            </a>
         </div>
-
-        
-
-      </div>
-
-    </div>
-
-<footer>
-    <div id="footer-info">
-        <ul id="build-details">
-            
-                <li class="footer-element">
-                    
-                        <a href="../_sources/api/data.rst.txt" rel="nofollow"> source</a>
-                    
-                </li>
-            
-
-            
-
-            
-        </ul>
-
-        
-            <div id="copyright">
-                &copy; 2023, Egsagon
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Egsagon
             </div>
-        
-
-        <div id="credit">
-            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/Autophagy/insegel">Insegel</a>
-
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
         </div>
+        
+      </footer>
     </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">API Dataclasses</a><ul>
+<li><a class="reference internal" href="#phub.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a><ul>
+<li><a class="reference internal" href="#phub.User.client"><code class="docutils literal notranslate"><span class="pre">User.client</span></code></a></li>
+<li><a class="reference internal" href="#phub.User.from_video"><code class="docutils literal notranslate"><span class="pre">User.from_video()</span></code></a></li>
+<li><a class="reference internal" href="#phub.User.get"><code class="docutils literal notranslate"><span class="pre">User.get()</span></code></a></li>
+<li><a class="reference internal" href="#phub.User.name"><code class="docutils literal notranslate"><span class="pre">User.name</span></code></a></li>
+<li><a class="reference internal" href="#phub.User.path"><code class="docutils literal notranslate"><span class="pre">User.path</span></code></a></li>
+<li><a class="reference internal" href="#phub.User.videos"><code class="docutils literal notranslate"><span class="pre">User.videos</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#phub.classes.Like"><code class="docutils literal notranslate"><span class="pre">Like</span></code></a><ul>
+<li><a class="reference internal" href="#phub.classes.Like.down"><code class="docutils literal notranslate"><span class="pre">Like.down</span></code></a></li>
+<li><a class="reference internal" href="#phub.classes.Like.up"><code class="docutils literal notranslate"><span class="pre">Like.up</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#phub.classes.Tag"><code class="docutils literal notranslate"><span class="pre">Tag</span></code></a><ul>
+<li><a class="reference internal" href="#phub.classes.Tag.count"><code class="docutils literal notranslate"><span class="pre">Tag.count</span></code></a></li>
+<li><a class="reference internal" href="#phub.classes.Tag.name"><code class="docutils literal notranslate"><span class="pre">Tag.name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#phub.classes.FeedItem"><code class="docutils literal notranslate"><span class="pre">FeedItem</span></code></a><ul>
+<li><a class="reference internal" href="#phub.classes.FeedItem.author"><code class="docutils literal notranslate"><span class="pre">FeedItem.author</span></code></a></li>
+<li><a class="reference internal" href="#phub.classes.FeedItem.content"><code class="docutils literal notranslate"><span class="pre">FeedItem.content</span></code></a></li>
+<li><a class="reference internal" href="#phub.classes.FeedItem.date"><code class="docutils literal notranslate"><span class="pre">FeedItem.date</span></code></a></li>
+<li><a class="reference internal" href="#phub.classes.FeedItem.type"><code class="docutils literal notranslate"><span class="pre">FeedItem.type</span></code></a></li>
+<li><a class="reference internal" href="#phub.classes.FeedItem.url"><code class="docutils literal notranslate"><span class="pre">FeedItem.url</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#phub.utils.Quality"><code class="docutils literal notranslate"><span class="pre">Quality</span></code></a><ul>
+<li><a class="reference internal" href="#phub.utils.Quality.BEST"><code class="docutils literal notranslate"><span class="pre">Quality.BEST</span></code></a></li>
+<li><a class="reference internal" href="#phub.utils.Quality.HALF"><code class="docutils literal notranslate"><span class="pre">Quality.HALF</span></code></a></li>
+<li><a class="reference internal" href="#phub.utils.Quality.WORST"><code class="docutils literal notranslate"><span class="pre">Quality.WORST</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
-    <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
-
-    <script type="text/javascript">
-      $("#menu-toggle").click(function() {
-        $("#menu-toggle").toggleClass("toggled");
-        $("#side-menu-container").slideToggle(300);
-      });
-    </script>
-
-</footer> 
-
-</div>
-
-</body>
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
+    </body>
 </html>

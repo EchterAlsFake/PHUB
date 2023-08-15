@@ -18,8 +18,8 @@ method.
                    quality = Quality.BEST)
 
 
-:meth:`.Video.download` Arguments
----------------------------------
+Download options
+----------------
 
 ^^^^^^^^^^^
 Output path
@@ -183,3 +183,5 @@ FFMPEG, which is able to download videos from M3U files.
     # ffmpeg -i file.m3u8 my-video.mp4
 
 You can also use ay kind of threaded downloaders.
+
+.. _tqdm: https://pypi.org/project/tqdm/

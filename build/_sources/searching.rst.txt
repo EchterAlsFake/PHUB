@@ -24,15 +24,13 @@ if needed. You can access its content like so:
     first_video = query[0]
 
     # Iterate through a range of videos
-    for video in query.range(0, 10):
+    for video in query[:10]:
         print(video.title)
     
-    # Iterate through *all* videos
-    # Warning: can be quite suspicious and detectable
-    # by PH if there are a lot of videos. 
+    # Iterate through all videos 
     for video in query:
         print(video.title)
 
 .. note:: Unlike :meth:`.Client.get`, by default the content
     of the video is not fetched yet, unless you ask for it
-    (by calling ``video.title`` for example).
+    (by calling `video.title` for example).

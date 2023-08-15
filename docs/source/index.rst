@@ -39,7 +39,8 @@ Guides
     :maxdepth: 2
 
     quickstart
-    CLI
+    cli-usage
+    video-data
     downloading
     searching
     accounts

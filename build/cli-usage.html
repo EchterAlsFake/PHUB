@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Quickstart" href="quickstart.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Exploiting video data" href="video-data.html" /><link rel="prev" title="Quickstart" href="quickstart.html" />
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2023.07.26 -->
-        <title>PHUB documentation</title>
+        <title>CLI Usage - PHUB documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
@@ -131,7 +131,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">PHUB  documentation</div></a>
+      <a href="index.html"><div class="brand">PHUB  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -151,7 +151,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
   <span class="sidebar-brand-text">PHUB  documentation</span>
@@ -162,9 +162,9 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul>
+  <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cli-usage.html">CLI Usage</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">CLI Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="video-data.html">Exploiting video data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="downloading.html">Video downloading</a></li>
 <li class="toctree-l1"><a class="reference internal" href="searching.html">Searching</a></li>
@@ -213,85 +213,57 @@
           </label>
         </div>
         <article role="main">
-          <section id="phub-documentation">
-<h1>PHUB documentation<a class="headerlink" href="#phub-documentation" title="Permalink to this heading">#</a></h1>
-<img alt="_images/banner.jpg" class="align-center" src="_images/banner.jpg" />
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">#</a></h2>
-<p>PHUB is an API wrapper for Pornhub (PH).
-It is able to communicate with most used PH
-features such as video searching, downloading,
-account connection, etc.</p>
+          <section id="cli-usage">
+<h1>CLI Usage<a class="headerlink" href="#cli-usage" title="Permalink to this heading">#</a></h1>
+<p>PHUB comes packaged with a built-in
+command-line tool. You can access it
+by calling the module from the terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>phub
+Usage:<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>phub<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
+
+Options:
+<span class="w">    </span>--help<span class="w">  </span>Show<span class="w"> </span>this<span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span>exit.
+
+Commands:
+<span class="w">    </span>download<span class="w">  </span>Download<span class="w"> </span>a<span class="w"> </span>specific<span class="w"> </span>video.
+<span class="w">    </span>ui<span class="w">        </span>Run<span class="w"> </span><span class="k">in</span><span class="w"> </span>UI<span class="w"> </span>mode.
+</pre></div>
+</div>
+<section id="downloading-a-video">
+<h2>Downloading a video<a class="headerlink" href="#downloading-a-video" title="Permalink to this heading">#</a></h2>
+<p>You can simply download a video using the
+<code class="docutils literal notranslate"><span class="pre">download</span></code> command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>phub<span class="w"> </span>download<span class="w"> </span>--url<span class="w"> </span>https://www.pornhub.com/view_video.php?viewkey<span class="o">=</span>xxx
+</pre></div>
+</div>
+<p>You can also specify a custom video quality and
+output file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>phub<span class="w"> </span>download<span class="w"> </span>--url<span class="w"> </span>https://www.pornhub.com/view_video.php?viewkey<span class="o">=</span>xxx<span class="w"> </span><span class="se">\</span>
+<span class="w">                          </span>--quality<span class="w"> </span><span class="m">1080</span><span class="w"> </span><span class="se">\</span>
+<span class="w">                          </span>--output<span class="w"> </span>my-video.mp4
+</pre></div>
+</div>
+<p>The given command will download the video with a quality of
+1080p under the <code class="docutils literal notranslate"><span class="pre">my-video.mp4`</span></code> filename.</p>
+</section>
+<section id="using-the-ui">
+<h2>Using the UI<a class="headerlink" href="#using-the-ui" title="Permalink to this heading">#</a></h2>
+<p>The CLI can also start a (very) barebone
+UI. It is not really useful since it does not
+hav a lot of features yet.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><strong>Early dev</strong> + i don’t plan to
-maintain this often so don’t hesitate
-to submit issues or requests through the
-project’s <a class="reference external" href="https://github.com/Egsagon/PHUB">github page</a>.</p>
+<p>You will need Tkinter to be installed</p>
 </div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>phub<span class="w"> </span>ui
+</pre></div>
+</div>
+<img alt="_images/ui.png" src="_images/ui.png" />
 </section>
-<section id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">#</a></h2>
-<ul class="simple">
-<li><p><a class="reference external" href="https://pypi.org/project/requests/">requests</a></p></li>
-<li><p><a class="reference external" href="https://pypi.org/project/click/">click</a></p></li>
-<li><p><a class="reference external" href="https://pypi.org/project/tqdm/">tqdm</a></p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Disclaimer: This project is probably against Pornhub TOS. Use at your own risks.</p>
-</div>
-<section id="guides">
-<h3>Guides<a class="headerlink" href="#guides" title="Permalink to this heading">#</a></h3>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#initialising-a-session">Initialising a session</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#fetching-a-video">Fetching a video</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#accessing-video-data">Accessing video data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html#downloading-a-video">Downloading a video</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="cli-usage.html">CLI Usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli-usage.html#downloading-a-video">Downloading a video</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli-usage.html#using-the-ui">Using the UI</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli-usage.html#other-features">Other features</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="video-data.html">Exploiting video data</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="video-data.html#advanced-usage">Advanced usage</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="downloading.html">Video downloading</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="downloading.html#downloading-a-video">Downloading a video</a></li>
-<li class="toctree-l2"><a class="reference internal" href="downloading.html#download-options">Download options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="downloading.html#advanced-downloading">Advanced downloading</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="searching.html">Searching</a></li>
-<li class="toctree-l1"><a class="reference internal" href="accounts.html">Accounts handling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="long-usage.html">Long term usage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="long-usage.html#todo">TODO</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
-<section id="api-docs">
-<h3>API docs<a class="headerlink" href="#api-docs" title="Permalink to this heading">#</a></h3>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api/index.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/classes.html">API objects</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/data.html">API Dataclasses</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/exceptions.html">Error handling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/utils.html">API utilities</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</section>
+<section id="other-features">
+<h2>Other features<a class="headerlink" href="#other-features" title="Permalink to this heading">#</a></h2>
+<p>Some features like searching for videos are
+still to be implemented to the CLI.</p>
 </section>
 </section>
 
@@ -300,16 +272,26 @@ project’s <a class="reference external" href="https://github.com/Egsagon/PHUB"
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="quickstart.html">
+          <a class="next-page" href="video-data.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Quickstart</div>
+                <div class="title">Exploiting video data</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          
+          <a class="prev-page" href="quickstart.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Quickstart</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -340,13 +322,10 @@ project’s <a class="reference external" href="https://github.com/Egsagon/PHUB"
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">PHUB documentation</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-<li><a class="reference internal" href="#dependencies">Dependencies</a><ul>
-<li><a class="reference internal" href="#guides">Guides</a></li>
-<li><a class="reference internal" href="#api-docs">API docs</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">CLI Usage</a><ul>
+<li><a class="reference internal" href="#downloading-a-video">Downloading a video</a></li>
+<li><a class="reference internal" href="#using-the-ui">Using the UI</a></li>
+<li><a class="reference internal" href="#other-features">Other features</a></li>
 </ul>
 </li>
 </ul>

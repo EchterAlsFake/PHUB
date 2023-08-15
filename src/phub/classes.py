@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Self, Callable, Generator
+from typing import TYPE_CHECKING, Self, Callable, Generator, Any
 if TYPE_CHECKING: from phub.core import Client
 
 import os
@@ -23,7 +23,9 @@ except ModuleNotFoundError:
 from phub import utils
 from phub import consts
 from phub import parser
-from phub.utils import log, download_presets as dlp
+from phub.utils import (log,
+                        register_properties,
+                        download_presets as dlp)
 
 
 @dataclass
@@ -138,6 +140,7 @@ class Tag:
     name: str
     count: int = field(repr = False)
 
+@register_properties
 class Video:
     '''
     Represent a PornHub video.
@@ -183,6 +186,13 @@ class Video:
         Load of refresh video page and data.
         '''
         
+        # Clear the cache
+        log('Video', 'Clearing cache of', self, level = 4)
+        for name in self.__properties__:
+            if name in self.__dict__:
+                delattr(self, name)
+        
+        # Refresh data
         log('video', 'Refreshing video', self, level = 4)
         response = self.client._call('GET', self.url)
         
@@ -197,6 +207,7 @@ class Video:
             dict: Parsed video data, fresh from Pornhub.
         '''
         
+        print('lazying')
         if not self.data: self.refresh()
         return self.data
     

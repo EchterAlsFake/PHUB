@@ -8,6 +8,7 @@ from string import ascii_letters
 import tqdm
 from datetime import datetime
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Callable, Self, Literal
 
 from phub import consts
@@ -20,7 +21,7 @@ DEBUG_RESET: bool = False
 DEBUG_FILE = sys.stdout
 
 
-def slash(string: str, form: str) -> str:
+def slash(string: str, form: Literal['**', '*/', '/*', '//']) -> str:
     '''
     Properly add or remove trailling slashes from an URL.
     
@@ -187,6 +188,26 @@ def hard_strip(text: str, sep: str = ' ') -> str:
     
     if not text: return
     return sep.join(text.split())
+
+def register_properties(cls):
+    '''
+    Register a class property as a
+    ___properties__ attribute.
+    
+    Args:
+        cls (object): The class to use.
+    
+    Returns:
+        The modified class.
+    '''
+    
+    cls.__properties__ = []
+    
+    for name, method in cls.__dict__.items():
+        if isinstance(method, cached_property):
+            cls.__properties__.append(name)
+    
+    return cls
 
 
 class download_presets:
