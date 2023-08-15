@@ -8,8 +8,7 @@ import click
 from phub.utils import download_presets as dlp
 
 @click.group()
-def cli() -> None:
-    pass
+def cli() -> None: pass
 
 @cli.command()
 def ui():
@@ -41,18 +40,15 @@ def download(url, quality, output):
     
     # Download video
     try:
-        path = video.download(path = output, quality = phub.Quality(quality),
-                              callback = dlp.bar, desc = 'Downloading ' + video.key)
+        path = video.download(output, quality,
+                              callback = dlp.bar(desc = f'Downloading "{video.key}"'))
     
     except Exception as err:
-        raise err
-        return click.secho(f'[ERR] Could not download video: {err}', fg = 'red')
+        return click.secho(f'[ERR] Could not download video: {repr(err)}', fg = 'red')
     
     click.secho('Downloaded video at:\n\t' + path, fg = 'green')
 
 if __name__ == '__main__':
-    
     cli()
-
 
 # EOF
