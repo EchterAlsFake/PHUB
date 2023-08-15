@@ -27,10 +27,7 @@ Example for downloading a video knowing its url, in the best available quality:
 python3 -m phub download --url https://www.pornhub.com/view_video.php?viewkey=xxx -q 'best'
 ```
 
-You can also use the provided UI if you have `tkinter` installed:
-```sh
-python3 -m phub ui
-```
+You can also use this beautiful UI made by EchterAlsFake: [EchterAlsFake/Porn_Fetch](https://github.com/EchterAlsFake/Porn_Fetch)
 
 ## Package usage
 Example video download usage:
