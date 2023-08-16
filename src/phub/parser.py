@@ -48,7 +48,7 @@ def resolve(video: Video) -> dict:
     
     log('parse', 'Resolving page JS script...', level = 5)
     
-    for i in range(RENEW_MAX_ATTEMPTS):
+    for _ in range(RENEW_MAX_ATTEMPTS):
         
         response = consts.regexes.video_flashvar(video.page)
         

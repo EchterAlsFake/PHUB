@@ -102,4 +102,20 @@ which case the title of the video will be taken as a filename.
 
 For advanced downloading, see `downloading`_
 
+Debugging
+---------
+
+At any time, you can use built-in debugging to see what's wrong with
+your code or the API.
+
+.. code-block:: python
+
+    import phub
+
+    # Start debug
+    phub.debug(True)
+
+    client = phub.Client()
+    ...
+
 .. _downloading: about:blank

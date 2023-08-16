@@ -16,9 +16,9 @@ from functools import cached_property
 from phub import utils
 from phub import consts
 from phub import classes
-from phub.utils import log
+from phub.utils import log, register_properties
 
-
+@register_properties
 class Account:
     '''
     Represent a Client's account.
@@ -57,6 +57,33 @@ class Account:
     def __repr__(self) -> str:
         return f'<phub.core.Account name={self.name}>'
     
+    def __getattribute__(self, item: str):
+        '''
+        Verify that the client is logged in.
+        '''
+        
+        obj = object.__getattribute__(self, item)
+        
+        # Bypass dunder & private methods & attributes
+        if item.startswith('_'): return obj
+        
+        if item in self.__properties__ and not self.client.logged:
+            raise consts.NotLoggedIn('Client is not logged in.')
+        
+        return obj
+    
+    def refresh(self) -> None:
+        '''
+        Delete the cache to allow refreshing items of this object.
+        '''
+        
+        # Clear the cache
+        log('accnt', 'Clearing cache of', self, level = 4)
+        
+        for name in self.__properties__:
+            if name in self.__dict__:
+                delattr(self, name)
+
     @cached_property
     def recommended(self) -> classes.Query:
         '''
@@ -105,6 +132,7 @@ class Account:
         
         return classes.Feed(self.client)
 
+
 class Client:
     '''
     Represents a Client capable of interacting with PornHub.
@@ -115,7 +143,7 @@ class Client:
                  password: str = None,
                  session: requests.Session = None,
                  language: str = 'en,en-US',
-                 autologin: bool = False,
+                 autologin: bool = True,
                  delay: bool = False) -> None:
         '''
         Initialise a new client.
@@ -132,21 +160,24 @@ class Client:
         self.session = session or requests.Session()
         self.session.cookies.set('accessAgeDisclaimerPH', '1')
         
+        # Account setings
+        self.logged = False
         self.creds = {'username': username, 'password': password}
         self._intents_to_login = bool(username)
         self.language = {'Accept-Language': language}
+        
+        # Delay settings
+        self.delay = (0, .5)[delay]
+        self._has_called = False
         
         # Connect Account object
         self.account: Account | None = Account(self)
         
         # Autologin
-        self.logged = False
-        if autologin: self.login()
+        if autologin and self._intents_to_login:
+            self.login()
         
         log('clien', 'Initialised new client', repr(self))
-        
-        self.delay = (0, .5)[delay]
-        self._has_called = False
 
     def __repr__(self) -> str:
         '''
@@ -154,7 +185,7 @@ class Client:
         whether the account is connected.
         '''
         
-        status = 'anonymous', 'connect (' + ('not ', '')[self.logged] + 'logged)'
+        status = 'anonymous', 'w/account (' + ('not ', '')[self.logged] + 'logged)'
         return f'<phub.Client {status[self._intents_to_login]}>'
     
     def __str__(self) -> str:
@@ -229,8 +260,7 @@ class Client:
         log('clien', 'Request passed with status', response.status_code, level = 6)
         
         if throw and not response.ok:
-            raise ConnectionError(f'Request `{func}` failed:' + \
-                utils.shortify(response.text))
+            raise ConnectionError(f'Request `{func}` failed.')
         
         self._has_called = True
         return response

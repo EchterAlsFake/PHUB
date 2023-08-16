@@ -10,8 +10,8 @@ if TYPE_CHECKING: from phub.core import Client
 
 import os
 import json
-from functools import cached_property
 from datetime import datetime, timedelta
+from functools import cached_property, cache
 
 Soup = None
 try:
@@ -23,9 +23,11 @@ except ModuleNotFoundError:
 from phub import utils
 from phub import consts
 from phub import parser
-from phub.utils import (log,
-                        register_properties,
-                        download_presets as dlp)
+from phub.utils import (
+    log,
+    register_properties,
+    download_presets as dlp
+)
 
 
 @dataclass
@@ -51,7 +53,9 @@ class User:
         '''
         
         log('users', 'Searching author of', video, level = 6)
-        video._lazy()
+        
+        if video.page is None:
+            video.refresh()
         
         # Guess the user is a model/pornstar or channel
         guess = consts.regexes.video_model(video.page) or \
@@ -172,7 +176,7 @@ class Video:
         # Video data
         self.client = client
         self.page: str = None
-        self.data: dict = None
+        self.data: dict = {}
         
         if preload:
             log('video', 'Preloading video', self, level = 6)
@@ -199,18 +203,27 @@ class Video:
         self.page = response.text
         self.data = parser.resolve(self)
     
-    def _lazy(self) -> dict:
+    def _fetch(self, key: str) -> Any:
         '''
-        Refresh the video data or get it from the cache.
+        Lazily fetch a value in the vieo data dict.
+        
+        Args:
+            key (str): The data key.
         
         Returns:
-            dict: Parsed video data, fresh from Pornhub.
+            Any: The asked data.
         '''
         
-        print('lazying')
-        if not self.data: self.refresh()
-        return self.data
-    
+        if not self.data or not key in self.data:
+            self.refresh()
+        
+        try:
+            value = self.data.get(key)
+            return value
+        
+        except ValueError:
+            raise consts.ParsingError(f'key `{key}` does not exists in video data.')
+        
     # ========= Download ========= #
     
     def get_M3U(self,
@@ -233,7 +246,7 @@ class Video:
         quality = utils.Quality(quality)
         
         quals = {int(el['quality']): el['videoUrl']
-                 for el in self._lazy()['mediaDefinitions']
+                 for el in self._fetch('mediaDefinitions')
                  if el['quality'] in ['1080', '720', '480', '240']}
         
         master = quality.select(quals)
@@ -326,7 +339,7 @@ class Video:
         The title of the video.
         '''
         
-        return self._lazy().get('video_title')
+        return self._fetch('video_title')
     
     @cached_property
     def image_url(self) -> str:
@@ -334,7 +347,7 @@ class Video:
         Thumbnail URL of the video. Use client.session.get to download.
         '''
         
-        return self._lazy().get('image_url')
+        return self._fetch('image_url')
     
     @cached_property
     def is_vertical(self) -> bool:
@@ -350,7 +363,7 @@ class Video:
         Video duration as a timedelta object.
         '''
         
-        secs = self._lazy().get('video_duration')
+        secs = self._fetch('video_duration')
         return timedelta(seconds = secs)
     
     @cached_property
@@ -360,7 +373,7 @@ class Video:
         '''
         
         return [Tag(*tag.split(':')) for tag in
-                self._lazy().get('actionTags').split(',') if tag]
+                self._fetch('actionTags').split(',') if tag]
 
     @cached_property
     def like(self) -> Like:
@@ -368,7 +381,8 @@ class Video:
         Positive and negative likes of the video.
         '''
         
-        self._lazy()
+        if self.page is None:
+            self.refresh()
         
         votes = {t.lower(): v for t, v in consts.regexes.video_likes(self.page)}
         return Like(votes['up'], votes['down'])
@@ -379,7 +393,8 @@ class Video:
         How many times the video has been watched.
         '''
 
-        self._lazy()
+        if self.page is None:
+            self.refresh()
 
         raw = consts.regexes.video_interactions(self.page)[0]
         return int(json.loads(f'[{raw}]')[0]['userInteractionCount'].replace(' ', '').replace(',', ''))
@@ -390,7 +405,7 @@ class Video:
         List of hotspots (in seconds) of the video.
         '''
         
-        return list(map(int, self._lazy().get('hotspots')))
+        return list(map(int, self._fetch('hotspots')))
 
     @cached_property
     def date(self) -> datetime:
@@ -398,7 +413,9 @@ class Video:
         The publish date of the video as a datetime object.
         '''
         
-        self._lazy()
+        if self.page is None:
+            self.refresh()
+        
         raw: str = consts.regexes.extract_video_date(self.page)[0]
         return datetime.strptime(raw, '%Y-%m-%dT%H:%M:%S%z')
 
@@ -495,11 +512,12 @@ class Query:
         def wrapper(): # We need to wrap this, otherwise the whole __getitem__ will be
                        # Interpreted as a generator.
             
-            for i in index.indices(self.length):
+            for i in index.indices(len(self)):
                 yield self.get(i)
         
         return wrapper()
     
+    @cache # keep generated Video objects unique
     def get(self, index: int) -> Video:
         '''
         Get a specific video using an index.

@@ -94,4 +94,10 @@ class UserNotFoundError(Exception):
     
     pass
 
+class NotLoggedIn(Exception):
+    '''
+    The client is not logged to a PH account,
+    but tried to access account data.
+    '''
+
 # EOF
