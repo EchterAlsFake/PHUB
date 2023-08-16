@@ -100,4 +100,9 @@ class NotLoggedIn(Exception):
     but tried to access account data.
     '''
 
+class AlreadyLoggedIn(Exception):
+    '''
+    The client already established a connection with PH.
+    '''
+
 # EOF

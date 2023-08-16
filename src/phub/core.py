@@ -265,7 +265,7 @@ class Client:
         self._has_called = True
         return response
     
-    def login(self, throw: bool = False) -> bool:
+    def login(self, force: bool = False, throw: bool = False) -> bool:
         '''
         Attempt to login to PornHub.
         
@@ -275,6 +275,9 @@ class Client:
         Returns:
             bool: whether the operation was successful.
         '''
+        
+        if not force and self.logged:
+            raise consts.AlreadyLoggedIn('Account already connected.')
         
         log('client', 'Attempting loggin...', level = 6)
         
