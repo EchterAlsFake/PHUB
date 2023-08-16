@@ -265,7 +265,7 @@ class Client:
         self._has_called = True
         return response
     
-    def login(self, force: bool = False, throw: bool = False) -> bool:
+    def login(self, force: bool = False, throw: bool = True) -> bool:
         '''
         Attempt to login to PornHub.
         
@@ -301,7 +301,7 @@ class Client:
             
             # Throw error
             if throw:
-                raise ConnectionRefusedError('Connection failed. Check credentials.')
+                raise consts.LogginFailed('Login failed. Check credentials.')
         
         self.logged = success
         return success

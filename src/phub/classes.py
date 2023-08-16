@@ -223,7 +223,7 @@ class Video:
         
         except ValueError:
             raise consts.ParsingError(f'key `{key}` does not exists in video data.')
-        
+    
     # ========= Download ========= #
     
     def get_M3U(self,
@@ -339,7 +339,14 @@ class Video:
         The title of the video.
         '''
         
-        return self._fetch('video_title')
+        return self.data['video_title']
+        # Explanation
+        # For all other properties, we need to fetch the video page
+        # and parse it, but the title is always passed in when coming
+        # from a query, so it *should* always exists.
+        # Doing this instead of self._fetch('video_title') ensure
+        # more parsing speed if the video was created by a query object,
+        # but only if we only get the title.
     
     @cached_property
     def image_url(self) -> str:
@@ -472,6 +479,7 @@ class Query:
         self.page: str = None
         self.corrector = corrector
     
+    @cache
     def __len__(self) -> int:
         '''
         Get the amount of videos.
@@ -479,8 +487,6 @@ class Query:
         Returns:
             int: The amount of videos in the `Query` object.
         '''
-        
-        if self._length: return self._length
         
         # Load 1st page to get the counter
         if self.page is None:
@@ -491,8 +497,7 @@ class Query:
         log('query', 'Collected counters:', counter, level = 4)
         
         if len(counter) != 1: raise consts.CounterNotFound()
-        self._length = int(counter[0]) 
-        return self._length
+        return int(counter[0])
     
     def __getitem__(self, index: int | slice) -> Video | Generator[Video, None, None]:
         '''
@@ -507,17 +512,22 @@ class Query:
         '''   
 
         if isinstance(index, int):
+            
+            if index < 0: index += len(self)
+            
             return self.get(index)
         
         def wrapper(): # We need to wrap this, otherwise the whole __getitem__ will be
                        # Interpreted as a generator.
             
-            for i in index.indices(len(self)):
+            indices = index.indices(len(self))
+            
+            for i in range(*indices):
                 yield self.get(i)
         
         return wrapper()
     
-    @cache # keep generated Video objects unique
+    @cache
     def get(self, index: int) -> Video:
         '''
         Get a specific video using an index.

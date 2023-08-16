@@ -36,7 +36,7 @@ class regexes:
     # extract_html_comment = re.compile( r'<!--(.*?)//-->',                                                  re.DOTALL ).findall   # Extract content of HTML comments
     
     # Searching regexes
-    video_search_counter = re.compile( r'showingCounter.*?\">.*?(\d+)\s+</',                               re.DOTALL ).findall   # Extract video counter from search responses
+    video_search_counter = re.compile( r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/',                     re.DOTALL ).findall   # Extract video counter from search responses
     video_likes          = re.compile( r'span class=\"votes(Up|Down)\" data-rating.*?>(.*?)<'                        ).findall   # Extract likes from a video page
     video_interactions   = re.compile( r'interactionStatistic\": \[(.*?)\]',                               re.DOTALL ).findall   # Find interaction stats from a video page
     video_flashvar       = re.compile( r'var (flashvars_\d*) = ({.*});\n'                                            ).findall   # Video obfuscation script part
@@ -103,6 +103,11 @@ class NotLoggedIn(Exception):
 class AlreadyLoggedIn(Exception):
     '''
     The client already established a connection with PH.
+    '''
+
+class LogginFailed(Exception):
+    '''
+    Login phase failed. Credentials may be wrong.
     '''
 
 # EOF
