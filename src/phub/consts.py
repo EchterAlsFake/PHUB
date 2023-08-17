@@ -50,7 +50,7 @@ class regexes:
     sub_root             = re.compile( r'https://.{2,3}\.pornhub\.com/'                                              ).sub       # Substitue URL roots
     
     # Match regexes
-    is_valid_video_url   = re.compile( r'https://.{2,3}\.pornhub\.com/view_video\.php\?viewkey=[a-z\d]{13,15}'       ).fullmatch # Verify video URL validity
+    is_valid_video_url   = re.compile( r'https:\/\/.{2,3}\.pornhub\..{2,3}\/view_video\.php\?viewkey=[a-z\d]{8,}'    ).fullmatch # Verify video URL validity
     
     # Renew regexes
     class renew:

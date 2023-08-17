@@ -165,7 +165,7 @@ class Video:
             preload (bool): Wether to load the video page.
         '''
         
-        # assert consts.regexes.is_valid_video_url(url), 'Invalid URL' # TODO - DOES NOT WORK FOR CERTAIN VIDS
+        assert consts.regexes.is_valid_video_url(url), 'Invalid URL'
         
         # Build URL
         self.url = utils.basic(url, False)
