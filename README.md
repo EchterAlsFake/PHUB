@@ -3,7 +3,10 @@
 # PHUB - An API for PornHub.
 PHUB is an API wrapper for PornHub. It is able to fetch, search and download videos and supports account connections, achieved with efficient web scrapping using requests and regexes.
 
-> :warning: **Early development + not maintained a lot** don't hesitate to submit issues and PRs
+> ⚠️ I don't maintain this often, so don't hesitate to submit issues or PRs
+
+> ⚠️ This project is probably against Pornhub TOS.
+
 
 ## Installation
 - Install using pip (python 3.11 or higher required):
@@ -11,7 +14,7 @@ PHUB is an API wrapper for PornHub. It is able to fetch, search and download vid
 pip install --upgrade phub
 ```
 
-- Or using this repository to get latest features:
+- Or using this repository to get the latest features:
 ```sh
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git
 ```
@@ -27,31 +30,25 @@ Example for downloading a video knowing its url, in the best available quality:
 python3 -m phub download --url https://www.pornhub.com/view_video.php?viewkey=xxx -q 'best'
 ```
 
-You can also use this beautiful UI made by EchterAlsFake: [EchterAlsFake/Porn_Fetch](https://github.com/EchterAlsFake/Porn_Fetch)
+## UI Usage
+You can use this masterpiece made by EchterAlsFake: [EchterAlsFake/Porn_Fetch](https://github.com/EchterAlsFake/Porn_Fetch)
 
 ## Package usage
-Example video download usage:
+Exemple for downloading a video:
 ```python
 import phub
 
 client = phub.Client()
 video = client.get('enter video URL here')
+print('Downloading:', video.title)
 
-# Download on working dir with maximum quality
+# Download on working dir with best quality
 video.download('.', quality = phub.Quality.BEST)
 ```
 
-Example searching for videos:
-```python
-query = client.search('enter query here')
-
-# Display videos from 0 to 10
-for video in query[:10]:
-  print(video.title)
-```
-
 ## Documentation
-See [here](https://phub.readthedocs.io).
+You can find out more on the API [in the docs](https://phub.readthedocs.io).
 
-## Why?
-This project was made as an enhancement for [pfetch](https://github.com/Egsagon/pornhub-fetch), which aimed at downloading videos from PornHub.
+## License
+
+GPLv3 - See the `LICENSE` file.
