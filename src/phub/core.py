@@ -259,6 +259,9 @@ class Client:
         
         log('clien', 'Request passed with status', response.status_code, level = 6)
         
+        if throw and response.status_code == 429:
+            raise consts.TooManyRequests('Too many requests.')
+        
         if throw and not response.ok:
             raise ConnectionError(f'Request `{func}` failed.')
         

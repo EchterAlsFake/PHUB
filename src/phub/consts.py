@@ -33,7 +33,6 @@ class regexes:
     extract_token        = re.compile( r'token *?= \"(.*?)\",'                                                       ).findall   # Extract session token from the home page
     extract_videos       = re.compile( r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?title=\"(.*?)\"', re.DOTALL ).findall   # Extract videos from a page
     extract_video_date   = re.compile( r'\"uploadDate\": \"(.*?)\"'                                                  ).findall   # Extract video publish date
-    # extract_html_comment = re.compile( r'<!--(.*?)//-->',                                                  re.DOTALL ).findall   # Extract content of HTML comments
     
     # Searching regexes
     video_search_counter = re.compile( r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/',                     re.DOTALL ).findall   # Extract video counter from search responses
@@ -53,8 +52,14 @@ class regexes:
     # Match regexes
     is_valid_video_url   = re.compile( r'https://.{2,3}\.pornhub\.com/view_video\.php\?viewkey=[a-z\d]{13,15}'       ).fullmatch # Verify video URL validity
     
-    # Old
-    # video_model          = re.compile( r'<span class=\"usernameBadgesWrapper\"><a rel=\"\" href=\"(.*?)\"  class=\"bolded\">(.*?)</a>').findall # Get video author if model
+    # Renew regexes
+    class renew:
+        script           = re.compile( r'go\(\) \{(.*?)n=least',                                           re.DOTALL ).findall   # Find renew script
+        comment          = re.compile( r'\/\*.*?\*\/',                                                     re.DOTALL ).sub       # Remove JS comments
+        states1          = re.compile( r'(if\s\(.*?&\s\d+\))'                                                        ).sub       # Format 'if' statements
+        states2          = re.compile( r'(else)'                                                                     ).sub       # Format 'else' statements
+        variables        = re.compile( r'var(.)=(\d+);'                                                              ).sub       # Remove variables leywords
+        cookie_end       = re.compile( r'cookie.*?s\+\":(.*?);'                                                      ).findall   # Find cookie end string
 
 class FeedType:
     '''
@@ -108,6 +113,17 @@ class AlreadyLoggedIn(Exception):
 class LogginFailed(Exception):
     '''
     Login phase failed. Credentials may be wrong.
+    '''
+
+class TooManyRequests(Exception):
+    '''
+    The client sent too many requests.
+    To bypass, consider using proxies or
+    set a small delay to the client request:
+    
+    .. code-block:: python
+    
+        client = phub.Client(delay = True)
     '''
 
 # EOF

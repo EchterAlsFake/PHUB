@@ -5,9 +5,8 @@
 from __future__ import annotations
 
 import json
-import js2py
 from phub import consts
-from phub.utils import log
+from phub.utils import log, least_factors, hard_strip
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING: from classes import Video
@@ -22,16 +21,31 @@ def renew(video: Video) -> None:
         video (Video): The object that called the parser.
     '''
     
-    # Fetch numbers
     log('parse', 'Attempting to renew connection')
-    script, end = consts.regexes.video_renew_connect(video.page)[0]
-    n, p, s = js2py.eval_js(script + ';return [n, p, s];}')()
     
-    # Build the cookie
-    cookie = f'{n}*{p / n}:{s}{end}'
+    # Get page JS code
+    code = consts.regexes.renew.script(video.page)[0]
+    
+    # Format JS code to python code
+    code = consts.regexes.renew.comment('', code)
+    code = consts.regexes.renew.states1(r'\n\g<1>:\n\t', code)
+    code = consts.regexes.renew.states2(r'\n\g<1>:\n\t', code)
+    code = hard_strip(code, '')
+    code = consts.regexes.renew.variables(r'\g<1>=\g<2>\n', code)
+    code = code.replace('varn;', '').replace(';', '\n')
+    
+    # Execute code
+    locales = {'n': 0, 'p': 0, 's': 0}
+    exec(code, locales)
+    n, p, s, _ = locales.values()
+    n = least_factors(p)
+    
+    # Build cookies
+    end = consts.regexes.renew.cookie_end(video.page)[0]
+    cookie = f'{n}*{p / n}:{s}:{end}'
     log('parse', 'Injecting calculated cookie:', cookie)
     
-    # Send cookie and reload page
+    # Inject cookie and reload page
     video.client.session.cookies.set('RNKEY', cookie)
     video.refresh()
 
