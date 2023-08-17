@@ -29,4 +29,28 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 
 html_static_path = ["_static"]
 
-html_theme = "furo"
+html_theme = "sphinx_material"
+
+html_theme_options = {
+
+    'nav_title': 'PHUB',
+
+    'color_primary': 'blue',
+    'color_accent': 'light-blue',
+
+    'repo_url': 'https://github.com/Egsagon/PHUB',
+    'repo_name': 'PHUB',
+
+    'globaltoc_depth': 3,
+    'globaltoc_collapse': False,
+    'globaltoc_includehidden': False,
+    
+    'logo_icon': '&#xe869'
+}
+
+html_sidebars = {
+    "**": [
+        "logo-text.html",
+        "globaltoc.html",
+    ]
+}

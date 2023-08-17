@@ -1,1 +1,1 @@
-furo
+git+https://github.com/bashtage/sphinx-material.git
