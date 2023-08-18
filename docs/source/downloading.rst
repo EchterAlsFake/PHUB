@@ -154,7 +154,7 @@ one or more video, you might want extra speed in certain
 scenarios.
 
 In that case, you can fetch the M3U file
-:meth:`.Video.get_M3U`. It takes a single argument, wether
+:meth:`.Video.get_M3U`. It takes a ``process`` argument, wether
 to process the file.
 
 .. note:: A M3U file is (basically) just a list of URLs to call to reconstituate the video. It also has comments on stuff like bandwith, resolution, timing, etc.

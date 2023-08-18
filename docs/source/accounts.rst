@@ -28,18 +28,18 @@ creds.json:
 
     import phub
 
-    client = phub.Client.from_file('my-credentials.json')
+    client = phub.Client.from_file('creds.json')
 
-By default, once loaded, nothing will be sent. To connect, you need to call :meth:`.Client.login`,
-or set parameter `phub.autologin` to `True`. If the login was successfull, you can access some
-features of your account:
+.. default-literal-role:: python
+
+By default, the client will immediatly attempt to login. This can be disabled by setting :literal:`autologin=False` 
+If the login was successfull, you can access some features of your account:
 
 .. code-block:: python
 
     import phub
 
-    client = phub.Client(...)
-    client.login()
+    client = phub.Client('my-username', 'my-password')
 
     # Get recommended videos
     client.account.recommended
@@ -49,6 +49,20 @@ features of your account:
 
     # Get liked videos
     client.account.liked
+
+If you want to login later, you can do something like:
+
+.. code-block:: python
+
+    import phub
+
+    client = phub.Client('my-username', 'my-password', autologin = False)
+
+    # Do things...
+
+    client.login()
+
+You can also use :meth:`.Client.login` to refresh your connection.
 
 Here is an exemple script that allows you to download the last 10 videos you watched:
 
@@ -68,14 +82,29 @@ Here is an exemple script that allows you to download the last 10 videos you wat
     the one linked with the phub client, while the 2nd represent any PH user.
 
     To get your `User` object (e.g., to get your posted videos), you can do something like this:
+    :literal:`client.get_user(name = client.account.name)`
+
+Accessing the user videos
+-------------------------
+
+The following queries are available through the user account:
 
 .. code-block:: python
 
-    me = client.get_user(name = client.account.name)
+    client = phub.Client('my-username', 'my-password')
+
+    account = client.account # (1)!
+
+.. code-annotations::
+    #. The :attr:`~.core.account` attribute will be :literal:`None` if the login fails.
+
+
+Fetching the user feed
+----------------------
 
 There is also an experimental feature that allows you to get the content of your feed:
 
-.. note:: This feature is currenlty not stable, but is under development.
+.. warning:: This feature is currenlty not stable, but is under development.
 
 .. code-block:: python
 

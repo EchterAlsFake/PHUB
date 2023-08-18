@@ -30,7 +30,7 @@ Dependencies
 .. _click: https://pypi.org/project/click/
 .. _tqdm: https://pypi.org/project/tqdm/
 
-.. note:: Disclaimer: This project is probably against Pornhub TOS. Use at your own risks.
+.. warning:: This project is probably against Pornhub TOS. Use at your own risks.
 
 Guides
 ------
