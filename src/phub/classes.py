@@ -627,7 +627,7 @@ class Feed:
         '''
 
         self.client = client
-        self.cache: dict[int, list[FeedItem]] = {}
+        self.cache = {}
     
     def _get_page(self, page: int) -> list[FeedItem]:
         '''

@@ -1,1 +1,1 @@
-git+https://github.com/bashtage/sphinx-material.git
+sphinx_immaterial

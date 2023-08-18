@@ -248,7 +248,7 @@ class Client:
         url = consts.ROOT + utils.slash(func, '**') \
               if simple_url else func
         
-        log('clien', f'Sending request at {utils.shortify(url, 25)}', level = 6)
+        log('clien', f'Sending request at {utils.shortify(func, 30)}', level = 6)
         
         response = self.session.request(
             method = method,
