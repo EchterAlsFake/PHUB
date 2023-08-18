@@ -1,7 +1,7 @@
 PHUB documentation
 ==================
 
-.. image:: images/banner.jpg
+.. image:: images/banner.png
     :align: center
 
 Introduction

@@ -1,5 +1,5 @@
 '''
-### Utilities for the PHUB package. ###
+Utilities for the PHUB package.
 '''
 
 import sys

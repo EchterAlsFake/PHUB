@@ -1,7 +1,7 @@
 '''
-#### PHUB - A light API for interacting with PornHub. ####
+#### PHUB - An API wrapper.
 
-See https://github.com/Egsagon/PHUB for documentation.
+See https://phub.rtfd.io for documentation.
 '''
 
 from phub import ( core, utils, consts, classes, parser )

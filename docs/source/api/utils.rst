@@ -20,3 +20,12 @@ These functions are used by the API. It might also be useful for you.
 .. autofunction:: phub.utils.log
 
 .. autofunction:: phub.utils.hard_strip
+
+.. autofunction:: phub.utils.register_properties
+
+.. autofunction:: phub.utils.least_factors
+
+Download display presets
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: phub.utils.download_presets

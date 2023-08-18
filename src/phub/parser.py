@@ -1,5 +1,5 @@
 '''
-### Parsing script for the PHUB package. ###
+Parser script for the PHUB package.
 '''
 
 from __future__ import annotations

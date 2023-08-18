@@ -1,5 +1,5 @@
 '''
-### Constants for the PHUB package. ###
+Constants for the PHUB package.
 '''
 
 import re

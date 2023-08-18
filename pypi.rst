@@ -1,4 +1,6 @@
-.. image https://github.com/Egsagon/PHUB/blob/master/assets/banner.png
+.. image::
+    https://github.com/Egsagon/PHUB/blob/master/assets/banner.png
+    :align: center
 
 ==========================
 PHUB - An API for PornHub.

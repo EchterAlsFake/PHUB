@@ -1,7 +1,5 @@
 '''
-### Core module of the PHUB package. ###
-
-See https://github.com/Egsagon/PHUB for documentation.
+Core module of the PHUB package.
 '''
 
 from __future__ import annotations
