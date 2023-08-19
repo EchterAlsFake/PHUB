@@ -157,4 +157,10 @@ class TooManyRequests(Exception):
         client = phub.Client(delay = True)
     '''
 
+class Noresult(Exception):
+    '''
+    The search query did not found videos with
+    its given filters.
+    '''
+
 # EOF

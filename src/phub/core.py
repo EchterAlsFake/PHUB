@@ -259,7 +259,7 @@ class Client:
         
         if throw and response.status_code == 429:
             raise consts.TooManyRequests('Too many requests.')
-        
+        print(response.status_code)
         if throw and not response.ok:
             raise ConnectionError(f'Request `{func}` failed.')
         
@@ -375,7 +375,7 @@ class Client:
         # Add filters
         if hd:            url += '&hd=1'
         if production:    url += f'&p={production}'
-        if duration:      url += '&min_duration={}&max_duration{}'.format(*duration) # TODO
+        if duration:      url += '&min_duration={}&max_duration={}'.format(*duration) # TODO
         if category:      url += '&filter_category=' #TODO
         if sort:          url += f'&o={sort}'
         if time and sort: url += f'&t=' + time[0]

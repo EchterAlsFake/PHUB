@@ -571,7 +571,13 @@ class Query:
         if self.page_index == index: return
         
         log('query', 'Fetching page at index', index, level = 4)
-        raw = self.client._call('GET', self.url + str(index + 1)).text
+        
+        response = self.client._call('GET', self.url + str(index + 1), throw = False)
+        
+        if response.status_code == 404:
+            raise consts.Noresult('No result for the given query.')
+        
+        raw = response.text
         
         # Parse videos
         self.page = raw
