@@ -10,6 +10,7 @@ from phub import ( core, utils, consts, classes, parser )
 from phub.core import Client
 from phub.utils import Quality
 from phub.classes import Video, User
+from phub.consts import locals
 
 # Debugging controls
 from sys import stdout

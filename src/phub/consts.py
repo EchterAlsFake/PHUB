@@ -24,6 +24,15 @@ LOGIN_PAYLOAD = {
     'taste_profile': ''
 }
 
+SEARCH_SORT_TRANSLATION = {
+    'most relevant': None,
+    'most recent': 'mr',
+    'most viewed': 'mv',
+    'top rated': 'tr',
+    'longest': 'lg',
+    None: None
+}
+
 class regexes:
     '''
     Compiled regexes methods used for parsing.
@@ -73,6 +82,28 @@ class FeedType:
     COMMENTED   = 'stream_grouped_comments_videos'
     # TODO more stream types
 
+
+class locals:
+    '''
+    Locales constants.
+    '''
+    
+    # Search production types
+    PROFESSIONAL = 'professional'
+    HOMEMADE = 'homemade'
+    
+    # Search sort filters
+    MOST_RELEVANT = None
+    MOST_RECENT = 'most recent'
+    MOST_VIEWED = 'most viewed'
+    TOP_RATED = 'top rated'
+    LONGEST = 'longest'
+    
+    # Search time filters
+    DAY = 'day'
+    WEEK = 'week'
+    MONTH = 'month'
+    YEAR = 'year'
 
 # Exceptions
 

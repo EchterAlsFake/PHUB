@@ -4,7 +4,7 @@ Core module of the PHUB package.
 
 from __future__ import annotations
 from io import TextIOWrapper
-from typing import Self
+from typing import Self, Literal
 
 import json
 import requests
@@ -343,19 +343,44 @@ class Client:
         
         return classes.User.get(self, url, name)
     
-    def search(self, query: str) -> classes.Query:
+    def search(self,
+               query: str,
+               production: Literal['professional', 'homemade'] | None = None,
+               duration: tuple[int] | None = None,
+               hd: bool = False,
+               category: int = None,
+               sort: Literal['most relevant', 'most recent',
+                             'most viewed', 'top rated', 'longest'] = None,
+               time: Literal['day', 'week', 'month', 'year'] | None = None
+               ) -> classes.Query:
         '''
         Search for videos on PornHub servers.
         
         Args:
             query (str): Sentence to send to the server.
+            production (str): The production type, professional or homemade (both by default).
+            duration (tuple[int]): Video duration boundaries.
+            hd (bool): Wether to get only HD quality videos.
+            category (int): TODO
+            sort (str): How to sort videos (most relevant by default).
+            time (str): Video release approximation (does not work when sorting most relevant).
         
         Returns:
             Query: The fetched query object.
         '''
         
-        log('clien', 'Opening new search query:', query, level = 6)
         url = consts.ROOT + 'video/search?search=' + query
+        sort = consts.SEARCH_SORT_TRANSLATION[sort]
+        
+        # Add filters
+        if hd:            url += '&hd=1'
+        if production:    url += f'&p={production}'
+        if duration:      url += '&min_duration={}&max_duration{}'.format(*duration) # TODO
+        if category:      url += '&filter_category=' #TODO
+        if sort:          url += f'&o={sort}'
+        if time and sort: url += f'&t=' + time[0]
+        
+        log('clien', 'Opening new search query:', url, level = 6)
         return classes.Query(self, url)
 
 # EOF
