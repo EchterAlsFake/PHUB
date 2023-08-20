@@ -26,3 +26,8 @@ by other PHUB objects.
     :members:
     :undoc-members:
     :special-members: __init__, __new__
+
+.. autoclass:: phub.utils.Category
+    :members:
+    :undoc-members:
+    :special-members: __init__

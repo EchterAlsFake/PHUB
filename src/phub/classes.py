@@ -13,21 +13,23 @@ import json
 from datetime import datetime, timedelta
 from functools import cached_property, cache
 
-Soup = None
-try:
-    from bs4 import BeautifulSoup as Soup
-
-except ModuleNotFoundError:
-    print('Warning: BS4 not installed. Feed features will not be available.')
-
 from phub import utils
 from phub import consts
 from phub import parser
+from phub import errors
+
 from phub.utils import (
     log,
     register_properties,
     download_presets as dlp
 )
+
+try:
+    from bs4 import BeautifulSoup as Soup
+
+except ModuleNotFoundError:
+    log('phub', 'Warning: BS4 not installed. Feed features will not be available.')
+    Soup = None
 
 
 @dataclass
@@ -106,7 +108,7 @@ class User:
                 return cls(name = name, path = url, client = client)
         
         else:
-            raise consts.UserNotFoundError(f'User `{name}` not found.')
+            raise errors.UserNotFoundError(f'User `{name}` not found.')
     
     @cached_property
     def videos(self) -> Query:
@@ -222,7 +224,7 @@ class Video:
             return value
         
         except ValueError:
-            raise consts.ParsingError(f'key `{key}` does not exists in video data.')
+            raise errors.ParsingError(f'key `{key}` does not exists in video data.')
     
     # ========= Download ========= #
     
@@ -470,7 +472,7 @@ class Query:
         log('query', 'Initialising new Query object', level = 6)
         
         self.client = client
-        self.url = (url + '?&'['?' in url] + 'page=').replace(consts.ROOT, '')
+        self.url = url.replace(consts.ROOT, '')
         
         self._length: int = None
         self.index = 0
@@ -496,7 +498,7 @@ class Query:
         counter = consts.regexes.video_search_counter(self.page)
         log('query', 'Collected counters:', counter, level = 4)
         
-        if len(counter) != 1: raise consts.CounterNotFound()
+        if len(counter) != 1: raise errors.CounterNotFound()
         return int(counter[0])
     
     def __getitem__(self, index: int | slice) -> Video | Generator[Video, None, None]:
@@ -517,8 +519,9 @@ class Query:
             
             return self.get(index)
         
-        def wrapper(): # We need to wrap this, otherwise the whole __getitem__ will be
-                       # Interpreted as a generator.
+        def wrapper() -> Generator[Video, None, None]:
+            # We need to wrap this, otherwise the whole __getitem__ will be
+            # Interpreted as a generator.
             
             indices = index.indices(len(self))
             
@@ -572,10 +575,15 @@ class Query:
         
         log('query', 'Fetching page at index', index, level = 4)
         
-        response = self.client._call('GET', self.url + str(index + 1), throw = False)
+        if index == 0: url = self.url
+        
+        else:
+            url = self.url + '?&'['?' in url] + 'page=' + str(index + 1)
+        
+        response = self.client._call('GET', url, throw = False)
         
         if response.status_code == 404:
-            raise consts.Noresult('No result for the given query.')
+            raise errors.Noresult('No result for the given query.')
         
         raw = response.text
         

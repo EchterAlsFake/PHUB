@@ -1,16 +1,15 @@
 '''
-#### PHUB - An API wrapper.
+#### PHUB - An API wrapper for Pornhub.
 
 See https://phub.rtfd.io for documentation.
 '''
 
-from phub import ( core, utils, consts, classes, parser )
+from phub import ( core, utils, consts, classes, parser, errors )
 
 # Shortcuts
 from phub.core import Client
-from phub.utils import Quality
 from phub.classes import Video, User
-from phub.consts import locals
+from phub.utils import Quality, Category
 
 # Debugging controls
 from sys import stdout

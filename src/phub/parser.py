@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 from phub import consts
+from phub import errors
 from phub.utils import log, least_factors, hard_strip
 
 from typing import TYPE_CHECKING
@@ -74,7 +75,7 @@ def resolve(video: Video) -> dict:
         break
     
     else:
-        raise consts.ParsingError('Max renew attempts exceeded.')
+        raise errors.ParsingError('Max renew attempts exceeded.')
     
     script = video.page.split("flashvars_['nextVideo'];")[1].split('var nextVideoPlay')[0]
     log('parse', 'Formating flash:', flash, level = 5)

@@ -13,6 +13,7 @@ from functools import cached_property
 
 from phub import utils
 from phub import consts
+from phub import errors
 from phub import classes
 from phub.utils import log, register_properties
 
@@ -66,7 +67,7 @@ class Account:
         if item.startswith('_'): return obj
         
         if item in self.__properties__ and not self.client.logged:
-            raise consts.NotLoggedIn('Client is not logged in.')
+            raise errors.NotLoggedIn('Client is not logged in.')
         
         return obj
     
@@ -246,7 +247,7 @@ class Client:
         url = consts.ROOT + utils.slash(func, '**') \
               if simple_url else func
         
-        log('clien', f'Sending request at {utils.shortify(func, 30)}', level = 6)
+        log('clien', f'Sending request at {utils.shortify(func, 120)}', level = 6)
         
         response = self.session.request(
             method = method,
@@ -258,8 +259,8 @@ class Client:
         log('clien', 'Request passed with status', response.status_code, level = 6)
         
         if throw and response.status_code == 429:
-            raise consts.TooManyRequests('Too many requests.')
-        print(response.status_code)
+            raise errors.TooManyRequests('Too many requests.')
+
         if throw and not response.ok:
             raise ConnectionError(f'Request `{func}` failed.')
         
@@ -278,7 +279,7 @@ class Client:
         '''
         
         if not force and self.logged:
-            raise consts.AlreadyLoggedIn('Account already connected.')
+            raise errors.AlreadyLoggedIn('Account already connected.')
         
         log('client', 'Attempting loggin...', level = 6)
         
@@ -302,7 +303,7 @@ class Client:
             
             # Throw error
             if throw:
-                raise consts.LogginFailed('Login failed. Check credentials.')
+                raise errors.LogginFailed('Login failed. Check credentials.')
         
         self.logged = success
         return success
@@ -348,7 +349,8 @@ class Client:
                production: Literal['professional', 'homemade'] | None = None,
                duration: tuple[int] | None = None,
                hd: bool = False,
-               category: int = None,
+               category: utils.Category = None,
+               exclude_category: utils.Category = None,
                sort: Literal['most relevant', 'most recent',
                              'most viewed', 'top rated', 'longest'] = None,
                time: Literal['day', 'week', 'month', 'year'] | None = None
@@ -361,7 +363,8 @@ class Client:
             production (str): The production type, professional or homemade (both by default).
             duration (tuple[int]): Video duration boundaries.
             hd (bool): Wether to get only HD quality videos.
-            category (int): TODO
+            category (utils.Category): The video category to search in.
+            exclude_category (utils.Category): The video category(ies) to exclude from searching.
             sort (str): How to sort videos (most relevant by default).
             time (str): Video release approximation (does not work when sorting most relevant).
         
@@ -373,14 +376,15 @@ class Client:
         sort = consts.SEARCH_SORT_TRANSLATION[sort]
         
         # Add filters
-        if hd:            url += '&hd=1'
-        if production:    url += f'&p={production}'
-        if duration:      url += '&min_duration={}&max_duration={}'.format(*duration) # TODO
-        if category:      url += '&filter_category=' #TODO
-        if sort:          url += f'&o={sort}'
-        if time and sort: url += f'&t=' + time[0]
+        if hd:               url += '&hd=1'
+        if production:       url += f'&p={production}'
+        if duration:         url += '&min_duration={}&max_duration={}'.format(*duration) # TODO
+        if category:         url += '&filter_category=' + str(category)
+        if exclude_category: url += '&exclude_category=' + str(exclude_category)
+        if sort:             url += f'&o={sort}'
+        if time and sort:    url += f'&t=' + time[0]
         
         log('clien', 'Opening new search query:', url, level = 6)
-        return classes.Query(self, url)
+        return classes.Query(self, url, utils.remove_video_ads)
 
 # EOF

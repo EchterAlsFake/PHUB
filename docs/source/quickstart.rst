@@ -46,13 +46,17 @@ like so:
     client = phub.Client()
 
     url = 'https://www.pornhub.com/view_video.php?viewkey=xxx'
-    video = client.get(url)
+    video = client.get(url) # (1)!
     # video will be a phub.Video object
 
-    # Note - You can also load the video 
-    # using its `viewkey` https argument
-    # if you think that improves clarity.
-    video = client.get(key = 'xxx')
+.. code-annotations::
+    #.
+        Note that you can also load the video 
+        using the `viewkey` paramater in the URL.
+
+        .. code-block:: python
+
+            video = client.get(key = 'xxx')
 
 Accessing video data
 --------------------

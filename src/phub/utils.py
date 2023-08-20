@@ -22,6 +22,7 @@ DEBUG_OVERRIDE: Callable[[str, str], None] = None
 DEBUG_RESET: bool = False
 DEBUG_FILE = sys.stdout
 
+# === Utilities function === #
 
 def slash(string: str, form: Literal['**', '*/', '/*', '//']) -> str:
     '''
@@ -250,6 +251,7 @@ def least_factors(n: int):
     
     return n
 
+# === Presets === #
 
 class download_presets:
     '''
@@ -319,6 +321,7 @@ class download_presets:
         
         return __wrapper__
 
+# === Dataclasses === #
 
 @dataclass
 class BaseQuality:
@@ -366,10 +369,145 @@ class BaseQuality:
         # This should not happen
         raise TypeError('Internal error: quality type is', type(self.value))
 
+class BaseCategory:
+    '''
+    Represent one or multiple categories.
+    '''
+    
+    def __init__(self, id: str | int, name: str) -> None:
+        '''
+        Initialise a new category.
+        '''
+        
+        self.name = name
+        self.id = str(id)
+    
+    def __repr__(self) -> str:
+        
+        return f'<phub.Category {self.name}>'
+    
+    def __str__(self) -> str:
+        
+        return self.id
+    
+    def __or__(self, __value: Self) -> Self:
+        '''
+        Concatenate two categories.
+        '''
+
+        return Category(f'{self.id}-{__value.id}',
+                        f'{self.name} & {__value.name}')
+
+# === Constant classes === #
 
 class Quality(BaseQuality):
+    '''
+    Represents a video quality.
+    '''
+    
     BEST = BaseQuality('best')
     HALF = BaseQuality('half')
     WORST = BaseQuality('worst')
+
+class Category(BaseCategory):
+    '''
+    Represents a search category.
+    '''
+    
+    # NOTE - These are all categories provided by PH when making
+    # search requests, but where the fuck are the missing ones 
+    ASIAN              = BaseCategory( 1  , 'Asian'              )
+    ORGY               = BaseCategory( 2  , 'Orgy'               )
+    AMATEUR            = BaseCategory( 3  , 'Amateur'            )
+    BIG_ASS            = BaseCategory( 4  , 'Big Ass'            )
+    BABE               = BaseCategory( 5  , 'Babe'               )
+    BBW                = BaseCategory( 6  , 'BBW'                )
+    BIG_DICK           = BaseCategory( 7  , 'Big Dick'           )
+    BIG_TITS           = BaseCategory( 8  , 'Big Tits'           )
+    BLONDE             = BaseCategory( 9  , 'Blonde'             )
+    BONDAGE            = BaseCategory( 10 , 'Bondage'            )
+    BRUNETTE           = BaseCategory( 11 , 'Brunette'           )
+    CELEBRITY          = BaseCategory( 12 , 'Celebrity'          )
+    BLOWJOB            = BaseCategory( 13 , 'Blowjob'            )
+    BUKKAKE            = BaseCategory( 14 , 'Bukkake'            )
+    CREAMPIE           = BaseCategory( 15 , 'Creampie'           )
+    CUMSHOT            = BaseCategory( 16 , 'Cumshot'            )
+    EBONY              = BaseCategory( 17 , 'Ebony'              )
+    FETISH             = BaseCategory( 18 , 'Fetish'             )
+    FISTING            = BaseCategory( 19 , 'Fisting'            )
+    HANDJOB            = BaseCategory( 20 , 'Handjob'            )
+    HARDCORE           = BaseCategory( 21 , 'Hardcore'           )
+    MASTURBATION       = BaseCategory( 22 , 'Masturbation'       )
+    TOYS               = BaseCategory( 23 , 'Toys'               )
+    PUBLIC             = BaseCategory( 24 , 'Public'             )
+    INTERRACIAL        = BaseCategory( 25 , 'Interracial'        )
+    LATINA             = BaseCategory( 26 , 'Latina'             )
+    LESBIAN            = BaseCategory( 27 , 'Lesbian'            )
+    MATURE             = BaseCategory( 28 , 'Mature'             )
+    MILF               = BaseCategory( 29 , 'MILF'               )
+    PORNSTAR           = BaseCategory( 30 , 'Pornstar'           )
+    REALITY            = BaseCategory( 31 , 'Reality'            )
+    ANAL               = BaseCategory( 35 , 'Anal'               )
+    HENTAI             = BaseCategory( 36 , 'Hentai'             )
+    TEEN               = BaseCategory( 37 , 'Teen (18+)'         )
+    POV                = BaseCategory( 41 , 'POV'                )
+    RED_HEAD           = BaseCategory( 42 , 'Red Head'           )
+    VINTAGE            = BaseCategory( 43 , 'Vintage'            )
+    PARTY              = BaseCategory( 53 , 'Party'              )
+    COMPILATION        = BaseCategory( 57 , 'Compilation'        )
+    SMALL_TITS         = BaseCategory( 59 , 'Small Tits'         )
+    WEBCAM             = BaseCategory( 61 , 'Webcam'             )
+    THREESOME          = BaseCategory( 65 , 'Threesome'          )
+    ROUGH_SEX          = BaseCategory( 67 , 'Rough Sex'          )
+    SQUIRT             = BaseCategory( 69 , 'Squirt'             )
+    DP                 = BaseCategory( 72 , 'DP'                 )
+    POPULAR_WITH_WOMEN = BaseCategory( 73 , 'Popular With Women' )
+    BISEXUAL_MALE      = BaseCategory( 76 , 'Bisexual Male'      )
+    MASSAGE            = BaseCategory( 78 , 'Massage'            )
+    COLLEGE            = BaseCategory( 79 , 'College (18+)'      )
+    GANGBANG           = BaseCategory( 80 , 'Gangbang'           )
+    ROLE_PLAY          = BaseCategory( 81 , 'Role Play'          )
+    TRANSGENDER        = BaseCategory( 83 , 'Transgender'        )
+    CARTOON            = BaseCategory( 86 , 'Cartoon'            )
+    SCHOOL             = BaseCategory( 88 , 'School (18+)'       )
+    BABYSITTER         = BaseCategory( 89 , 'Babysitter (18+)'   )
+    CASTING            = BaseCategory( 90 , 'Casting'            )
+    SMOKING            = BaseCategory( 91 , 'Smoking'            )
+    SOLO_MALE          = BaseCategory( 92 , 'Solo Male'          )
+    FEET               = BaseCategory( 93 , 'Feet'               )
+    FRENCH             = BaseCategory( 94 , 'French'             )
+    GERMAN             = BaseCategory( 95 , 'German'             )
+    BRITISH            = BaseCategory( 96 , 'British'            )
+    ITALIAN            = BaseCategory( 97 , 'Italian'            )
+    ARAB               = BaseCategory( 98 , 'Arab'               )
+    RUSSIAN            = BaseCategory( 99 , 'Russian'            )
+    CZECH              = BaseCategory( 100, 'Czech'              )
+    INDIAN             = BaseCategory( 101, 'Indian'             )
+    BRAZILIAN          = BaseCategory( 102, 'Brazilian'          )
+    KOREAN             = BaseCategory( 103, 'Korean'             )
+    VIRTUAL_REALITY    = BaseCategory( 104, 'Virtual Reality'    )
+    FPS60              = BaseCategory( 105, '60FPS'              )
+    JAPANESE           = BaseCategory( 111, 'Japanese'           )
+    EXCLUSIVE          = BaseCategory( 115, 'Exclusive'          )
+    MUSIC              = BaseCategory( 121, 'Music'              )
+    PUSSY_LICKING      = BaseCategory( 131, 'Pussy Licking'      )
+    VERIFIED_AMATEURS  = BaseCategory( 138, 'Verified Amateurs'  )
+    VERIFIED_MODELS    = BaseCategory( 139, 'Verified Models'    )
+    BEHIND_THE_SCENES  = BaseCategory( 141, 'Behind The Scenes'  )
+    OLD_YOUNG          = BaseCategory( 181, 'Old/Young (18+)'    )
+    PARODY             = BaseCategory( 201, 'Parody'             )
+    PISSING            = BaseCategory( 211, 'Pissing'            )
+    SFW                = BaseCategory( 221, 'SFW'                )
+    COSPLAY            = BaseCategory( 241, 'Cosplay'            )
+    CUCKOLD            = BaseCategory( 242, 'Cuckold'            )
+    STEP_FANTASY       = BaseCategory( 444, 'Step Fantasy'       )
+    VERIFIED_COUPLES   = BaseCategory( 482, 'Verified Couples'   )
+    SOLO_FEMALE        = BaseCategory( 492, 'Solo Female'        )
+    FEMALE_ORGASM      = BaseCategory( 502, 'Female Orgasm'      )
+    MUSCULAR_MEN       = BaseCategory( 512, 'Muscular Men'       )
+    ROMANTIC           = BaseCategory( 522, 'Romantic'           )
+    TATTOOED_WOMEN     = BaseCategory( 562, 'Tattooed Women'     )
+    TRANS_WITH_GIRL    = BaseCategory( 572, 'Trans With Girl'    )
+    TRANS_WITH_GUY     = BaseCategory( 582, 'Trans With Guy'     )
 
 # EOF

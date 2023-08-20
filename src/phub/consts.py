@@ -33,6 +33,23 @@ SEARCH_SORT_TRANSLATION = {
     None: None
 }
 
+# Search production filters
+PROFESSIONAL = 'professional'
+HOMEMADE = 'homemade'
+
+# Search sort filters
+MOST_RELEVANT = None
+MOST_RECENT = 'most recent'
+MOST_VIEWED = 'most viewed'
+TOP_RATED = 'top rated'
+LONGEST = 'longest'
+
+# Search time filters
+DAY = 'day'
+WEEK = 'week'
+MONTH = 'month'
+YEAR = 'year'
+
 class regexes:
     '''
     Compiled regexes methods used for parsing.
@@ -81,86 +98,5 @@ class FeedType:
     SITE_UPLOAD = 'stream_sites_subscriptions'
     COMMENTED   = 'stream_grouped_comments_videos'
     # TODO more stream types
-
-
-class locals:
-    '''
-    Locales constants.
-    '''
-    
-    # Search production types
-    PROFESSIONAL = 'professional'
-    HOMEMADE = 'homemade'
-    
-    # Search sort filters
-    MOST_RELEVANT = None
-    MOST_RECENT = 'most recent'
-    MOST_VIEWED = 'most viewed'
-    TOP_RATED = 'top rated'
-    LONGEST = 'longest'
-    
-    # Search time filters
-    DAY = 'day'
-    WEEK = 'week'
-    MONTH = 'month'
-    YEAR = 'year'
-
-# Exceptions
-
-class CounterNotFound(Exception):
-    '''
-    The video counter wasn't found in the query,
-    or is badly parsed.
-    '''
-    
-    pass
-
-class ParsingError(Exception):
-    '''
-    The parser failed to properly resolve the script
-    for this element.
-    '''
-    
-    pass
-
-class UserNotFoundError(Exception):
-    '''
-    Failed to find a PH user account.
-    '''
-    
-    pass
-
-class NotLoggedIn(Exception):
-    '''
-    The client is not logged to a PH account,
-    but tried to access account data.
-    '''
-
-class AlreadyLoggedIn(Exception):
-    '''
-    The client already established a connection with PH.
-    '''
-
-class LogginFailed(Exception):
-    '''
-    Login phase failed. Credentials may be wrong.
-    '''
-
-class TooManyRequests(Exception):
-    '''
-    The client sent too many requests.
-    To bypass, consider using proxies or
-    set a small delay to the client request:
-    
-    .. code-block:: python
-    
-        client = phub.Client(delay = True)
-    '''
-
-class Noresult(Exception):
-    '''
-    The search query did not found videos with
-    its given filters.
-    '''
 
 # EOF
