@@ -132,19 +132,6 @@ def pathify(string: str) -> str:
     
     return ''.join(c for c in string if c in ascii_letters + '- _()')
 
-def remove_video_ads(li: list) -> list:
-    '''
-    Remove leading video ads from playlists.
-    
-    Args:
-        li (list): A list of video URLs.
-    
-    Returns:
-        list: A sanitized list of video URLs.
-    '''
-    
-    return li[4:]
-
 def log(cls: str, *text, level: int = 1, r: bool = False) -> None:
     '''
     Homemade logging.

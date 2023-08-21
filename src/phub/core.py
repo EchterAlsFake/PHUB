@@ -117,8 +117,7 @@ class Account:
         '''
         
         url = consts.ROOT + f'users/{self.name}/videos/favorites'
-        return classes.Query(self.client, url,
-                                     corrector = utils.remove_video_ads)
+        return classes.Query(self.client, url)
 
     @cached_property
     def feed(self) -> classes.Feed:
@@ -385,6 +384,6 @@ class Client:
         if time and sort:    url += f'&t=' + time[0]
         
         log('clien', 'Opening new search query:', url, level = 6)
-        return classes.Query(self, url, utils.remove_video_ads)
+        return classes.Query(self, url)
 
 # EOF

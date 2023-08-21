@@ -459,7 +459,7 @@ class Query:
             print(video.title)
     '''
     
-    def __init__(self, client: Client, url: str, corrector: Callable = None) -> None:
+    def __init__(self, client: Client, url: str) -> None:
         '''
         Generate a new video iterator object.
         
@@ -479,7 +479,6 @@ class Query:
         self.page_index: int = None
         self.videos: list[str] = None
         self.page: str = None
-        self.corrector = corrector
     
     @cache
     def __len__(self) -> int:
@@ -516,7 +515,6 @@ class Query:
         if isinstance(index, int):
             
             if index < 0: index += len(self)
-            
             return self.get(index)
         
         def wrapper() -> Generator[Video, None, None]:
@@ -526,7 +524,7 @@ class Query:
             indices = index.indices(len(self))
             
             for i in range(*indices):
-                yield self.get(i)
+                yield self.__getitem__(i)
         
         return wrapper()
     
@@ -554,8 +552,10 @@ class Query:
             self._get_page(page_index)
         
         # Get the needed video
-        key, title = self.videos[ index % 32 ]
+        key, action, title = self.videos[ index % 32 ]
         url = consts.ROOT + f'view_video.php?viewkey={key}'
+        
+        if action in ('show', 'view'): raise errors.ParsingError('Unexpected video ad:', key)
         
         video = Video(client = self.client, url = url, preload = False)
         log('query', 'Generated video object')
@@ -569,7 +569,7 @@ class Query:
         Args:
             index: The index of the page.
         '''
-        
+                
         # If cached, avoid scrapping again
         if self.page_index == index: return
         
@@ -578,7 +578,7 @@ class Query:
         if index == 0: url = self.url
         
         else:
-            url = self.url + '?&'['?' in url] + 'page=' + str(index + 1)
+            url = self.url + '?&'['?' in self.url] + 'page=' + str(index + 1)
         
         response = self.client._call('GET', url, throw = False)
         
@@ -590,13 +590,8 @@ class Query:
         # Parse videos
         self.page = raw
         self.page_index = index
-        self.videos = consts.regexes.extract_videos(raw)
+        self.videos = consts.regexes.extract_videos(raw.split('nf-videos')[1])
         
-        # Correct videos
-        if self.corrector is not None:
-            log('query', 'Correcting video regex parsing', level = 6)
-            self.videos = self.corrector(self.videos)
-            
         log('query', f'Collected {len(self.videos)} videos', level = 6)
 
     def __iter__(self) -> Self:
