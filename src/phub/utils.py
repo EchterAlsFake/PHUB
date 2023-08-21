@@ -17,7 +17,7 @@ from phub import consts
 
 # Debug settings
 DEBUG = False
-DEBUG_LEVELS = list(range( 100, 108 ))
+DEBUG_LEVELS = (None, 101, 103, 105, 104, 102, 107)
 DEBUG_OVERRIDE: Callable[[str, str], None] = None
 DEBUG_RESET: bool = False
 DEBUG_FILE = sys.stdout
@@ -102,7 +102,7 @@ def closest(iter: list[int], value: int) -> int:
     
     difference = lambda input_list: abs(input_list - value)
     response = min(iter, key = difference)
-    log('utils', f'Selecting closest value to {value}: {response}', level = 3)
+    log('utils', f'Selecting closest value to {value}: {response}', level = 5)
     return response
 
 def extract_urls(string: str) -> list[str]:
@@ -132,7 +132,7 @@ def pathify(string: str) -> str:
     
     return ''.join(c for c in string if c in ascii_letters + '- _()')
 
-def log(cls: str, *text, level: int = 1, r: bool = False) -> None:
+def log(cls: str, *text, level: int = 1) -> None:
     '''
     Homemade logging.
     
@@ -153,16 +153,10 @@ def log(cls: str, *text, level: int = 1, r: bool = False) -> None:
     
     color = DEBUG_LEVELS[level]
     date = datetime.now().strftime('%H:%M:%S')
-    raw = f'\033[30m{date}\033[0m \033[{color}m {cls.upper()} \033[0m {text}'
     
-    # TODO - Refactor
-    if r and not DEBUG_RESET:
-        print(raw, end = '', file = DEBUG_FILE)
-        DEBUG_RESET = True
+    raw = f'\033[30m{date}\033[0m \033[{color}m {cls.upper(): ^10} \033[0m {text}'
     
-    elif r and DEBUG_RESET: print(f'\r{raw}', end = '', file = DEBUG_FILE)
-    elif not r and DEBUG_RESET: print(f'\n{raw}', file = DEBUG_FILE)
-    else: print(raw, file = DEBUG_FILE)
+    print(raw, file = DEBUG_FILE)
 
 def hard_strip(text: str, sep: str = ' ') -> str:
     '''
@@ -338,7 +332,7 @@ class BaseQuality:
         '''
         
         keys = list(quals.keys())
-        log('quals', f'Selecting {self.value} among {keys}', level = 6)
+        log('Quality', f'Selecting {self.value} among {keys}', level = 5)
         
         if isinstance(self.value, str):
             # Get approximative quality

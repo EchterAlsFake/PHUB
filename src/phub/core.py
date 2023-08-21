@@ -38,7 +38,7 @@ class Account:
         if client._intents_to_login:
             return object.__new__(cls)
         
-        log('accnt', 'Passing account creation')
+        log('account', 'Passing account creation', level = 6)
     
     def __init__(self, client: Client) -> None:
         '''
@@ -51,7 +51,7 @@ class Account:
         self.client = client
         self.name = self.client.creds['username']
         
-        log('accnt', 'Initialised new account', repr(self))
+        log('account', 'Initialised new account', repr(self), level = 4)
     
     def __repr__(self) -> str:
         return f'<phub.core.Account name={self.name}>'
@@ -77,7 +77,7 @@ class Account:
         '''
         
         # Clear the cache
-        log('accnt', 'Clearing cache of', self, level = 4)
+        log('account', 'Clearing cache of', self, level = 4)
         
         for name in self.__properties__:
             if name in self.__dict__:
@@ -175,7 +175,7 @@ class Client:
         if autologin and self._intents_to_login:
             self.login()
         
-        log('clien', 'Initialised new client', repr(self))
+        log('client', 'Initialised new client', repr(self), level = 3)
 
     def __repr__(self) -> str:
         '''
@@ -211,7 +211,7 @@ class Client:
         if isinstance(data, dict):
             if data.get('username') and data.get('password'):
                 
-                log('clien', 'Initialising client from', type(data), level = 7)
+                log('client', 'Initialising client from', type(data), level = 3)
                 return cls(**data)
             
             raise KeyError('Data must have username and password keys.')
@@ -246,7 +246,7 @@ class Client:
         url = consts.ROOT + utils.slash(func, '**') \
               if simple_url else func
         
-        log('clien', f'Sending request at {utils.shortify(func, 120)}', level = 6)
+        log('client', f'Sending request at {utils.shortify(func, 120)}', level = 6)
         
         response = self.session.request(
             method = method,
@@ -255,7 +255,7 @@ class Client:
             data = data
         )
         
-        log('clien', 'Request passed with status', response.status_code, level = 6)
+        log('client', 'Request passed with status', response.status_code, level = 6)
         
         if throw and response.status_code == 429:
             raise errors.TooManyRequests('Too many requests.')
@@ -285,20 +285,20 @@ class Client:
         # Extract token
         home = self._call('GET', '/').text
         token = consts.regexes.extract_token(home)
-        log('clien', 'Extracted token', token, level = 5)
+        log('client', 'Extracted token', token, level = 5)
         
         # Send credentials
-        log('clien', 'Sending payload', level = 5)
+        log('client', 'Sending payload', level = 5)
         payload = consts.LOGIN_PAYLOAD | self.creds | {'token': token}
         
         response = self._call('POST', 'front/authenticate', data = payload)
         success = int(response.json()['success'])
         
         if success:
-            log('clien', 'Login successful!', level = 6)
+            log('client', 'Login successful!', level = 5)
         
         else:
-            log('clien', 'Login failed', level = 2)
+            log('client', 'Login failed', level = 1)
             
             # Throw error
             if throw:
@@ -339,14 +339,14 @@ class Client:
             User: The fetched user object.
         '''
         
-        log('clien', 'Fetching user', name, level = 6)
+        log('client', 'Fetching user', name, level = 3)
         
         return classes.User.get(self, url, name)
     
     def search(self,
                query: str,
                production: Literal['professional', 'homemade'] | None = None,
-               duration: tuple[int] | None = None,
+               duration: tuple[int | None] = (None, None),
                hd: bool = False,
                category: utils.Category = None,
                exclude_category: utils.Category = None,
@@ -360,7 +360,7 @@ class Client:
         Args:
             query (str): Sentence to send to the server.
             production (str): The production type, professional or homemade (both by default).
-            duration (tuple[int]): Video duration boundaries.
+            duration (tuple[int | None]): Video duration boundaries (rounded to 10).
             hd (bool): Wether to get only HD quality videos.
             category (utils.Category): The video category to search in.
             exclude_category (utils.Category): The video category(ies) to exclude from searching.
@@ -374,16 +374,18 @@ class Client:
         url = consts.ROOT + 'video/search?search=' + query
         sort = consts.SEARCH_SORT_TRANSLATION[sort]
         
+        min_dur, max_dur = map(lambda num: round(num or 0, -1), duration)
+        
         # Add filters
         if hd:               url += '&hd=1'
         if production:       url += f'&p={production}'
-        if duration:         url += '&min_duration={}&max_duration={}'.format(*duration) # TODO
+        if min_dur:          url += f'&min_duration={min_dur}'
+        if max_dur:          url += f'&max_duration={max_dur}'
         if category:         url += '&filter_category=' + str(category)
         if exclude_category: url += '&exclude_category=' + str(exclude_category)
         if sort:             url += f'&o={sort}'
         if time and sort:    url += f'&t=' + time[0]
         
-        log('clien', 'Opening new search query:', url, level = 6)
         return classes.Query(self, url)
 
 # EOF

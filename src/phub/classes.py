@@ -28,7 +28,7 @@ try:
     from bs4 import BeautifulSoup as Soup
 
 except ModuleNotFoundError:
-    log('phub', 'Warning: BS4 not installed. Feed features will not be available.')
+    log('phub', 'Warning: BS4 not installed. Feed features will not be available.', level = 2)
     Soup = None
 
 
@@ -54,7 +54,7 @@ class User:
             User: The video author.
         '''
         
-        log('users', 'Searching author of', video, level = 6)
+        log('users', 'Searching author of', video, level = 4)
         
         if video.page is None:
             video.refresh()
@@ -88,7 +88,7 @@ class User:
             User: The fetched user.
         '''
         
-        log('users', 'Initialising new user:', name or url, level = 6)
+        log('users', 'Initialising new user:', name or url, level = 4)
         
         assert bool(url) ^ bool(name), 'Must specify exactly one of url and name'
         
@@ -99,7 +99,7 @@ class User:
         
         for type_ in ('model', 'pornstar', 'channels'):
             
-            log('users', 'Guessing user is of type', type_, level = 5)
+            log('users', 'Guessing user is of type', type_, level = 4)
             
             url = f'{type_}/{name.replace(" ", "-")}'
             response = client._call('GET', url, throw = False)
@@ -173,7 +173,7 @@ class Video:
         self.url = utils.basic(url, False)
         self.key = url.split('=')[-1]
         
-        log('video', 'Initialising new video:', self.key, level = 6)
+        log('video', 'Initialising new video:', self.key, level = 3)
         
         # Video data
         self.client = client
@@ -181,7 +181,7 @@ class Video:
         self.data: dict = {}
         
         if preload:
-            log('video', 'Preloading video', self, level = 6)
+            log('video', 'Preloading video', self, level = 3)
             self.refresh()
     
     def __repr__(self) -> str:
@@ -193,13 +193,13 @@ class Video:
         '''
         
         # Clear the cache
-        log('Video', 'Clearing cache of', self, level = 4)
+        log('Video', 'Clearing cache of', self, level = 3)
         for name in self.__properties__:
             if name in self.__dict__:
                 delattr(self, name)
         
         # Refresh data
-        log('video', 'Refreshing video', self, level = 4)
+        log('video', 'Refreshing video', self, level = 3)
         response = self.client._call('GET', self.url)
         
         self.page = response.text
@@ -252,14 +252,14 @@ class Video:
                  if el['quality'] in ['1080', '720', '480', '240']}
         
         master = quality.select(quals)
-        log('video', 'Selecting quality', utils.shortify(master, 25), level = 4)
+        log('video', 'Selecting quality', utils.shortify(master, 25), level = 3)
         
         # Fetch quality file
         res = self.client._call('GET', master, simple_url = False)
         
         url_base = master.split('master.m3u8')[0]
         url = utils.extract_urls(res.text)[0]
-        log('video', 'Extracted', len(url), level = 4)
+        log('video', 'Extracted', len(url), level = 3)
         
         # Fetch the master file
         raw = self.client._call('GET', url_base + url, simple_url = False).text
@@ -296,14 +296,14 @@ class Video:
             str: The path of the created file.
         '''
         
-        log('video', f'Downloading {self} at', path, level = 5)
+        log('video', f'Downloading {self} at', path, level = 3)
         
         # Append name if path is directory
         if os.path.isdir(path):
             path += ('' if path.endswith('/') else '/') + utils.pathify(self.title) + '.mp4'
-            log('video', f'Changing path to', path, level = 2)
+            log('video', f'Changing path to', path, level = 3)
         
-        log('downl', 'Starting video download for', self)
+        log('video', 'Starting video download for', self, level = 3)
         
         segments = self.get_M3U(quality, process = True)
         
@@ -315,14 +315,13 @@ class Video:
         with open(path, 'wb') as output:
             
             for index, url in enumerate(segments):
-                log('downl', f'Downloading {index + 1}/{len(segments)}', level = 3, r = 0) # TODO
                 callback(index + 1, len(segments))
                 
                 for i in range(max_retries):
                     res = self.client._call('GET', url, simple_url = False, throw = False)
                     
                     if not res.ok:                        
-                        log('downl', f'Segment download failed, retrying ({i}/{max_retries})', level = 1)
+                        log('video', f'Segment download failed, retrying ({i}/{max_retries})', level = 2)
                         continue
                     
                     output.write(res.content)
@@ -330,7 +329,7 @@ class Video:
         
         # Stop
         callback(len(segments), len(segments)) # Make sure full progress is registered
-        log('downl', 'Successfully downloaded video at', path)
+        log('video', 'Successfully downloaded video at', path, level = 3)
         return path
     
     # ======== Properties ======== #
@@ -469,7 +468,7 @@ class Query:
             corrector (Callable): Parsing corrector.
         '''
         
-        log('query', 'Initialising new Query object', level = 6)
+        log('query', 'Initialising new Query object', level = 4)
         
         self.client = client
         self.url = url.replace(consts.ROOT, '')
@@ -540,7 +539,7 @@ class Query:
             Video: The specific video.
         '''
         
-        log('query', 'Getting video at index', index, level = 5)
+        log('query', 'Getting video at index', index, level = 4)
         
         # Handle relative indexes
         if index < 0: index += len(self)
@@ -558,7 +557,7 @@ class Query:
         if action in ('show', 'view'): raise errors.ParsingError('Unexpected video ad:', key)
         
         video = Video(client = self.client, url = url, preload = False)
-        log('query', 'Generated video object')
+        log('query', 'Generated video object', level = 4)
         video.data = {'video_title': title} # Inject title
         return video
 
@@ -592,30 +591,15 @@ class Query:
         self.page_index = index
         self.videos = consts.regexes.extract_videos(raw.split('nf-videos')[1])
         
-        log('query', f'Collected {len(self.videos)} videos', level = 6)
+        log('query', f'Collected {len(self.videos)} videos', level = 4)
 
     def __iter__(self) -> Self:
         '''
-        Generator initialisation.
+        Return a generator that outputs
+        all videos in the query.
         '''
         
-        self.index = 0
-        return self
-
-    def __next__(self) -> Video:
-        '''
-        Generator iteration.
-        '''
-        
-        try:
-            result = self.get(self.index)
-        
-        except IndexError:
-            log('query', 'Reached end of generation')
-            raise StopIteration
-        
-        self.index += 1
-        return result
+        return self[::]
 
 @dataclass
 class FeedItem:

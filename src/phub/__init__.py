@@ -27,6 +27,6 @@ def debug(boolean: bool, file: TextIOBase = stdout) -> None:
     utils.DEBUG = boolean
     utils.DEBUG_FILE = file
     
-    utils.log('init_', 'Switching logging to', boolean)
+    utils.log('PHUB', 'Switched logging to', bool(boolean), level = 6)
 
 # EOF

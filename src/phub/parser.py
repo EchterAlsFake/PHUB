@@ -22,7 +22,7 @@ def renew(video: Video) -> None:
         video (Video): The object that called the parser.
     '''
     
-    log('parse', 'Attempting to renew connection')
+    log('parser', 'Attempting to renew connection', level = 2)
     
     # Get page JS code
     code = consts.regexes.renew.script(video.page)[0]
@@ -44,7 +44,7 @@ def renew(video: Video) -> None:
     # Build cookies
     end = consts.regexes.renew.cookie_end(video.page)[0]
     cookie = f'{n}*{p / n}:{s}:{end}'
-    log('parse', 'Injecting calculated cookie:', cookie)
+    log('parser', 'Injecting calculated cookie:', cookie, level = 6)
     
     # Inject cookie and reload page
     video.client.session.cookies.set('RNKEY', cookie)
@@ -61,7 +61,7 @@ def resolve(video: Video) -> dict:
         dict: A dictionnary containing clean video data, fresh from PH.
     '''
     
-    log('parse', 'Resolving page JS script...', level = 5)
+    log('parser', 'Resolving page JS script...', level = 6)
     
     for _ in range(RENEW_MAX_ATTEMPTS):
         
@@ -78,7 +78,7 @@ def resolve(video: Video) -> dict:
         raise errors.ParsingError('Max renew attempts exceeded.')
     
     script = video.page.split("flashvars_['nextVideo'];")[1].split('var nextVideoPlay')[0]
-    log('parse', 'Formating flash:', flash, level = 5)
+    log('parser', 'Formating flash:', flash, level = 6)
     
     # Load context
     data: dict = json.loads(ctx)
@@ -90,7 +90,7 @@ def resolve(video: Video) -> dict:
     
     # Execute the script
     exec(script) # In case you ask, what we are doing here is converting the obfuscated Pornhub JS code into python code so that we can execute it and directly get the video M3U file.
-    log('parse', 'Execution successful, script resolved', level = 5)
+    log('parser', 'Execution successful, script resolved', level = 6)
     
     return data
 
