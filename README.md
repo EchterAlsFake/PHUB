@@ -47,7 +47,7 @@ video.download('.', quality = phub.Quality.BEST)
 ## Contributing
 
 I don't plan to really maintain this after i start school, so feel free to support this project by submiting issues or requests
-and share the bugs you encountered in [Known issues]([https://github.com/](https://github.com/Egsagon/PHUB/blob/master/KNOWN_ISSUES.md))
+and share the bugs you encountered in [Known issues](https://github.com/Egsagon/PHUB/blob/master/KNOWN_ISSUES.md)
 
 ## Documentation
 You can find out more on the API [in the docs](https://phub.readthedocs.io).
