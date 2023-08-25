@@ -2,9 +2,12 @@
 PHUB 4 utilities.
 '''
 
+import os
 import math
-
+import json
+import requests
 from . import consts
+from . objects import data
 
 def concat(*args: list[str]) -> str:
     '''
@@ -52,3 +55,58 @@ def least_factors(n: int):
         i += 30
     
     return n
+
+def closest(iter: list[int], value: int) -> int:
+    '''
+    Pick the closest value in a list.
+    From www.entechin.com/find-nearest-value-list-python/
+    
+    Args:
+        iter (list[int]): List of possible values.
+        value (int): Value to pick closest to.
+    
+    Returns:
+        int: _description_
+    '''
+    
+    difference = lambda input_list: abs(input_list - value)
+    return min(iter, key = difference)
+
+def update_categories():
+    '''
+    Update the categories in the Category classes.
+    
+    Warning - This will make changes to phub.data.py.
+    '''
+    
+    # TODO - refactor
+    
+    url = concat(consts.API_ROOT, 'categories')
+    res = requests.get(url)
+    res.raise_for_status()
+    data_ = sorted(json.loads(res.text)['categories'],
+                   key = lambda d: d['id'])
+    
+    with open(data.__file__, 'r') as file:
+        content = file.read()
+    
+    # Format categories
+    cats = ''
+    for obj in data_:
+        name = obj['category']
+        var = name.upper().replace('-', '_').replace('/', '_').replace(' ', '_')
+        
+        if var[0].isdigit(): var = '_' + var
+        
+        cats += f'\n    {var: <21} = _BaseCategory( {obj["id"]: >3}, \'{name: <21}\' )'
+    
+    content = content.split('#@START-CATEGORY')[0] + \
+              '#@START-CATEGORY' + \
+              cats + '\n' + \
+              '    #@END-CATEGORY' + \
+              content.split('#@END-CATEGORY')[1]
+    
+    with open(data.__file__, 'w') as file:
+        file.write(content)
+
+# EOF

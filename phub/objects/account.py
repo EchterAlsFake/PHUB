@@ -31,7 +31,7 @@ class Account:
         
     def __repr__(self) -> str:
         
-        status = '<logged-out>' if self.name is None else f'name={self.name}' 
+        status = 'logged-out' if self.name is None else f'name={self.name}' 
         return f'phub.Account({status})'
 
     def connect(self, data: dict) -> None:

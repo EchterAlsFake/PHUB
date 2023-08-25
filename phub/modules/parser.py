@@ -8,11 +8,11 @@ import json
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from .objects import Video
+    from ..objects import Video
 
-from . import utils
-from . import errors
-from . import consts
+from .. import utils
+from .. import errors
+from .. import consts
 
 
 def renew(video: Video) -> None:
@@ -61,7 +61,7 @@ def resolve(video: Video) -> dict:
         
     for _ in range(consts.MAX_VIDEO_RENEW_ATTEMPTS):
         
-        response = consts.re.extract_flash(video.page)
+        response = consts.re.get_flash(video.page)
         
         if not response:
             renew(video)

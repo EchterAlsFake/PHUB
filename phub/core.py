@@ -86,7 +86,7 @@ class Client:
     
         # Get token
         page = self.call('').text
-        token = consts.re.extract_token(page)
+        token = consts.re.get_token(page)
         
         # Send credentials
         payload = consts.LOGIN_PAYLOAD | self.credentials | {'token': token}

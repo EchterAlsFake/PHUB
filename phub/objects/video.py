@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta
 
 from typing import TYPE_CHECKING, Generator, LiteralString
@@ -8,14 +9,18 @@ from functools import cached_property
 if TYPE_CHECKING:
     import core
 
-# from . import Image
-from . import Tag, Like, User
+from . import Tag, Like, User, Image, Quality
 from .. import utils
 from .. import errors
 from .. import consts
-from .. import parser
+from ..modules import parser, downloader
 
 class Video:
+    '''
+    Represents a Pornhub video.
+    '''
+    
+    # === Base methods === #
     
     def __init__(self, client: core.Client, url: str) -> None:
         '''
@@ -32,6 +37,14 @@ class Video:
         
         self.page: str = None # The video page content
         self.data: dict = {}  # The video webmasters data
+        
+        # Save data keys so far so we can make a difference with the
+        # cached property ones.
+        self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
+    
+    def __repr__(self) -> str:
+        
+        return f'phub.Video(key={self.key})'
     
     def refresh(self, page: bool = True, data: bool = True) -> None:
         '''
@@ -43,9 +56,9 @@ class Video:
         if data: self.data.clear()
         
         # Clear properties cache
-        del self.title
-        del self.image
-        del self.duration
+        for key in list(self.__dict__.keys()):           
+            if not key in self.loaded_keys:
+                delattr(self, key)
      
     def fetch(self, key: str) -> None:
         '''
@@ -62,7 +75,7 @@ class Video:
             data = self.client.call(url).json()
             self.data |= {f'data@{k}': v for k, v in data['video'].items()}
         
-        # Fetch raw page 
+        # Fetch raw page
         elif key.startswith('page@'):
             
             self.page = self.client.call(self.url).text
@@ -70,6 +83,67 @@ class Video:
             self.data |= {f'page@{k}': v for k, v in data.items()}
         
         return self.data.get(key)
+
+    # === Download methods === #
+
+    def get_segments(self, quality: Quality) -> Generator[str, None, None]:
+        '''
+        Get the video segment URLs.
+        '''
+        
+        # Get the quality master file
+        qualities = {
+            int(el['quality']): el['videoUrl']
+            for el in self.fetch('page@mediaDefinitions')
+            if el['quality'] in ['1080', '720', '480', '240']
+        }
+        
+        # Fetch the master file
+        master_url = Quality(quality).select(qualities)
+        master_src = self.client.call(master_url).text
+        
+        urls = [l for l in master_src.split('\n')
+                if l and not l.startswith('#')]
+        
+        if len(urls) != 1:
+            raise errors.ParsingError('Multiple index files found.')
+        
+        # Get DNS address
+        dns = master_url.split('master.m3u8')[0]
+        
+        # Fetch the index file
+        url = urls[0]
+        raw = self.client.call(dns + url).text
+        
+        # Parse files
+        for line in raw.split('\n'):
+            if not line.startswith('#'):
+                yield dns + line
+    
+    def download(self,
+                 path: str,
+                 quality: Quality,
+                 backend: callable = downloader.default,
+                 callback: callable = None) -> str:
+        '''
+        Download the video to a file.
+        '''
+        
+        if os.path.isdir(path):
+            path += utils.concat(path, self.key)
+
+        # Call the backend
+        video = backend(client = self.client,
+                        segments = self.get_segments(quality),
+                        callback = callback)
+        
+        # Write to file
+        with open(path, 'wb') as output:
+            output.write(video)
+        
+        return path
+    
+    # === Data properties === #
 
     @cached_property
     def title(self) -> str:
@@ -132,16 +206,8 @@ class Video:
         counter = self.fetch('data@ratings')
         
         return Like(up = round(rating * counter),
-                    down = round((1 - rating) * counter))
-    
-    @cached_property
-    def ratings(self) -> float:
-        '''
-        Percentage of people that liked the video instead
-        of disliking it.
-        '''
-
-        return self.fetch('data@rating')
+                    down = round((1 - rating) * counter),
+                    ratings = rating)
     
     @cached_property
     def views(self) -> int:
@@ -174,7 +240,8 @@ class Video:
         The pornstars present in the video.
         '''
         
-        return [User() for _ in self.fetch('data@pornstars')] # TODO
+        return [User(ps['pornstar_name'])
+                for ps in self.fetch('data@pornstars')]
     
     @cached_property
     def categories(self) -> list[NotImplemented]:
@@ -187,7 +254,7 @@ class Video:
     @cached_property
     def segment(self) -> LiteralString:
         '''
-        Video 'segment' (straight, TODO)
+        Video segment (e.g. straight).
         '''
         
         return self.fetch('data@segment')
@@ -198,6 +265,6 @@ class Video:
         The video's author.
         '''
         
-        return NotImplemented
+        return User.from_video(self)
 
 # EOF

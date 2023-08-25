@@ -24,8 +24,9 @@ LOGIN_PAYLOAD = {
 }
 
 MAX_VIDEO_RENEW_ATTEMPTS = 3
+DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 
-def find(pattern: str, flags: engine.RegexFlag = 0) -> Callable[[str], str]:
+def find(pattern: str, flags: engine.RegexFlag = 0) -> Callable[[str, bool], str]:
     '''
     Compile a regex and wraps handling its errors.
     '''
@@ -80,12 +81,13 @@ def subc(pattern: str, repl: str, flags: int = 0) -> Callable[[str], str]:
 class re:
     
     # Basic regexes
-    extract_token = find( r'token *?= \"(.*?)\",'       )
+    get_token     = find( r'token *?= \"(.*?)\",'       )
     get_viewkey   = find( r'[&\?]viewkey=([a-z\d]{8,})' )
     is_video_url  = comp( p.fullmatch, r'https:\/\/.{2,3}\.pornhub\..{2,3}\/view_video\.php\?viewkey=[a-z\d]{8,}' )
+    get_videos    = comp( p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"', engine.DOTALL )
     
     # Resolve regexes
-    extract_flash = find( r'var (flashvars_\d*) = ({.*});\n' )
+    get_flash     = find( r'var (flashvars_\d*) = ({.*});\n' )
     rm_comments   = subc( r'\/\*.*?\*\/', ''                 )
     
     # Renew regexes
@@ -94,5 +96,9 @@ class re:
     format_rn_els = subc( r'(else)', r'\n\g<1>:\n\t'              ) #  |
     format_rn_var = subc( r'var(.)=(\d+);', r'\g<1>=\g<2>\n'      ) # /
     get_rn_cookie = find( r'cookie.*?s\+\":(.*?);' )
+
+    # Find author regexes
+    video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<' )
+    video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' )
 
 # EOF

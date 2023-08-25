@@ -29,3 +29,9 @@ class ParsingError(Exception):
     The parser failed to properly
     fetch data.
     '''
+
+class MaxRetriesExceeded(Exception):
+    '''
+    A module failed its job after too
+    much retries.
+    '''

@@ -5,3 +5,5 @@ See github.com/Egsagon/PHUB for docs.
 '''
 
 from .core import Client
+from .objects import *
+from .modules import *
