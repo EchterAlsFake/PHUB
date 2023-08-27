@@ -3,8 +3,6 @@
 # PHUB - An API for PornHub.
 PHUB is an API wrapper for PornHub. It is able to fetch, search and download videos and supports account connections, achieved with efficient web scrapping using requests and regexes.
 
-> ⚠️ I don't maintain this often, so don't hesitate to submit issues or PRs
-
 > ⚠️ This project is probably against Pornhub TOS.
 
 
@@ -45,6 +43,11 @@ print('Downloading:', video.title)
 # Download on working dir with best quality
 video.download('.', quality = phub.Quality.BEST)
 ```
+
+## Contributing
+
+I don't plan to really maintain this after i start school, so feel free to support this project by submiting issues or requests
+and share the bugs you encountered in [Known issues](https://github.com/Egsagon/PHUB/blob/master/KNOWN_ISSUES.md)
 
 ## Documentation
 You can find out more on the API [in the docs](https://phub.readthedocs.io).
