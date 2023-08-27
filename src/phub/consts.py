@@ -5,11 +5,13 @@ Constants for the PHUB package.
 import re
 
 ROOT = 'https://www.pornhub.com/'
+API_ROOT = ROOT + 'webmasters/'
 
 HEADERS = {
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    
+    'Accept': '*/*',
     'Accept-Encoding': 'gzip, deflate, br',
-    'Accept-Language': 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
+    'Accept-Language': 'en,en-US',
     'Connection': 'keep-alive',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0'
 }
@@ -58,8 +60,8 @@ class regexes:
     # Extraction regexes
     extract_token        = re.compile( r'token *?= \"(.*?)\",'                                                       ).findall   # Extract session token from the home page
     extract_videos       = re.compile( r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"', re.DOTALL ).findall   # Extract videos from a page
-    
     extract_video_date   = re.compile( r'\"uploadDate\": \"(.*?)\"'                                                  ).findall   # Extract video publish date
+    extract_engine       = re.compile( r'SEARCH_ENGINE_DATA = ({.*?});'                                              ).findall   # Extract search engine JSON
     
     # Searching regexes
     video_search_counter = re.compile( r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/',                     re.DOTALL ).findall   # Extract video counter from search responses
@@ -69,12 +71,11 @@ class regexes:
     video_datalayer      = re.compile( r'window\.dataLayer\.push\(({.*?})\);',                             re.DOTALL ).findall   # Get video advanced datalayer
     video_channel        = re.compile( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<'          ).findall   # Get video author if channel
     video_model          = re.compile( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' ).findall   # Get video author if model
-    
     video_renew_connect  = re.compile( r'<!--(.*?);\n{ doc.*?s\+"(.*?);',                                  re.DOTALL ).findall   # Find all infos to build renewing conn cookie
     
     # Substraction regexes
     sub_js_comments      = re.compile( r'\/\*.*?\*\/'                                                                ).sub       # Remove js comments
-    sub_root             = re.compile( r'https://.{2,3}\.pornhub\.com/'                                              ).sub       # Substitue URL roots
+    sub_root             = re.compile( r'https://.{2,3}\.pornhub\..{2,3}/'                                              ).sub       # Substitue URL roots
     
     # Match regexes
     is_valid_video_url   = re.compile( r'https:\/\/.{2,3}\.pornhub\..{2,3}\/view_video\.php\?viewkey=[a-z\d]{8,}'    ).fullmatch # Verify video URL validity
