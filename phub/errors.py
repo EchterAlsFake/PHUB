@@ -35,3 +35,8 @@ class MaxRetriesExceeded(Exception):
     A module failed its job after too
     much retries.
     '''
+
+class UserNotFound(Exception):
+    '''
+    User wasn't found.
+    '''

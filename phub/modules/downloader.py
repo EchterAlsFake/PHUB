@@ -4,6 +4,9 @@ PHUB 4 download backends.
 
 from __future__ import annotations
 
+import os
+import time
+
 import threading
 from typing import TYPE_CHECKING, Generator, Callable
 
@@ -25,11 +28,14 @@ def _segment_wrap(client: Client,
             segment = client.call(url, throw = False)
             
             if segment.ok:
-                if buffer:
+                if buffer is not None:
                     buffer[url] = segment.content
                     callback()
                 
                 return segment.content
+
+            print(url, 'thread failed, retrying in .05')
+            time.sleep(1)
         
     raise errors.MaxRetriesExceeded(segment.status_code, segment.text)
 
@@ -59,47 +65,68 @@ def threaded(client: Client,
     '''
     
     buffer = {}
-    finished = False
+    finished = []
     
     def update():
         '''
         Called by threads on finish.
         '''
         
+        nonlocal finished
+        
         lb, lf = len(buffer), len(threads)
         
         callback(lb, lf)
-        finished = lb >= lf
+        
+        if lb >= lf:
+            finished.append(True) # TODO crappy, refactor
     
     # Create the threads
     threads = [threading.Thread(target = _segment_wrap,
                                 args = [client, url, buffer])
                for url in segments]
     
+    print(f'Generated {len(threads)} threads')
+    
     # Start the threads
     for thread in threads:
+        time.sleep(.05)
+        print('start')
         thread.start()
     
     # Wait for threads
-    while not finished: pass
+    while len(buffer) < len(threads):
+        print('DOWNLOAD', len(buffer))
+        pass
     
+    print('All finished')
     # Concatenate buffer
     video = b''
     
     for url in segments:
         video += buffer[url]
     
+    print('COncatenated all')
+    
     return video
         
         
 
-def FFMPEG(client: Client, segments: Generator) -> bytes:
+def FFMPEG(client: Client, segments: Generator, callback) -> bytes:
     '''
     TODO
     '''
     
-    # TODO
+    # Write temp file
+    with open('temp.m3u8', 'w') as file:
+        for segment in segments:
+            file.write(segment + '\n')
     
+    # Call FFMPEG
+    print('Starting ffmpeg')
+    os.system('ffmpeg -i temp.m3u8 video.mp4')
+    
+    return b'none'
 
 # EOF
     

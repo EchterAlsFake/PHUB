@@ -53,7 +53,7 @@ class Client:
         Send a request. 
         '''
         
-        print('CALL =>', func)
+        # print('CALL =>', func)
         
         # Delay
         if self.start_delay:
@@ -114,5 +114,12 @@ class Client:
               else utils.concat(consts.HOST, 'view_video.php?viewkey=' + video)
         
         return objects.Video(self, url)
+
+    def get_user(self, user: str) -> objects.User:
+        '''
+        Get a specific user.
+        '''
+
+        return objects.User.get(self, user)
 
 # EOF

@@ -2,10 +2,10 @@
 PHUB 4 utilities.
 '''
 
-import os
 import math
 import json
 import requests
+
 from . import consts
 from . objects import data
 

@@ -47,12 +47,34 @@ class User:
                    url = utils.concat(consts.HOST, guess[0]))
     
     @classmethod
-    def get(cls, user: str) -> Self:
+    def get(cls, client: core.Client, user: str) -> Self:
         '''
         Fetch a user knowing its name or URL.
+        
+        NOTE - while using names only, multiple users can be found.
         '''
         
-        # TODO
+        if consts.re.is_url(user):
+            name = url.split('/')[-1]
+            url = user
+        
+        else:
+            name = user.replace(' ', '-')
+            
+            # Guess the user type
+            for type_ in ('model', 'pornstar', 'channels'):            
+                
+                guess = utils.concat(type_, name)
+                response = client.call(guess, throw = False)
+            
+                if response.ok:
+                    url = response.url
+                    break
+            
+            else:
+                raise errors.UserNotFound(f'User {user} not found.')
+            
+        return cls(client = client, name = name, url = url)
     
     @cached_property
     def videos(self) -> objects.HQuery:
@@ -64,5 +86,36 @@ class User:
         if '/model' in url: url += '/videos'
         
         return objects.HQuery(client = self.client, args = url)
+
+    @cached_property
+    def page(self) -> str:
+        '''
+        The user page.
+        '''
+        
+        return self.client.call(self.url).text
+
+    @cached_property
+    def bio(self) -> str | None:
+        '''
+        The user bio.
+        '''
+        
+        return consts.re.user_bio(self.page, throw = False)
+
+    @cached_property
+    def info(self) -> dict[str, str]:
+        '''
+        The user detailled infos.
+        
+        [Experimental]
+        
+        Warning: language dependant.
+        
+        '''
+        
+        li = consts.re.user_infos(self.page)
+
+        return {k: v for k, v in li} # TODO better parsing
 
 # EOF

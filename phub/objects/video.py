@@ -117,7 +117,7 @@ class Video:
         
         # Parse files
         for line in raw.split('\n'):
-            if not line.startswith('#'):
+            if line.strip() and not line.startswith('#'):
                 yield dns + line
     
     def download(self,

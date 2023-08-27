@@ -26,9 +26,11 @@ LOGIN_PAYLOAD = {
 MAX_VIDEO_RENEW_ATTEMPTS = 3
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 
+# Regex wrappers
+
 def find(pattern: str, flags: engine.RegexFlag = 0) -> Callable[[str, bool], str]:
     '''
-    Compile a regex and wraps handling its errors.
+    Compile a single find regex and wraps handling its errors.
     '''
     
     regex = engine.compile(pattern, flags)
@@ -85,6 +87,7 @@ class re:
     get_viewkey   = find( r'[&\?]viewkey=([a-z\d]{8,})' )
     is_video_url  = comp( p.fullmatch, r'https:\/\/.{2,3}\.pornhub\..{2,3}\/view_video\.php\?viewkey=[a-z\d]{8,}' )
     get_videos    = comp( p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"', engine.DOTALL )
+    is_url        = comp( p.fullmatch, r'https*:\/\/.*' )
     
     # Resolve regexes
     get_flash     = find( r'var (flashvars_\d*) = ({.*});\n' )
@@ -101,4 +104,8 @@ class re:
     video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<' )
     video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' )
 
+    # User regexes
+    user_bio      = find( r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/', engine.DOTALL )
+    user_infos    = comp( p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/', engine.DOTALL )
+    
 # EOF
