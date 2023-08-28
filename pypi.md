@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/Egsagon/PHUB/blob/master/assets/banner.png">
+  <img src="https://github.com/Egsagon/PHUB/blob/master/assets/banner.png?raw=true">
 </p>
 
 # PHUB - An API for PornHub.
