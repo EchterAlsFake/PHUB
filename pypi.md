@@ -16,8 +16,14 @@ Learn more on the project [documentation](https://phub.readthedocs.io) and
 
 Dependencies: `requests`, `click`, `tqdm`
 
-Install: `pip install -U phub`
-Or (dev) `pip install -U git+https://github.com/Egsagon/PHUB.git`
+```sh
+pip install -U phub
+```
+
+Or, development branch:
+```sh
+pip install -U git+https://github.com/Egsagon/PHUB.git`
+```
 
 ## Exemple usage
 
