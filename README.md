@@ -1,10 +1,15 @@
+# Note
+
+### With the end of vacations for me, this project will probably remain unmaintained for a lot of time. That said, i will still view issues/PRs/discussions and try to answer to them or apply quick fixes, so don't hesitate to post there.
+
+-------------
+
 ![PHUB](https://github.com/Egsagon/PHUB/blob/master/assets/banner.png)
 
 # PHUB - An API for PornHub.
 PHUB is an API wrapper for PornHub. It is able to fetch, search and download videos and supports account connections, achieved with efficient web scrapping using requests and regexes.
 
 > ⚠️ This project is probably against Pornhub TOS.
-
 
 ## Installation
 - Install using pip (python 3.11 or higher required):
