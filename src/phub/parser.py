@@ -61,7 +61,7 @@ def resolve(video: Video) -> dict:
         dict: A dictionnary containing clean video data, fresh from PH.
     '''
     
-    log('parser', 'Resolving page JS script...', level = 6)
+    log('parser', 'Parsing video data...', level = 6)
     
     for _ in range(RENEW_MAX_ATTEMPTS):
         
@@ -77,20 +77,8 @@ def resolve(video: Video) -> dict:
     else:
         raise errors.ParsingError('Max renew attempts exceeded.')
     
-    script = video.page.split("flashvars_['nextVideo'];")[1].split('var nextVideoPlay')[0]
-    log('parser', 'Formating flash:', flash, level = 6)
-    
     # Load context
     data: dict = json.loads(ctx)
-    
-    # Format the script
-    script = ''.join(script.replace('var', '').split())
-    script = consts.regexes.sub_js_comments('', script)
-    script = script.replace(flash.replace('var', ''), 'data')
-    
-    # Execute the script
-    exec(script) # In case you ask, what we are doing here is converting the obfuscated Pornhub JS code into python code so that we can execute it and directly get the video M3U file.
-    log('parser', 'Execution successful, script resolved', level = 6)
     
     return data
 
