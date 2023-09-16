@@ -1,9 +1,3 @@
-# Note
-
-### With the end of vacations for me, this project will probably remain unmaintained for a lot of time. That said, i will still view issues/PRs/discussions and try to answer to them or apply quick fixes, so don't hesitate to post there.
-
--------------
-
 ![PHUB](https://github.com/Egsagon/PHUB/blob/master/assets/banner.png)
 
 # PHUB - An API for PornHub.
