@@ -14,7 +14,7 @@ class Account:
     
     def __new__(cls, client: Client) -> Self | None:
         '''
-        Check if it is nessescary to create an account object.
+        Check if it is necessary to create an account object.
         '''
         
         if all(client.credentials.values()):
@@ -22,7 +22,7 @@ class Account:
     
     def __init__(self, client: Client) -> None:
         '''
-        Initalise the account.
+        Initialise the account.
         '''
         
         self.client = client

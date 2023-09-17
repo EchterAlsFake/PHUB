@@ -50,13 +50,13 @@ def renew(video: Video) -> None:
 
 def resolve(video: Video) -> dict:
     '''
-    Resolves obfuscation that protect PornHub video M3U files.
+    Resolves obfuscation that protects PornHub video M3U files.
     
     Args:
         video (Video): The object that called the parser.
     
     Returns:
-        dict: A dictionnary containing clean video data, fresh from PH.
+        dict: A dictionary containing clean video data, fresh from PH.
     '''
         
     for _ in range(consts.MAX_VIDEO_RENEW_ATTEMPTS):

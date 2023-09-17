@@ -24,7 +24,7 @@ class User:
         self.name = name
         self.url = url
         
-        # Save data keys so far so we can make a difference with the
+        # Save data keys so far, so we can make a difference with the
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
     
@@ -120,7 +120,7 @@ class User:
     @cached_property
     def info(self) -> dict[str, str]:
         '''
-        The user detailled infos.
+        The user detailed infos.
         
         [Experimental]
         

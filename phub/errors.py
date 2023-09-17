@@ -33,7 +33,7 @@ class ParsingError(Exception):
 class MaxRetriesExceeded(Exception):
     '''
     A module failed its job after too
-    much retries.
+    many retries.
     '''
 
 class UserNotFound(Exception):

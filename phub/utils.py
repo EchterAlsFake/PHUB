@@ -1,112 +1,111 @@
-'''
+"""
 PHUB 4 utilities.
-'''
+"""
 
 import math
 import json
 import requests
 
 from . import consts
-from . objects import data
+from .objects import data
+
+# Named constants for least_factors
+INCREMENT = 30
+KNOWN_PRIME_FACTORS = [2, 3, 5]
+
 
 def concat(*args: list[str]) -> str:
-    '''
-    Concatenate multiple url parts.
-    '''
-        
+    """
+    Concatenate multiple URL parts.
+    """
     args = [arg.strip('/') for arg in args]
     return '/'.join(args)
 
-def least_factors(n: int):
-    '''
-    Rewrite of the PH least_factor function.
-    I don't know why it is like that, don't ask.
-    
+
+def least_factors(n: int) -> int:
+    """
+    Find the least factor of a given integer.
+
     Args:
-        n (int): Function input
-    
+        n (int): Input integer.
+
     Returns:
-        int: Function output
-    '''
-    
-    if not n: return 0
-    
-    if (n % 1 or n * n < 2): return 1
-    
-    if n % 2 == 0: return 2
-    if n % 3 == 0: return 3
-    if n % 5 == 0: return 5
-    
-    m = math.sqrt(n)
-    
+        int: The least factor of n.
+    """
+    if n == 0:
+        return 0
+
+    if n % 1 or n * n < 2:
+        return 1
+
+    for factor in KNOWN_PRIME_FACTORS:
+        if n % factor == 0:
+            return factor
+
+    sqrt_n = int(math.sqrt(n))
     i = 7
-    while i <= m:
-        
-        if n % i == 0: return i
-        
-        if n % (i + 4) == 0: return i + 4
-        if n % (i + 6) == 0: return i + 6
-        if n % (i + 10) == 0: return i + 10
-        if n % (i + 12) == 0: return i + 12
-        if n % (i + 16) == 0: return i + 16
-        if n % (i + 22) == 0: return i + 22
-        if n % (i + 24) == 0: return i + 24
-        
-        i += 30
-    
+
+    while i <= sqrt_n:
+        if n % i == 0:
+            return i
+
+        for offset in [4, 6, 10, 12, 16, 22, 24]:
+            if n % (i + offset) == 0:
+                return i + offset
+
+        i += INCREMENT
+
     return n
 
-def closest(iter: list[int], value: int) -> int:
-    '''
-    Pick the closest value in a list.
-    From www.entechin.com/find-nearest-value-list-python/
-    
+
+def closest(numbers: list[int], value: int) -> int:
+    """
+    Find the closest value in a list to the given value.
+
     Args:
-        iter (list[int]): List of possible values.
-        value (int): Value to pick closest to.
-    
+        numbers (list[int]): List of possible values.
+        value (int): Target value.
+
     Returns:
-        int: _description_
-    '''
-    
-    difference = lambda input_list: abs(input_list - value)
-    return min(iter, key = difference)
+        int: The closest value in the list to the target value.
+    """
+    difference = lambda x: abs(x - value)
+    return min(numbers, key=difference)
+
 
 def update_categories():
-    '''
+    """
     Update the categories in the Category classes.
-    
-    Warning - This will make changes to phub.data.py.
-    '''
-    
-    # TODO - refactor
-    
-    url = concat(consts.API_ROOT, 'categories')
-    res = requests.get(url)
-    res.raise_for_status()
-    data_ = sorted(json.loads(res.text)['categories'],
-                   key = lambda d: d['id'])
-    
-    with open(data.__file__, 'r') as file:
-        content = file.read()
-    
-    # Format categories
-    cats = ''
-    for obj in data_:
-        name = obj['category']
-        var = name.upper().replace('-', '_').replace('/', '_').replace(' ', '_')
-        
-        if var[0].isdigit(): var = '_' + var
-        
-        cats += f'\n    {var: <21} = _BaseCategory( {obj["id"]: >3}, \'{name: <21}\' )'
-    
-    content = content.split('#@START-CATEGORY')[0] + \
-              '#@START-CATEGORY' + \
-              cats + '\n' + \
-              '    #@END-CATEGORY' + \
-              content.split('#@END-CATEGORY')[1]
-    
-    with open(data.__file__, 'w') as file:
-        file.write(content)
 
-# EOF
+    Warning: This will modify phub.data.py.
+    """
+    url = concat(consts.API_ROOT, 'categories')
+    response = requests.get(url)
+    response.raise_for_status()
+
+    sorted_categories = sorted(
+        json.loads(response.text)['categories'],
+        key=lambda d: d['id']
+    )
+
+    categories_str = ''
+    for obj in sorted_categories:
+        name = obj['category']
+        var_name = name.upper().replace('-', '_').replace('/', '_').replace(' ', '_')
+
+        if var_name[0].isdigit():
+            var_name = '_' + var_name
+
+        categories_str += f'\n    {var_name: <21} = _BaseCategory( {obj["id"]: >3}, \'{name: <21}\' )'
+
+    with open(data.__file__, 'r+') as file:
+        content = file.read()
+        content = content.split('#@START-CATEGORY')[0] + \
+                  '#@START-CATEGORY' + \
+                  categories_str + '\n' + \
+                  '    #@END-CATEGORY' + \
+                  content.split('#@END-CATEGORY')[1]
+
+        file.seek(0)
+        file.write(content)
+        file.truncate()

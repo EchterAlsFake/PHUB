@@ -50,7 +50,7 @@ class Image:
         
         if size:
             if not size in self._sizes:
-                raise KeyError(f'{size} not disponible.')
+                raise KeyError(f'{size} not available.')
             
             url = self._sizes[size]
         
