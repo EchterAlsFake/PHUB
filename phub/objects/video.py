@@ -8,12 +8,14 @@ from functools import cached_property
 
 if TYPE_CHECKING:
     from ..core import Client
+    from ..locals import Quality # TODO
 
-from . import Tag, Like, User, Image, Quality
+from . import Tag, Like, User, Image
 from .. import utils
 from .. import errors
 from .. import consts
 from ..modules import parser, downloader
+
 
 class Video:
     '''
@@ -102,7 +104,7 @@ class Video:
         }
         
         # Fetch the master file
-        master_url = Quality(quality).select(qualities)
+        master_url = Quality(quality).select(qualities) # won't work because circular import
         master_src = self.client.call(master_url).text
         
         urls = [l for l in master_src.split('\n')
@@ -255,10 +257,12 @@ class Video:
     @cached_property
     def categories(self) -> list[NotImplemented]:
         '''
-        The catgories the video is in.
+        The categories of the video.
         '''
         
-        return self.fetch('data@categories') # TODO
+        raw = self.fetch('data@categories')
+        
+        return raw # TODO
 
     @cached_property
     def segment(self) -> LiteralString:

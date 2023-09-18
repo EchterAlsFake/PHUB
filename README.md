@@ -9,12 +9,12 @@ Project improvements:
 - [x] More objects (images, users, etc.)
 - [ ] Support client session long term usage
 - [ ] Making regexes cleaner and more efficient
-- [ ] Using pornhub's webmasters project along with PHUB3 scrappers
+- [x] Using pornhub's webmasters project along with PHUB3 scrappers
 
 Features improvements:
 
 - [ ] Download backends (normal, threaded, using FFMPEG, etc.)
-- [ ] Accurate searching filters with tags, categories, etc.
-- [ ] Providing more info on user's accounts (bios, avatars, etc.)
+- [x] Accurate searching filters with tags, categories, etc.
+- [x] Providing more info on user's accounts (bios, avatars, etc.)
 - [ ] Actually working feed
 - [ ] Better built-in CLI with more features

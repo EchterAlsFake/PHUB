@@ -5,7 +5,15 @@ from . import utils
 from . import consts
 from . import errors
 
-from .objects import JQuery, HQuery, Video, User, Account
+from .objects import (
+    JQuery,
+    HQuery,
+    Video,
+    User,
+    Account,
+    Param,
+    NO_PARAM
+)
 
 
 class Client:
@@ -127,13 +135,20 @@ class Client:
         https://www.pornhub.com/user/search
         '''
         
-        pass
+        return NotImplemented
 
-    def search(self, query: str, filter: object) -> JQuery | HQuery:
+    def search(self, query: str, filter: Param = NO_PARAM, feature = JQuery) -> JQuery | HQuery:
         '''
         Performs research on Pornhub.
         '''
         
-        return NotImplemented
+        key = 'name'
+        args = f'search?search={query}'
+        
+        if feature is HQuery:
+            key = 'id'
+            args = 'video/' + args
+        
+        return feature(client = self, args = args + filter.gen(key))
 
 # EOF

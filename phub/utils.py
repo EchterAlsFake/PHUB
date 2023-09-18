@@ -6,8 +6,7 @@ import math
 import json
 import requests
 
-from . import consts
-from .objects import data
+from . import consts, locals 
 
 # Named constants for least_factors
 INCREMENT = 30
@@ -18,6 +17,7 @@ def concat(*args: list[str]) -> str:
     """
     Concatenate multiple URL parts.
     """
+    
     args = [arg.strip('/') for arg in args]
     return '/'.join(args)
 
@@ -32,6 +32,7 @@ def least_factors(n: int) -> int:
     Returns:
         int: The least factor of n.
     """
+        
     if n == 0:
         return 0
 
@@ -69,25 +70,32 @@ def closest(numbers: list[int], value: int) -> int:
     Returns:
         int: The closest value in the list to the target value.
     """
+    
     difference = lambda x: abs(x - value)
     return min(numbers, key=difference)
 
 
-def update_categories():
+def update_locals():
     """
-    Update the categories in the Category classes.
+    Update the locals.
 
-    Warning: This will modify phub.data.py.
+    Warning: This will modify phub.locals.py.
     """
+    
+    # TODO - Refactor
+    
     url = concat(consts.API_ROOT, 'categories')
     response = requests.get(url)
     response.raise_for_status()
 
     sorted_categories = sorted(
         json.loads(response.text)['categories'],
-        key=lambda d: d['id']
+        key = lambda d: d['id']
     )
-
+    
+    max_length = len(sorted(sorted_categories,
+                            key = lambda d: len(d['category']))[-1]['category'])
+    
     categories_str = ''
     for obj in sorted_categories:
         name = obj['category']
@@ -96,16 +104,22 @@ def update_categories():
         if var_name[0].isdigit():
             var_name = '_' + var_name
 
-        categories_str += f'\n    {var_name: <21} = _BaseCategory( {obj["id"]: >3}, \'{name: <21}\' )'
+        name += '\''
+        
+        # categories_str += f'\n    {var_name: <21} = Param( {obj["id"]: >3}, \'{name: <{max_length + 1}})'
+        categories_str += f'\n    {var_name: <21} = Param( \'category\', {obj["id"]: >3}, \'{name: <{max_length + 1}})'
 
-    with open(data.__file__, 'r+') as file:
+    start_tag = '#START@CATEGORIES'
+    end_tag = '#END@CATEGORIES'
+
+    with open(locals.__file__, 'r+') as file:
         content = file.read()
-        content = content.split('#@START-CATEGORY')[0] + \
-                  '#@START-CATEGORY' + \
-                  categories_str + '\n' + \
-                  '    #@END-CATEGORY' + \
-                  content.split('#@END-CATEGORY')[1]
+        content = content.split(start_tag)[0] + start_tag + \
+                  categories_str + '\n' + '    ' + end_tag + \
+                  content.split(end_tag)[1]
 
         file.seek(0)
         file.write(content)
         file.truncate()
+
+# EOF
