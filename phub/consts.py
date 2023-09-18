@@ -95,13 +95,6 @@ class re:
     get_flash     = find( r'var (flashvars_\d*) = ({.*});\n' )
     rm_comments   = subc( r'\/\*.*?\*\/', ''                 )
     
-    # Renew regexes
-    get_rn_script = find( r'go\(\) \{(.*?)n=least', engine.DOTALL ) # \
-    format_rn_ifs = subc( r'(if\s\(.*?&\s\d+\))', r'\n\g<1>:\n\t' ) #  | -> TODO - Concat these into 1 or 2
-    format_rn_els = subc( r'(else)', r'\n\g<1>:\n\t'              ) #  |
-    format_rn_var = subc( r'var(.)=(\d+);', r'\g<1>=\g<2>\n'      ) # /
-    get_rn_cookie = find( r'cookie.*?s\+\":(.*?);' )
-
     # Find author regexes
     video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<' )
     video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' )

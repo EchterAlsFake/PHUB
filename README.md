@@ -13,7 +13,7 @@ Project improvements:
 
 Features improvements:
 
-- [ ] Download backends (normal, threaded, using FFMPEG, etc.)
+- [x] Download backends (normal, threaded, using FFMPEG, etc.)
 - [x] Accurate searching filters with tags, categories, etc.
 - [x] Providing more info on user's accounts (bios, avatars, etc.)
 - [ ] Actually working feed
