@@ -140,7 +140,7 @@ class Video:
         '''
         
         if os.path.isdir(path):
-            path += utils.concat(path, self.key)
+            path += utils.concat(path, self.key + '.mp4')
 
         # Call the backend
         video = downloader(client = self.client,
