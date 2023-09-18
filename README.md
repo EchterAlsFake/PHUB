@@ -13,7 +13,7 @@ pip install --upgrade phub
 
 - Or using this repository to get the latest features:
 ```sh
-pip install --upgrade git+https://github.com/Egsagon/PHUB.git
+pip install --upgrade git+https://github.com/Egsagon/PHUB.git@v4
 ```
 
 ## CLI usage
