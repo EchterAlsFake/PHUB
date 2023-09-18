@@ -1,20 +1,21 @@
 from __future__ import annotations
 
 import os
+import shutil
 from datetime import datetime, timedelta
 
-from typing import TYPE_CHECKING, Generator, LiteralString
+from typing import TYPE_CHECKING, Generator, LiteralString, Callable
 from functools import cached_property
 
 if TYPE_CHECKING:
     from ..core import Client
-    from ..locals import Quality # TODO
+    from ..locals import Quality
 
 from . import Tag, Like, User, Image
 from .. import utils
 from .. import errors
 from .. import consts
-from ..modules import parser, downloader
+from ..modules import download, parser, display
 
 
 class Video:
@@ -96,6 +97,8 @@ class Video:
         Get the video segment URLs.
         '''
         
+        from ..locals import Quality
+        
         # Get the quality master file
         qualities = {
             int(el['quality']): el['videoUrl']
@@ -104,7 +107,7 @@ class Video:
         }
         
         # Fetch the master file
-        master_url = Quality(quality).select(qualities) # won't work because circular import
+        master_url = Quality(quality).select(qualities)
         master_src = self.client.call(master_url).text
         
         urls = [l for l in master_src.split('\n')
@@ -127,9 +130,11 @@ class Video:
     
     def download(self,
                  path: str,
-                 quality: Quality,
-                 backend: callable = downloader.default,
-                 callback: callable = print) -> str:
+                 quality: Quality | str = 'best',
+                 *,
+                 downloader: Callable = download.default,
+                 display: Callable = display.default,
+                 **kwargs) -> str:
         '''
         Download the video to a file.
         '''
@@ -138,13 +143,19 @@ class Video:
             path += utils.concat(path, self.key)
 
         # Call the backend
-        video = backend(client = self.client,
-                        segments = self.get_segments(quality),
-                        callback = callback)
+        video = downloader(client = self.client,
+                           segments = self.get_segments(quality),
+                           callback = display,
+                           **kwargs)
         
-        # Write to file
-        with open(path, 'wb') as output:
-            output.write(video)
+        if isinstance(video, str):
+            # Move to file
+            shutil.move(video, path)
+        
+        else:
+            # Write to file
+            with open(path, 'wb') as output:
+                output.write(video)
         
         return path
     

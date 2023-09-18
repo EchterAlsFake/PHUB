@@ -3,6 +3,7 @@ PHUB 4 modules.
 '''
 
 from . import parser
-from . import downloader
+from . import display
+from . import download
 
 # EOF
