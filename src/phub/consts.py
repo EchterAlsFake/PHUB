@@ -90,6 +90,7 @@ class re:
     is_video_url  = comp( p.fullmatch, r'https:\/\/.{2,3}\.pornhub\..{2,3}\/view_video\.php\?viewkey=[a-z\d]{8,}' )
     get_videos    = comp( p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"', engine.DOTALL )
     is_url        = comp( p.fullmatch, r'https*:\/\/.*' )
+    remove_host   = subc( r'https://.{2,3}\.pornhub\..{2,3}/', '' )
     
     # Resolve regexes
     get_flash     = find( r'var (flashvars_\d*) = ({.*});\n' )

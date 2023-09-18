@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from ..core import Client
 
 from . import User, Image, HQuery
-from .. import objects
 from .. import consts
 
 class Account:

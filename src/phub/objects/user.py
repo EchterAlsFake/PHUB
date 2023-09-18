@@ -13,6 +13,7 @@ from .. import errors
 
 from .. import objects
 
+
 class User:
 
     def __init__(self, client: Client, name: str, url: str) -> None:
@@ -22,7 +23,7 @@ class User:
         
         self.client = client
         self.name = name
-        self.url = url
+        self.url = consts.re.remove_host(url)
         
         # Save data keys so far, so we can make a difference with the
         # cached property ones.
@@ -69,8 +70,8 @@ class User:
         '''
         
         if consts.re.is_url(user):
-            name = url.split('/')[-1]
             url = user
+            name = url.split('/')[-1]
         
         else:
             name = user.replace(' ', '-')
@@ -96,9 +97,9 @@ class User:
         Get the list of videos published by this user.
         '''
         
-        url = self.url.replace(consts.HOST, '')
+        url = self.url
         if 'model/' in url: url += '/videos'
-                
+        
         return objects.HQuery(client = self.client, args = url)
 
     @cached_property

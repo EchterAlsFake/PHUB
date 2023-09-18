@@ -13,6 +13,7 @@ from .. import utils
 from .. import consts
 from .. import errors
 
+
 class JQuery:
     '''
     Represents a query able to parse JSON data.
