@@ -79,7 +79,7 @@ class Client:
               force: bool = False,
               throw: bool = True) -> bool:
         '''
-        Attempt to login.
+        Attempt to log in.
         '''
         
         if not force and self.logged:
@@ -131,7 +131,7 @@ class Client:
 
     def search(self, query: str, filter: object) -> JQuery | HQuery:
         '''
-        Performs a research on Pornhub.
+        Performs research on Pornhub.
         '''
         
         return NotImplemented

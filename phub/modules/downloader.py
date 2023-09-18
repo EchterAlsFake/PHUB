@@ -107,7 +107,7 @@ def threaded(client: Client,
     for url in segments:
         video += buffer[url]
     
-    print('COncatenated all')
+    print('CConcatenated all')
     
     return video
 

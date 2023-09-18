@@ -38,7 +38,7 @@ class Video:
         self.page: str = None # The video page content
         self.data: dict = {}  # The video webmasters data
         
-        # Save data keys so far so we can make a difference with the
+        # Save data keys so far, so we can make a difference with the
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
     
