@@ -10,10 +10,7 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"
 ]
-dependencies = [
-    "requests",
-    "tqdm"
-]
+dependencies = ["requests"]
 requires-python = ">=3.11"
 
 [project.optional-dependencies]
