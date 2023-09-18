@@ -12,6 +12,6 @@ from .user import User
 from .video import Video
 from .query import JQuery, HQuery
 from .account import Account
-
+from .feed import Feed
 
 # EOF

@@ -47,11 +47,8 @@ class Video:
     
     def __repr__(self) -> str:
         
-        # return f'phub.Video(key={self.key})'
+        return f'phub.Video(key={self.key})'
         
-        # The cooler repr
-        return f'phub.Video(key=\033[96m{self.key}\033[0m)'
-    
     def refresh(self, page: bool = True, data: bool = True) -> None:
         '''
         Refresh video data.
@@ -69,6 +66,9 @@ class Video:
     def fetch(self, key: str) -> None:
         '''
         Lazily fetch some data.
+        
+        data@key => Use webmasters
+        page@key => Use web scraper
         '''
         
         if key in self.data:

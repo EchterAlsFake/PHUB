@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
 
-from .. import utils
-
 @dataclass
 class Tag:
     name: str

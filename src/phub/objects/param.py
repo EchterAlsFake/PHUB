@@ -4,6 +4,10 @@ from dataclasses import dataclass, field
 
 @dataclass
 class _DataParam:
+    '''
+    Represents the core of a Param object,
+    or exactly one filter.
+    '''
     
     key: str = field(repr = None)
     id: str | int = field(repr = None)
@@ -28,6 +32,10 @@ class _DataParam:
 
 
 class Param:
+    '''
+    Represents a parameter capable of mutating,
+    concatenate to others or negate itself.
+    '''
     
     def __init__(self, *args) -> None:
         '''

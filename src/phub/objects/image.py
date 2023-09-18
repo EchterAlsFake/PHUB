@@ -11,6 +11,10 @@ if TYPE_CHECKING:
 from .. import utils
 
 class Image:
+    '''
+    Represents an image hosted on Pornhub.
+    (user avatar, video thumbnail, etc.)
+    '''
     
     def __init__(self,
                  client: Client,
