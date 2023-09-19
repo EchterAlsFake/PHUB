@@ -99,7 +99,6 @@ class Account:
     
     @cached_property
     def feed(self) -> Feed:
-    def feed(self) -> Feed:
         '''
         The account feed.
         '''
