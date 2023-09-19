@@ -8,16 +8,22 @@ from typing import TYPE_CHECKING, Generator
 if TYPE_CHECKING:
     from ..core import Client
 
-from . import Video
+from . import Video, User, FeedItem
 from .. import utils
 from .. import consts
 from .. import errors
+
+
+class Query:
+    pass # TODO - A base query for index wraping + type hints
 
 
 class JQuery:
     '''
     Represents a query able to parse JSON data.
     '''
+    
+    PAGE_LENGTH = 30
     
     def __init__(self, client: Client, args: str) -> None:
         '''
@@ -63,7 +69,7 @@ class JQuery:
         
         assert isinstance(index, int)
         
-        data = self._get_page(index // 30)[index % 30]
+        data = self._get_page(index // self.PAGE_LENGTH)[index % self.PAGE_LENGTH]
         
         # Create the object and inject data
         video = Video(self.client, url = data['url'])
@@ -89,6 +95,8 @@ class HQuery(JQuery):
     Represents a Query able to parse HTML data.
     '''
     
+    PAGE_LENGTH = 32
+    
     def __init__(self, client: Client, args: str) -> None:
         '''
         Initialise a new query.
@@ -103,7 +111,7 @@ class HQuery(JQuery):
         Get a single video at an index.
         '''
         
-        video = self._get_page(index // 32)[index % 32]
+        video = self._get_page(index // self.PAGE_LENGTH)[index % self.PAGE_LENGTH]
         
         url = f'{consts.HOST}view_video.php?viewkey={video[0]}'
         
@@ -113,13 +121,12 @@ class HQuery(JQuery):
         return obj
     
     @cache
-    def _get_page(self, index: int) -> list[dict]:
+    def _get_page(self, index: int) -> list:
         '''
         Fetch a page.
         '''
         
         url = self.url + str(index + 1)
-        
         raw = self.client.call(url).text
         
         container = raw.split('class="container')[1]
@@ -127,5 +134,46 @@ class HQuery(JQuery):
         videos: list = consts.re.get_videos(container)
         
         return videos
+
+class FQuery(HQuery):
+    '''
+    Represents a query specific to the Feed.
+    '''
+    
+    PAGE_LENGTH = 14 # TODO - one of them is sus, should be 13
+    
+    @cache
+    def get(self, index: int) -> NotImplemented:
+        '''
+        Get a single item at an index.
+        '''
+        
+        user_url, item = self._get_page(index // self.PAGE_LENGTH)[index % self.PAGE_LENGTH]
+        
+        obj = FeedItem(
+            raw = item,
+            user = User(self.client, 'NotImplemented', user_url)
+        )
+        
+        return obj
+        
+        
+    @cache
+    def _get_page(self, index: int) -> list:
+        '''
+        Fetch a page.
+        '''
+        
+        url = self.url + str(index + 1)
+        raw = self.client.call(url).text
+        
+        items = consts.re.feed_items(raw)
+        print(f'found {len(items) = }')
+        
+        return items
+
+# <div class="container-wrapper-feeds
+# <div class="feedContent <- better
+
 
 # EOF

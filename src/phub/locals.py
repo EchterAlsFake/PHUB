@@ -60,6 +60,21 @@ class Quality(_BaseQuality):
     HALF = _BaseQuality('half')
     WORST = _BaseQuality('worst')
 
+class Section:
+    '''
+    Feed section filters.
+    '''
+    
+    ALL = Param('section', '')
+    VIDEO = Param('section', 'videos')
+    VIDEO = Param('section', 'videos')
+    MODEL_VIDEO = Param('section', 'pornstars_models') # Pornstars and models videos
+    CHANNEL_VIDEO = Param('section', 'channels')
+    PHOTO = Param('section', 'albums')
+    PLAYLIST = Param('section', 'playlists')
+    POST = Param('section', 'posts')
+    COMMENT = Param('section', 'comments')
+    FAVORITE = Param('section', 'favourite') # wtf is this
 
 class Production:
     # Production types
@@ -234,17 +249,5 @@ class Category:
     #END@CATEGORIES
     
     pass
-
-
-""" # Does not work. You can't affect searching with tags. I think.
-def Tag(value: str) -> Param:
-    '''
-    Wraps creating a tag.
-    '''
-
-    return Param('tag', value)
-
-tag = Tag
-"""
 
 # EOF

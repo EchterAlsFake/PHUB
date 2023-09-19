@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
     from ..core import Client
+    from . import Feed
 
 from . import User, Image, HQuery
 from .. import consts
@@ -92,11 +93,15 @@ class Account:
         return HQuery(self.client, f'users/{self.name}/videos/favorites')
     
     @cached_property
-    def feed(self) -> NotImplemented:
+    def feed(self) -> Feed:
         '''
         The account feed.
         '''
+        
+        from . import Feed
 
-        return NotImplemented
+        return Feed(self.client)
+    
+    # TODO - Recommended users /user/discover/popular_verified_members
 
 # EOF

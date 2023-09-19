@@ -103,5 +103,8 @@ class re:
     # User regexes
     user_bio      = find( r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/', engine.DOTALL )
     user_infos    = comp( p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/', engine.DOTALL )
+    
+    # Feed regexes
+    feed_items = comp( p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section', engine.DOTALL )
 
 # EOF
