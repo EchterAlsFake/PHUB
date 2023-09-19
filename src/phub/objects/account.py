@@ -7,14 +7,19 @@ if TYPE_CHECKING:
     from ..core import Client
     from . import Feed
 
-from . import User, Image, HQuery
+from . import User, Image, HQuery, Feed
 from .. import consts
 
 class Account:
+    '''
+    Represents a connected Ponhub account,
+    capable of accessing account-only features.
+    If the login fails, will be None.
+    '''
     
     def __new__(cls, client: Client) -> Self | None:
         '''
-        Check if it is necessary to create an account object.
+        Check if the object creation is needed.
         '''
         
         if all(client.credentials.values()):
@@ -22,7 +27,7 @@ class Account:
     
     def __init__(self, client: Client) -> None:
         '''
-        Initialise the account.
+        Initialise a new account object.
         '''
         
         self.client = client
@@ -43,7 +48,7 @@ class Account:
 
     def connect(self, data: dict) -> None:
         '''
-        Update account data once login was successful. 
+        Update account data once login was successful.
         '''
         
         self.name = data.get('username')
@@ -93,6 +98,7 @@ class Account:
         return HQuery(self.client, f'users/{self.name}/videos/favorites')
     
     @cached_property
+    def feed(self) -> Feed:
     def feed(self) -> Feed:
         '''
         The account feed.

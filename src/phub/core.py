@@ -15,8 +15,11 @@ from .objects import (
     NO_PARAM
 )
 
-
 class Client:
+    '''
+    Represents a client capable of handling requests
+    with Pornhub.
+    '''
     
     def __init__(self,
                  username: str = None,
@@ -62,7 +65,7 @@ class Client:
         Send a request. 
         '''
         
-        print('\033[93mCALL =>', func, end = '\033[0m\n')
+        # print('\033[93mCALL =>', func, end = '\033[0m\n')
         
         # Delay
         if self.start_delay:
@@ -130,14 +133,18 @@ class Client:
 
         return User.get(self, user)
 
-    def search_user(self) -> NotImplemented:
+    def search_user(self, query: str, filter: Param = NO_PARAM) -> HQuery:
         '''
-        https://www.pornhub.com/user/search
+        Search for users in the community.
         '''
         
-        return NotImplemented
+        # https://www.pornhub.com/user/search
+        return HQuery(self, NotImplemented + filter.gen(NotImplemented))
 
-    def search(self, query: str, filter: Param = NO_PARAM, feature = JQuery) -> JQuery | HQuery:
+    def search(self,
+               query: str,
+               filter: Param = NO_PARAM,
+               feature = JQuery) -> JQuery | HQuery:
         '''
         Performs research on Pornhub.
         '''

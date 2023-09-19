@@ -15,6 +15,9 @@ from .. import objects
 
 
 class User:
+    '''
+    Represents a Pornhub user.
+    '''
 
     def __init__(self, client: Client, name: str, url: str) -> None:
         '''
@@ -35,7 +38,7 @@ class User:
 
     def refresh(self) -> None:
         '''
-        Refresh user cache.
+        Refresh this instance cache.
         '''
         
         # Clear properties cache
@@ -125,12 +128,11 @@ class User:
         
         [Experimental]
         
-        Warning: language dependant.
-        
+        Warning: keys depends on the lanugage.
         '''
         
         li = consts.re.user_infos(self.page)
 
-        return {k: v for k, v in li} # TODO better parsing
+        return {k: v for k, v in li} # TODO
 
 # EOF

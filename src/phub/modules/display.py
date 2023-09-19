@@ -2,8 +2,8 @@
 PHUB video download display presets.
 '''
 
-import tqdm
-
+import os
+import sys
 from typing import Callable
 
 def progress(color: bool = True) -> Callable:
@@ -17,21 +17,42 @@ def progress(color: bool = True) -> Callable:
         tem = 'Downloading: \033[92m{percent}%\033[0m [\033[93m{cur}\033[0m/\033[93m{total}\033[0m]'
     
     def wrapper(cur: int, total: int) -> None:
-        percent = round( (cur / total) * 100 )
-    
-        #print(tem.format(percent = percent, cur = cur, total = total),
-        #    end = '\n' if percent >= 100 else '')
         
-        print('\r' + tem.format(percent = percent, cur = cur, total = total), end = '')
+        percent = round((cur / total) * 100)
+        print(tem.format(percent = percent, cur = cur, total = total), end = '\r')
             
     return wrapper
 
-def bar(**kwargs) -> Callable:
+def bar(desc = 'Downloading') -> Callable:
     '''
-    TQDM bar.
+    Progress bar.
     '''
     
-    pass # TODO
+    tem = desc + ' |{bar}| [{cur}/{total}]'
+    
+    term_size = os.get_terminal_size().columns
+    
+    def wrapper(cur: int, total: int) -> None:
+        
+        raw = tem.format(cur = cur, total = total, bar = '{bar}')
+        bar_length = term_size - len(tem) + 10
+        percent = round((cur / total) * bar_length)
+        
+        print(raw.format(bar = ('=' * percent).ljust(bar_length, ' ')), end = '\r')
+        
+        if cur == total: print()
+        
+    return wrapper
+
+def std(file = sys.stdout) -> Callable:
+    '''
+    Output to std.
+    '''
+    
+    def wrapper(cur: int, total: int) -> None:
+        print(round((cur / total) * 100))
+    
+    return wrapper
 
 # Set default display
 default = progress

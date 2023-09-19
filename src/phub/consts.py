@@ -26,7 +26,8 @@ LOGIN_PAYLOAD = {
 MAX_VIDEO_RENEW_ATTEMPTS = 3
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 
-FFMPEG_COMMAND = 'ffmpeg -f concat -safe 0 -protocol_whitelist file,http,https,tcp,tls -i {input} -c copy {output}'
+FFMPEG_EXECUTABLE = 'ffmpeg' # Use from PATH by default
+FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -f concat -safe 0 -protocol_whitelist file,http,https,tcp,tls -i {input} -c copy {output}'
 
 # Regex wrappers
 
@@ -83,6 +84,9 @@ def subc(pattern: str, repl: str, flags: int = 0) -> Callable[[str], str]:
     return wrapper
 
 class re:
+    '''
+    Web scraping regexes.
+    '''
     
     # Basic regexes
     get_token     = find( r'token *?= \"(.*?)\",'       )

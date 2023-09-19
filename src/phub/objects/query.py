@@ -64,7 +64,7 @@ class JQuery:
     @cache
     def get(self, index: int) -> Video:
         '''
-        Get one video at an index.
+        Get a video at an index.
         '''
         
         assert isinstance(index, int)

@@ -11,6 +11,10 @@ if TYPE_CHECKING:
 from .. import utils
 
 class Image:
+    '''
+    Represents an image hosted on Pornhub.
+    (user avatar, video thumbnail, etc.)
+    '''
     
     def __init__(self,
                  client: Client,
@@ -27,36 +31,16 @@ class Image:
         self.client = client
     
     def __repr__(self) -> str:
-        return f'phub.Image(name={self.name} in {len(self.sizes)} sizes)'
+        return f'phub.Image(name={self.name})'
     
-    @cached_property
-    def sizes(self) -> list[str]:
+    def download(self, path: str = '.') -> str:
         '''
-        The image sizes.
-        '''
+        Download the image in a certain quality.
         
-        # NOTE - I don't know if it is only with the tested videos,
-        # but most of them only have one size with multiple urls.
-        # return list(self._sizes.keys())
-        
-        # NOTE - With `avatar` images only, well, there is only one size.
-        
-        return []
-    
-    def download(self, path: str = '.', size: str = None) -> str:
-        '''
-        Download the image.
+        TODO - Handle multiple qualities/sizes
         '''
         
-        if size:
-            if not size in self._sizes:
-                raise KeyError(f'{size} not available.')
-            
-            url = self._sizes[size]
-        
-        else:
-            url = self.url
-        
+        url = self.url
         _, ext = os.path.splitext(url)
         
         if os.path.isdir(path):
