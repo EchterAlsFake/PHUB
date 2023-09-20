@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
+from functools import cached_property
 
 if TYPE_CHECKING:
     from ..core import Client
@@ -13,8 +15,6 @@ class Feed:
     Represents the account feed.
     '''
     
-    PAGE_LENGTH = 0
-    
     def __init__(self, client: Client) -> None:
         '''
         Initialise a new feed object.
@@ -22,7 +22,7 @@ class Feed:
         
         self.client = client
         self.url = 'feeds'
-        
+    
     def filter(self,
                section: Section | Param | str = None,
                user: User | str = None) -> FQuery: # TODO - Unify multiple types for all constants
@@ -35,6 +35,19 @@ class Feed:
         if section: args += section
         if user: args += Param('username', user.name if isinstance(user, User) else user)
         
-        return FQuery(self.client, self.url + args.gen().replace('&', '?', 1))
+        raw_args = args.gen()
+        
+        if raw_args.startswith('&'):
+            raw_args = raw_args.replace('&', '?', 1)
+        
+        return FQuery(self.client, self.url + raw_args)
+    
+    @cached_property
+    def feed(self) -> FQuery:
+        '''
+        A feed query with no filters.
+        '''
+
+        return self.filter()
 
 # EOF

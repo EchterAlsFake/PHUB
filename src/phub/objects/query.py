@@ -30,7 +30,8 @@ class Query:
         '''
 
         self.client = client
-        self.url = utils.concat(self.BASE, args) + '&page='
+        page = '?&'['?' in args] + 'page='
+        self.url = utils.concat(self.BASE, args) + page
     
     def __repr__(self) -> str:
         
@@ -147,10 +148,7 @@ class HQuery(Query):
         raw = self.client.call(url).text
         
         container = raw.split('class="container')[1]
-        
-        videos: list = consts.re.get_videos(container)
-        
-        return videos
+        return consts.re.get_videos(container)
 
 class FQuery(Query):
     '''
@@ -158,7 +156,7 @@ class FQuery(Query):
     '''
     
     BASE = consts.HOST
-    PAGE_LENGTH = 14 # TODO - one of them is sus, should be 13
+    PAGE_LENGTH = 14
     
     @cache
     def get(self, index: int) -> FeedItem:
@@ -167,13 +165,12 @@ class FQuery(Query):
         '''
         
         user_url, item = self._get_page(index // self.PAGE_LENGTH)[index % self.PAGE_LENGTH]
+        user_url = utils.concat(consts.HOST, user_url)
         
-        obj = FeedItem(
+        return FeedItem(
             raw = item,
-            user = User(self.client, 'NotImplemented', user_url)
+            user = User.get(self.client, user_url)
         )
-        
-        return obj
     
     @cache
     def _get_page(self, index: int) -> list:

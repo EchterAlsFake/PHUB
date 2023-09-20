@@ -66,7 +66,7 @@ class Client:
         Send a request. 
         '''
         
-        # print('\033[93mCALL =>', func, end = '\033[0m\n')
+        print('\033[93mCALL =>', func, end = '\033[0m\n')
         
         # Delay
         if self.start_delay:
