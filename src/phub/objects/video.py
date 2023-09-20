@@ -1,20 +1,22 @@
 from __future__ import annotations
 
 import os
-from datetime import datetime, timedelta
-
-from typing import TYPE_CHECKING, Generator, LiteralString, Callable
+import logging
 from functools import cached_property
-
-if TYPE_CHECKING:
-    from ..core import Client
-    from ..locals import Quality
+from datetime import datetime, timedelta
+from typing import TYPE_CHECKING, Generator, LiteralString, Callable
 
 from . import Tag, Like, User, Image
 from .. import utils
 from .. import errors
 from .. import consts
 from ..modules import download, parser, display
+
+if TYPE_CHECKING:
+    from ..core import Client
+    from ..locals import Quality
+
+logger = logging.getLogger(__name__)
 
 
 class Video:
@@ -43,6 +45,8 @@ class Video:
         # Save data keys so far, so we can make a difference with the
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
+        
+        logger.debug('Initialised new video object %s', self)
     
     def __repr__(self) -> str:
         
@@ -53,6 +57,8 @@ class Video:
         Refresh video data.
         '''
         
+        logger.info('Refreshing %s cache', self)
+        
         # Clear saved video page and data 
         if page: self.page = None
         if data: self.data.clear()
@@ -60,6 +66,7 @@ class Video:
         # Clear properties cache
         for key in list(self.__dict__.keys()):
             if not key in self.loaded_keys:
+                logger.debug('Deleting key %s', key)
                 delattr(self, key)
      
     def fetch(self, key: str) -> None:
@@ -72,6 +79,8 @@ class Video:
         
         if key in self.data:
             return self.data.get(key)
+        
+        logger.debug('Fetching %s key %s', self, key)
         
         # Fetch only webmasters data
         if key.startswith('data@'):
@@ -104,6 +113,8 @@ class Video:
             for el in self.fetch('page@mediaDefinitions')
             if el['quality'] in ['1080', '720', '480', '240']
         }
+        
+        logger.info('Extracted %s qualities from %s', len(qualities), self)
         
         return Quality(quality).select(qualities)
 
@@ -150,6 +161,8 @@ class Video:
         # Add a name if the path is a directory
         if os.path.isdir(path):
             path = utils.concat(path, self.key + '.mp4')
+
+        logger.info('Starting download for %s at %s', self, path)
 
         # Call the backend
         video = downloader(video = self,

@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import os
-
-from functools import cached_property
+import logging
 from typing import TYPE_CHECKING
+from functools import cached_property
+
+from .. import utils
 
 if TYPE_CHECKING:
     from ..core import Client
 
-from .. import utils
+
+logger = logging.getLogger(__name__)
+
 
 class Image:
     '''
@@ -29,6 +33,8 @@ class Image:
         self.name = name
         self._sizes = sizes
         self.client = client
+        
+        logger.debug('Generated new image object: %s', self)
     
     def __repr__(self) -> str:
         return f'phub.Image(name={self.name})'
@@ -45,6 +51,8 @@ class Image:
         
         if os.path.isdir(path):
             path = utils.concat(path, self.name + ext)
+        
+        logger.info('Saving %s at %s', self, path)
         
         with open(path, 'wb') as file:
             

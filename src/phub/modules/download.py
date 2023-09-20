@@ -11,17 +11,16 @@ import logging
 import requests
 import threading
 import subprocess
-
-logger = logging.getLogger(__name__)
-
 from typing import TYPE_CHECKING, Generator, Callable
+
+from .. import errors, consts
 
 if TYPE_CHECKING:
     from ..core import Client
     from ..objects import Video
     from ..locals import Quality
 
-from .. import errors, consts
+logger = logging.getLogger(__name__)
 
 
 '''

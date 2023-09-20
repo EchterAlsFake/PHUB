@@ -1,17 +1,19 @@
 from __future__ import annotations
 
+import logging
 from functools import cached_property
 from typing import TYPE_CHECKING, Self
+
+from . import HQuery
+from .. import utils
+from .. import consts
+from .. import errors
 
 if TYPE_CHECKING:
     from ..core import Client
     from .video import Video
 
-from .. import utils
-from .. import consts
-from .. import errors
-
-from .. import objects
+logger = logging.getLogger(__name__)
 
 
 class User:
@@ -31,6 +33,8 @@ class User:
         # Save data keys so far, so we can make a difference with the
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
+        
+        logger.debug('Initialised new user object %s', self)
     
     def __repr__(self) -> str:
         
@@ -41,9 +45,12 @@ class User:
         Refresh this instance cache.
         '''
         
+        logger.info('Refreshing %s object', self)
+        
         # Clear properties cache
         for key in list(self.__dict__.keys()):
             if not key in self.loaded_keys:
+                logger.debug('Deleting key %s', key)
                 delattr(self, key)
 
     @classmethod
@@ -54,11 +61,12 @@ class User:
         
         if video.page is None:
             video.fetch('page@')
-                
+        
         guess = consts.re.video_model(video.page, throw = False) or \
                 consts.re.video_channel(video.page, throw = False)
         
         if not guess:
+            logger.error('Author of %s not found', video)
             raise errors.RegexError('Could not find user for video', video)
         
         return cls(client = video.client, name = guess[1],
@@ -86,16 +94,18 @@ class User:
                 response = client.call(guess, throw = False)
             
                 if response.ok:
+                    logger.info('Guessing type of %s is %s', user, type_)
                     url = response.url
                     break
             
             else:
+                logger.error('Could not guess type of %s', user)
                 raise errors.UserNotFound(f'User {user} not found.')
-            
+        
         return cls(client = client, name = name, url = url)
     
     @cached_property
-    def videos(self) -> objects.HQuery:
+    def videos(self) -> HQuery:
         '''
         Get the list of videos published by this user.
         '''
@@ -103,7 +113,7 @@ class User:
         url = self.url
         if 'model/' in url: url += '/videos'
         
-        return objects.HQuery(client = self.client, args = url)
+        return HQuery(client = self.client, args = url)
 
     @cached_property
     def page(self) -> str:

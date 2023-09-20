@@ -6,14 +6,13 @@ from __future__ import annotations
 
 import json
 import logging
-
 from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from ..objects import Video
 
 from .. import errors
 from .. import consts
+
+if TYPE_CHECKING:
+    from ..objects import Video
 
 logger = logging.getLogger(__name__)
 

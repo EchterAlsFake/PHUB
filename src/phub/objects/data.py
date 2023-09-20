@@ -1,14 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 from functools import cached_property
 from dataclasses import dataclass, field
 
-from typing import TYPE_CHECKING
+from .. import utils
 
 if TYPE_CHECKING:
     from . import User
 
-from .. import utils
 
 @dataclass
 class Tag:

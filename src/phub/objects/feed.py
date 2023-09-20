@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 from functools import cached_property
+
+from . import FQuery, User, Param, NO_PARAM
 
 if TYPE_CHECKING:
     from ..core import Client
     from ..locals import Section
 
-from . import FQuery, User, Param, NO_PARAM
+logger = logging.getLogger(__name__)
 
 
 class Feed:
@@ -22,6 +25,8 @@ class Feed:
         
         self.client = client
         self.url = 'feeds'
+        
+        logger.debug('Initialised account feed: %s', self)
     
     def filter(self,
                section: Section | Param | str = None,
@@ -29,6 +34,7 @@ class Feed:
         '''
         Creates a Feed Query with specific filters.
         '''
+        
         
         # Generate args
         args = NO_PARAM
@@ -39,6 +45,8 @@ class Feed:
         
         if raw_args.startswith('&'):
             raw_args = raw_args.replace('&', '?', 1)
+        
+        logger.info('Generating new filter feed using args `%s`', raw_args)
         
         return FQuery(self.client, self.url + raw_args)
     

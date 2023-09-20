@@ -8,10 +8,6 @@ import requests
 
 from . import consts, locals 
 
-# Named constants for least_factors
-INCREMENT = 30
-KNOWN_PRIME_FACTORS = [2, 3, 5]
-
 
 def concat(*args: list[str]) -> str:
     """
@@ -20,43 +16,6 @@ def concat(*args: list[str]) -> str:
     
     args = [arg.strip('/') for arg in args]
     return '/'.join(args)
-
-
-def least_factors(n: int) -> int:
-    """
-    Find the least factor of a given integer.
-
-    Args:
-        n (int): Input integer.
-
-    Returns:
-        int: The least factor of n.
-    """
-        
-    if n == 0:
-        return 0
-
-    if n % 1 or n * n < 2:
-        return 1
-
-    for factor in KNOWN_PRIME_FACTORS:
-        if n % factor == 0:
-            return factor
-
-    sqrt_n = int(math.sqrt(n))
-    i = 7
-
-    while i <= sqrt_n:
-        if n % i == 0:
-            return i
-
-        for offset in [4, 6, 10, 12, 16, 22, 24]:
-            if n % (i + offset) == 0:
-                return i + offset
-
-        i += INCREMENT
-
-    return n
 
 
 def closest(numbers: list[int], value: int) -> int:

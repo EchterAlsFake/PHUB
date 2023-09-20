@@ -1,19 +1,22 @@
 from __future__ import annotations
 
 import json
+import logging
 from functools import cache
-
 from typing import TYPE_CHECKING, Generator
-
-if TYPE_CHECKING:
-    from ..core import Client
 
 from . import Video, User, FeedItem
 from .. import utils
 from .. import consts
 from .. import errors
 
+if TYPE_CHECKING:
+    from ..core import Client
+
+logger = logging.getLogger(__name__)
+
 QueryItem = Video | FeedItem
+
 
 class Query:
     '''
@@ -32,6 +35,8 @@ class Query:
         self.client = client
         page = '?&'['?' in args] + 'page='
         self.url = utils.concat(self.BASE, args) + page
+        
+        logger.debug('Initialised new query %s', self)
     
     def __repr__(self) -> str:
         
@@ -109,7 +114,9 @@ class JQuery(Query):
         raw = self.client.call(self.url + str(index + 1)).text
         data = json.loads(raw).get('videos')
 
-        if data is None: raise errors.URLError('Invalid API response')
+        if data is None:
+            logger.error('Invalif API response from `%s`', self.url)
+            raise errors.ParsingError('Invalid API response')
 
         return data
 
@@ -120,8 +127,6 @@ class HQuery(Query):
     
     BASE = consts.HOST
     PAGE_LENGTH = 32
-    
-    # self.url = utils.concat(consts.HOST, args) + '?&'['?' in args] + 'page='
     
     @cache
     def get(self, index: int) -> Video:

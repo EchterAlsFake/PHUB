@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+import logging
 from functools import cached_property
 from typing import TYPE_CHECKING, Self
+
+from .. import consts
+from . import User, Image, HQuery
 
 if TYPE_CHECKING:
     from ..core import Client
     from . import Feed
 
-from . import User, Image, HQuery
-from .. import consts
+logger = logging.getLogger(__name__)
+
 
 class Account:
     '''
@@ -23,7 +27,10 @@ class Account:
         '''
         
         if all(client.credentials.values()):
-            return object.__new__(cls)        
+            logger.info('Creating new account object')
+            return object.__new__(cls)
+        
+        logger.info('Bypassing account creation, no credentials')
     
     def __init__(self, client: Client) -> None:
         '''
@@ -41,6 +48,8 @@ class Account:
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
         
+        logger.info('Account object %s created', self)
+        
     def __repr__(self) -> str:
         
         status = 'logged-out' if self.name is None else f'name={self.name}' 
@@ -56,6 +65,9 @@ class Account:
         self.is_premium = data.get('premium_redirect_cookie') != '0'
         
         # We assert that the account is from a normal user (not model, etc.)
+        if not 'user/' in self.user.url:
+            logger.error('Invalid user type: %s', url)
+            raise NotImplementedError('Non-user account are not supported.')
         
         url = consts.HOST + f'/users/{self.name}'
         self.user = User(client = self.client, name = self.name, url = url)
@@ -65,12 +77,17 @@ class Account:
         Delete the object's cache to allow items refreshing.
         '''
         
+        logger.info('Refreshing account %s', self)
+        
         if refresh_login:
+            logger.info('Forcing login refresh')
             self.client.login(force = True)
         
         # Clear properties cache
         for key in list(self.__dict__.keys()):
             if not key in self.loaded_keys:
+                
+                logger.debug('Deleting key %s', key)
                 delattr(self, key)
     
     @cached_property

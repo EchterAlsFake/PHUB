@@ -2,11 +2,15 @@
 PHUB 4 constants.
 '''
 
+import logging
 import re as engine
 from re import Pattern as p
 from typing	import Callable
 
 from . import errors
+
+logger = logging.getLogger(__name__)
+
 
 HOST = 'https://www.pornhub.com/'
 API_ROOT = HOST + 'webmasters/'
@@ -23,6 +27,7 @@ LOGIN_PAYLOAD = {
     'from': 'pc_login_modal_:homepage_redesign',
 }
 
+SEGMENT_LENGTH = 4 # Length of a PH video segment
 MAX_VIDEO_RENEW_ATTEMPTS = 3
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 DOWNLOAD_SEGMENT_ERROR_DELAY = .5
@@ -30,8 +35,6 @@ DOWNLOAD_SEGMENT_ERROR_DELAY = .5
 FFMPEG_EXECUTABLE = 'ffmpeg' # Use from PATH by default
 FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output}'
 
-SEGMENT_LENGTH = 4 # Estimation of the length of one PH segment length (in seconds)
-                   # Idk if it changes between cdns or videos
 
 # Regex wrappers
 
@@ -46,6 +49,7 @@ def find(pattern: str, flags: engine.RegexFlag = 0) -> Callable[[str, bool], str
         
         matches = regex.findall(string)
         if throw and not matches:
+            logger.error('Pattern %s failed', pattern)
             raise errors.RegexError('Find regex failed.')
         
         if len(matches): return matches[0]
@@ -66,6 +70,7 @@ def comp(method: Callable, pattern: str, flags: int = 0) -> Callable[[str], str]
             return matches
         
         except AttributeError:
+            logger.error('Invalid regex method: %s', method)
             raise AttributeError('Invalid compiled regex method:', method)
     
     return wrapper
@@ -83,6 +88,7 @@ def subc(pattern: str, repl: str, flags: int = 0) -> Callable[[str], str]:
             return regex.sub(repl, *args)
         
         except Exception as err:
+            logger.error('Pattern %s replacing %s failed', pattern, repl)
             raise errors.RegexError('Substraction failed:', err)
     
     return wrapper
