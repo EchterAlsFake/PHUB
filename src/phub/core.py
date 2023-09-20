@@ -7,6 +7,7 @@ from . import consts
 from . import errors
 
 from .objects import (
+    Query,
     JQuery,
     HQuery,
     Video,
@@ -162,7 +163,7 @@ class Client:
     def search(self,
                query: str,
                filter: Param = NO_PARAM,
-               feature = JQuery) -> JQuery | HQuery:
+               feature = JQuery) -> Query:
         '''
         Performs research on Pornhub.
         '''
