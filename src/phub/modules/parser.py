@@ -5,15 +5,17 @@ PHUB 4 parser.
 from __future__ import annotations
 
 import json
+import logging
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..objects import Video
 
-from .. import utils
 from .. import errors
 from .. import consts
+
+logger = logging.getLogger(__name__)
 
 
 def resolve(video: Video) -> dict:
@@ -27,14 +29,18 @@ def resolve(video: Video) -> dict:
         dict: A dictionary containing clean video data, fresh from PH.
     '''
     
-    # NOTE - Removed de-obfuscation script because it was deleted by PH
-    # and we don't need it anymore
+    # NOTE - Keeping this in a separate file in case PH adds
+    # more obfuscation stuff
     
-    # NOTE - Removed renew functionnality because it is no more raised
-    # by PH for some reason.
-    
+    logger.info('Resolving %s page', video)
     flash, ctx = consts.re.get_flash(video.page)
     
-    return json.loads(ctx)
+    try:
+        obj = json.loads(ctx)
+        return obj
+    
+    except:
+        logger.error('Failed to parse flash %s for video %s', flash, video)
+        raise errors.ParsingError('Failed to resolve page for', video)
 
 # EOF
