@@ -16,5 +16,8 @@ from . import errors
 from .objects import *
 from .modules import *
 
+# why
+# import logging
+# logging.getLogger('phub').addHandler(logging.NullHandler())
 
 # EOF

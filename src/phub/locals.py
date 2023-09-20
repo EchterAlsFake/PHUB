@@ -3,7 +3,6 @@ Dynamic file.
 '''
 
 from typing import Self, Literal
-
 from .objects import Param, NO_PARAM
 
 

@@ -1,4 +1,5 @@
 import time
+import logging
 import requests
 
 from . import utils
@@ -14,6 +15,8 @@ from .objects import (
     Param,
     NO_PARAM
 )
+
+logger = logging.getLogger(__name__)
 
 class Client:
     '''
@@ -31,6 +34,8 @@ class Client:
         '''
         Initialise a new client.
         '''
+        
+        logger.debug('Initialised new Client %s', self)
         
         # Initialise session
         self.session = requests.Session()
@@ -51,9 +56,12 @@ class Client:
         # Connect account
         self.logged = False
         self.account = Account(self)
+        logger.debug('Connected account to client %s', self.account)
         
         # Automatic login
-        if login and self.account: self.login()
+        if login and self.account:
+            logger.debug('Automatic login triggered')
+            self.login()
     
     def call(self,
              func: str,
@@ -66,7 +74,7 @@ class Client:
         Send a request. 
         '''
         
-        print('\033[93mCALL =>', func, end = '\033[0m\n')
+        logger.info('Making call %s', func)
         
         # Delay
         if self.start_delay:
@@ -95,7 +103,10 @@ class Client:
         Attempt to log in.
         '''
         
+        logger.debug('Attempting login')
+        
         if not force and self.logged:
+            logger.error('Client is already logged in')
             raise errors.ClientAlreadyLogged()
     
         # Get token
@@ -109,9 +120,11 @@ class Client:
         # Parse response
         data = response.json()
         success = int(data.get('success'))
+        message = data.get('message')
         
         if throw and not success:
-            raise errors.LoginFailed(data.get('message'))
+            logger.error('Login failed: Received error: %s', message)
+            raise errors.LoginFailed(message)
         
         # Update account data
         self.account.connect(data)
@@ -123,6 +136,8 @@ class Client:
         Fetch a Pornhub video.
         '''
         
+        logger.debug('Fetching video at', video)
+        
         url = video if video.startswith('http') \
               else utils.concat(consts.HOST, 'view_video.php?viewkey=' + video)
         
@@ -133,6 +148,7 @@ class Client:
         Get a specific user.
         '''
 
+        logger.debug('Fetching user %s', user)
         return User.get(self, user)
 
     def search_user(self, query: str, filter: Param = NO_PARAM) -> HQuery:
@@ -158,6 +174,9 @@ class Client:
             key = 'id'
             args = 'video/' + args
         
-        return feature(client = self, args = args + filter.gen(key))
+        raw_args = args + filter.gen(key)
+        
+        logger.info('Opening search query at %s', raw_args)
+        return feature(client = self, args = raw_args)
 
 # EOF
