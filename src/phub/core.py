@@ -72,7 +72,7 @@ class Client:
              timeout: float = 30,
              throw: bool = True) -> requests.Response:
         '''
-        Send a request. 
+        Send a request.
         '''
         
         logger.info('Making call %s', func)
