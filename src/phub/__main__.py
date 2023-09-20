@@ -96,6 +96,23 @@ def liked(n: str, output: str, user: str, quality: str) -> None:
         
         video.download(output, quality, display = phub.display.bar(f'Downloading {video.key}'))
 
+@cli.command()
+@click.argument('user')
+@click.option('-n', help = 'Video count')
+@click.option('-o', '--output', help = 'Output dir', default = '.')
+@click.option('-q', '--quality', help = 'Video quality', default = 'best')
+def user_videos(user: str, n: str, output: str, quality: str) -> None:
+    '''
+    Download the n last videos from a channel/model/etc. 
+    '''
+    
+    client = phub.Client()
+    user = client.get_user(user)
+    
+    for i, video in enumerate(user.videos[:n]):
+        
+        video.download(output, quality, display = phub.display.bar(f'#{i}'))
+
 if __name__ == '__main__':
     cli()
 
