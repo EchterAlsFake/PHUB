@@ -4,7 +4,6 @@ import logging
 from functools import cached_property
 from typing import TYPE_CHECKING, Self
 
-from . import HQuery
 from .. import utils
 from .. import consts
 from .. import errors
@@ -12,6 +11,7 @@ from .. import errors
 if TYPE_CHECKING:
     from ..core import Client
     from .video import Video
+    from . import HQuery
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +109,8 @@ class User:
         '''
         Get the list of videos published by this user.
         '''
+        
+        from . import HQuery
         
         url = self.url
         if 'model/' in url: url += '/videos'

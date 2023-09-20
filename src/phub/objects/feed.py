@@ -4,11 +4,12 @@ import logging
 from typing import TYPE_CHECKING
 from functools import cached_property
 
-from . import FQuery, User, Param, NO_PARAM
+from . import User, Param, NO_PARAM
 
 if TYPE_CHECKING:
     from ..core import Client
     from ..locals import Section
+    from . import FQuery
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ class Feed:
         Creates a Feed Query with specific filters.
         '''
         
+        from . import FQuery
         
         # Generate args
         args = NO_PARAM

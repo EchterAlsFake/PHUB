@@ -5,11 +5,11 @@ from functools import cached_property
 from typing import TYPE_CHECKING, Self
 
 from .. import consts
-from . import User, Image, HQuery
+from . import User, Image
 
 if TYPE_CHECKING:
     from ..core import Client
-    from . import Feed
+    from . import Feed, HQuery
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +96,8 @@ class Account:
         Videos recommended to the account.
         '''
         
+        from . import HQuery
+        
         return HQuery(self.client, 'recommended')
     
     @cached_property
@@ -104,6 +106,8 @@ class Account:
         Account video history.
         '''
         
+        from . import HQuery
+        
         return HQuery(self.client, f'users/{self.name}/videos/recent')
     
     @cached_property
@@ -111,6 +115,8 @@ class Account:
         '''
         Videos liked by the account.
         '''
+        
+        from . import HQuery
         
         return HQuery(self.client, f'users/{self.name}/videos/favorites')
     
