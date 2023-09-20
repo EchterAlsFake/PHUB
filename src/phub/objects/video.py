@@ -91,10 +91,10 @@ class Video:
         return self.data.get(key)
 
     # === Download methods === #
-
-    def get_segments(self, quality: Quality) -> Generator[str, None, None]:
+    
+    def get_M3U_URL(self, quality: Quality) -> str:
         '''
-        Get the video segment URLs.
+        The URL of the master M3U file.
         '''
         
         from ..locals import Quality
@@ -106,8 +106,15 @@ class Video:
             if el['quality'] in ['1080', '720', '480', '240']
         }
         
+        return Quality(quality).select(qualities)
+
+    def get_segments(self, quality: Quality) -> Generator[str, None, None]:
+        '''
+        Get the video segment URLs.
+        '''
+        
         # Fetch the master file
-        master_url = Quality(quality).select(qualities)
+        master_url = self.get_M3U_URL(quality)
         master_src = self.client.call(master_url).text
         
         urls = [l for l in master_src.split('\n')
@@ -133,18 +140,19 @@ class Video:
                  quality: Quality | str = 'best',
                  *,
                  downloader: Callable = download.default,
-                 display: Callable = display.default,
+                 display: Callable = display.default(),
                  **kwargs) -> str:
         '''
         Download the video to a file.
         '''
         
         if os.path.isdir(path):
-            path += utils.concat(path, self.key + '.mp4')
+            path = utils.concat(path, self.key + '.mp4')
 
         # Call the backend
         video = downloader(client = self.client,
-                           segments = self.get_segments(quality),
+                           video = self,
+                           quality = quality,
                            callback = display,
                            **kwargs)
         

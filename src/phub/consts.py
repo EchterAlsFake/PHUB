@@ -27,7 +27,7 @@ MAX_VIDEO_RENEW_ATTEMPTS = 3
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 
 FFMPEG_EXECUTABLE = 'ffmpeg' # Use from PATH by default
-FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -f concat -safe 0 -protocol_whitelist file,http,https,tcp,tls -i {input} -c copy {output}'
+FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -v info -c copy {output}' #  -crf 50
 
 # Regex wrappers
 
@@ -109,6 +109,8 @@ class re:
     user_infos    = comp( p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/', engine.DOTALL )
     
     # Feed regexes
-    feed_items = comp( p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section', engine.DOTALL )
+    feed_items    = comp( p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section', engine.DOTALL )
+    
+    ffmpeg_line   = find( r'seg-(\d*?)-' )
 
 # EOF

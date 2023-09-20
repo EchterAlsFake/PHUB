@@ -4,20 +4,25 @@ PHUB 4 download backends.
 
 from __future__ import annotations
 
+import io
 import os
 import copy
 import time
 
 import requests
 import threading
+import subprocess
 
 from typing import TYPE_CHECKING, Generator, Callable
 
 if TYPE_CHECKING:
     from ..core import Client
+    from ..objects import Video
+    from ..locals import Quality
 
 from .. import errors, consts
 
+# TODO - Base download for type hint
 
 def _segment_wrap(client: Client,
                   url: str,
@@ -62,28 +67,35 @@ def default(client: Client,
     return buffer
 
 def FFMPEG(client: Client,
-           segments: Generator,
+           video: Video,
+           quality: Quality,
            callback: Callable) -> None:
     '''
     Download using FFMPEG. It has to be installed to your system.
     You can override FFMPEG access with consts.FFMPEG_COMMAND
-    
-    Now i have no idea how to implement callbacks for that.
-    Maybe using this masterpiece i did long ago:
-    https://github.com/Egsagon/neko-sama-api/blob/ad34184823072f98abbee1a90b111358a6b39cb2/src/nekosama/utils.py#L134
     '''
     
-    # Write temp file
-    with open('temp', 'w') as file:
-        for segment in segments:
-            file.write(f'file {segment}\n')
+    M3U = video.get_M3U_URL(quality)
+    
+    command = consts.FFMPEG_COMMAND.format(input = M3U, output = '_temp.mp4')
     
     # Call FFMPEG
-    print('Starting ffmpeg')
-    os.system(consts.FFMPEG_COMMAND.format(input = 'temp', output = '_temp.mp4'))
+    print('Starting FFMPEG')
+    # TODO - no ask overwrite    
+    proc = subprocess.Popen(command, stdout = subprocess.PIPE,
+                            stderr = subprocess.STDOUT, universal_newlines = True)
     
-    # Delete temp file
-    os.remove('temp')
+    while 1:
+        line = proc.stdout.readline()
+        if proc.poll() != None: break
+        
+        if 'Opening \'https' in line and not '/index' in line:
+            
+            index = consts.re.ffmpeg_line(line)
+            
+            callback(int(index), -1)
+    
+    print('finished')
     
     return '_temp.mp4'
 
