@@ -31,6 +31,7 @@ class Client:
                  *,
                  language: str = 'en,en-US',
                  delay: int = 0,
+                 proxies: dict = None,
                  login: bool = True) -> None:
         '''
         Initialise a new client.
@@ -47,6 +48,7 @@ class Client:
         self.session.cookies.set('accessPH', '1')
         self.session.cookies.set('age_verified', '1')
 
+        self.proxies = proxies
         self.language = {'Accept-Language': language}
         self.credentials = {'username': username,
                             'password': password}
@@ -91,7 +93,8 @@ class Client:
             url = url,
             headers = consts.HEADERS | headers | self.language,
             data = data,
-            timeout = timeout
+            timeout = timeout,
+            proxies = self.proxies
         )
         
         if throw: response.raise_for_status()
