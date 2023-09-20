@@ -50,7 +50,7 @@ def std(file = sys.stdout) -> Callable:
     '''
     
     def wrapper(cur: int, total: int) -> None:
-        print(round((cur / total) * 100))
+        print(round((cur / total) * 100), file = file)
     
     return wrapper
 
