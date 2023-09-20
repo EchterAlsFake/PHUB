@@ -19,7 +19,7 @@ def progress(color: bool = True) -> Callable:
     def wrapper(cur: int, total: int) -> None:
         
         percent = round((cur / total) * 100)
-        print(tem.format(percent = percent, cur = cur, total = total), end = '\r')
+        print(tem.format(percent = percent, cur = cur, total = total))#, end = '\r') # TODO - glitches with ffmpeg download
             
     return wrapper
 

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 from datetime import datetime, timedelta
 
 from typing import TYPE_CHECKING, Generator, LiteralString, Callable
@@ -139,34 +138,27 @@ class Video:
                  path: str,
                  quality: Quality | str = 'best',
                  *,
-                 downloader: Callable = download.default,
-                 display: Callable = display.default(),
-                 **kwargs) -> str:
+                 downloader: Callable[[Video,
+                                       Quality,
+                                       Callable[[int, int], None],
+                                       str], None] = download.default,
+                 display: Callable[[int, int], None] = display.default()) -> str:
         '''
         Download the video to a file.
         '''
         
+        # Add a name if the path is a directory
         if os.path.isdir(path):
             path = utils.concat(path, self.key + '.mp4')
 
         # Call the backend
-        video = downloader(client = self.client,
-                           video = self,
+        video = downloader(video = self,
                            quality = quality,
                            callback = display,
-                           **kwargs)
-        
-        if isinstance(video, str):
-            # Move to file
-            shutil.move(video, path)
-        
-        else:
-            # Write to file
-            with open(path, 'wb') as output:
-                output.write(video)
+                           path = path)
         
         return path
-    
+        
     # === Data properties === #
 
     @cached_property

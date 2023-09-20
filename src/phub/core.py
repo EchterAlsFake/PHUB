@@ -60,6 +60,7 @@ class Client:
              method: str = 'GET',
              data: dict = None,
              headers: dict = {},
+             timeout: float = 30,
              throw: bool = True) -> requests.Response:
         '''
         Send a request. 
@@ -80,7 +81,8 @@ class Client:
             method = method,
             url = url,
             headers = consts.HEADERS | headers | self.language,
-            data = data
+            data = data,
+            timeout = timeout
         )
         
         if throw: response.raise_for_status()

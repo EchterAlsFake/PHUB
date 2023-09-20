@@ -4,8 +4,6 @@ PHUB 4 download backends.
 
 from __future__ import annotations
 
-import io
-import os
 import copy
 import time
 
@@ -22,54 +20,56 @@ if TYPE_CHECKING:
 
 from .. import errors, consts
 
-# TODO - Base download for type hint
 
-def _segment_wrap(client: Client,
-                  url: str,
-                  callback: Callable = None,
-                  buffer: dict = None) -> bytes:
-    '''
-    Download a single segment.
-    '''
-    
-    for _ in range(consts.DOWNLOAD_SEGMENT_MAX_ATTEMPS):
-        
-            segment = client.call(url, throw = False)
-            
-            if segment.ok:
-                if buffer is not None:
-                    buffer[url] = segment.content
-                    callback()
-                
-                return segment.content
+'''
+default  => Download one segment at once and concatenate them
+FFMPEG   => FFMPEG handles everything
+threaded => Threaded download + concatenation
+'''
 
-            print(url, 'thread failed, retrying in .05')
-            time.sleep(1)
-        
-    raise errors.MaxRetriesExceeded(segment.status_code, segment.text)
-
-def default(client: Client,
-            segments: Generator,
-            callback: Callable) -> None:
+def default(video: Video,
+            quality: Quality,
+            callback: Callable,
+            path: str,
+            start: int = 0) -> None:
     '''
-    Simple download.
+    Dummy download. Can fail with slow speeds.
     '''
     
     buffer = b''
     
-    segments = list(segments)
+    segments = list(video.get_segments(quality))[start:]
     length = len(segments)
     
+    # Fetch segments
     for i, url in enumerate(segments):
-        buffer += _segment_wrap(client, url)
+        for _ in range(consts.DOWNLOAD_SEGMENT_MAX_ATTEMPS):
+        
+            segment = video.client.call(url, throw = False, timeout = 4)
+            
+            if segment.ok:
+                buffer += segment.content
+                break
+
+            print('Retrying download')
+            time.sleep(consts.DOWNLOAD_SEGMENT_ERROR_DELAY)
+                
+        else:
+            print('Timed out. Refreshing segments...')
+            return default(video, quality, callback, i - 1)
+            
+            # raise errors.MaxRetriesExceeded(segment.status_code, segment.text)
+        
         callback(i + 1, length)
     
-    return buffer
+    # Concatenate
+    with open(path, 'wb') as file:
+        file.write(buffer)
 
-def FFMPEG(client: Client,
-           video: Video,
+def FFMPEG(video: Video,
            quality: Quality,
-           callback: Callable) -> None:
+           callback: Callable,
+           path: str) -> None:
     '''
     Download using FFMPEG. It has to be installed to your system.
     You can override FFMPEG access with consts.FFMPEG_COMMAND
@@ -77,27 +77,25 @@ def FFMPEG(client: Client,
     
     M3U = video.get_M3U_URL(quality)
     
-    command = consts.FFMPEG_COMMAND.format(input = M3U, output = '_temp.mp4')
+    # Estimate video segment count
+    length = int(video.duration.total_seconds() // consts.SEGMENT_LENGTH)
+    
+    command = consts.FFMPEG_COMMAND.format(input = M3U, output = path)
     
     # Call FFMPEG
-    print('Starting FFMPEG')
-    # TODO - no ask overwrite    
-    proc = subprocess.Popen(command, stdout = subprocess.PIPE,
-                            stderr = subprocess.STDOUT, universal_newlines = True)
+    proc = subprocess.Popen(command,
+                            stdout = subprocess.PIPE,
+                            stderr = subprocess.STDOUT,
+                            universal_newlines = True)
     
     while 1:
         line = proc.stdout.readline()
         if proc.poll() != None: break
         
-        if 'Opening \'https' in line and not '/index' in line:
+        if 'Opening \'https' in line and '/seg' in line:
             
             index = consts.re.ffmpeg_line(line)
-            
-            callback(int(index), -1)
-    
-    print('finished')
-    
-    return '_temp.mp4'
+            callback(int(index), length)
 
 def _thread(req: requests.PreparedRequest,
             session: requests.Session,
@@ -173,15 +171,17 @@ def base_thread(client: Client,
     callback(length, length)
     return buffer
 
-def threaded(client: Client,
-             segments: Generator,
+def threaded(video: Video,
+             quality: Quality,
              callback: Callable,
+             path: str,
              delay: float = .05) -> bytes:
     '''
     Threaded download.
     '''
     
-    buffer = base_thread(client, segments, callback, delay)
+    segments = video.get_segments(quality)
+    buffer = base_thread(video.client, segments, callback, delay)
     items = sorted(buffer.items(), key = lambda row: row[0])
     
     raw = b''
@@ -190,6 +190,8 @@ def threaded(client: Client,
         print(f'{url = }')
         raw += value
     
-    return raw
+    # Write to file
+    with open(path, 'wb') as file:
+        file.write(raw)
 
 # EOF

@@ -25,9 +25,13 @@ LOGIN_PAYLOAD = {
 
 MAX_VIDEO_RENEW_ATTEMPTS = 3
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
+DOWNLOAD_SEGMENT_ERROR_DELAY = .5
 
 FFMPEG_EXECUTABLE = 'ffmpeg' # Use from PATH by default
-FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -v info -c copy {output}' #  -crf 50
+FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output}'
+
+SEGMENT_LENGTH = 4 # Estimation of the length of one PH segment length (in seconds)
+                   # Idk if it changes between cdns or videos
 
 # Regex wrappers
 
