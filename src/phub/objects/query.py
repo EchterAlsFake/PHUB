@@ -13,17 +13,16 @@ from .. import utils
 from .. import consts
 from .. import errors
 
+QueryItem = Video | FeedItem
 
 class Query:
-    pass # TODO - A base query for index wraping + type hints
-
-
-class JQuery:
     '''
-    Represents a query able to parse JSON data.
+    A Base query for type hints that handles
+    getting items. 
     '''
     
-    PAGE_LENGTH = 30
+    BASE: str = None
+    PAGE_LENGTH: int = None
     
     def __init__(self, client: Client, args: str) -> None:
         '''
@@ -31,11 +30,15 @@ class JQuery:
         '''
 
         self.client = client
-        self.url = utils.concat(consts.API_ROOT, args) + '&page='
+        self.url = utils.concat(self.BASE, args) + '&page='
     
-    def __getitem__(self, index: int | slice | tuple) -> Video | Generator[Video, None, None] | tuple[Video]:
+    def __repr__(self) -> str:
+        
+        return f'phub.Query(url={self.url})'
+    
+    def __getitem__(self, index: int | slice | tuple) -> QueryItem | Generator[QueryItem, None, None] | tuple[QueryItem]:
         '''
-        Get one or multiple videos.
+        Get one or multiple items from the query.
         '''
         
         assert isinstance(index, (int, slice, tuple))
@@ -55,11 +58,30 @@ class JQuery:
                 
                 yield self.get(i)
         
-        return wrap()            
+        return wrap()
     
-    def __repr__(self) -> str:
+    # Methods defined by children    
+    def get(self, index: int) -> QueryItem:
+        '''
+        Get a single query item.
+        '''
         
-        return f'phub.Query(url={self.url})'
+        return NotImplemented
+    
+    def _get_page(self, index: int) -> list:
+        '''
+        Get a query page.
+        '''
+        
+        return NotImplemented
+
+class JQuery(Query):
+    '''
+    Represents a query able to parse JSON data.
+    '''
+    
+    BASER = consts.API_ROOT
+    PAGE_LENGTH = 30
     
     @cache
     def get(self, index: int) -> Video:
@@ -90,20 +112,15 @@ class JQuery:
 
         return data
 
-class HQuery(JQuery):
+class HQuery(Query):
     '''
     Represents a Query able to parse HTML data.
     '''
     
+    BASE = consts.HOST
     PAGE_LENGTH = 32
     
-    def __init__(self, client: Client, args: str) -> None:
-        '''
-        Initialise a new query.
-        '''
-        
-        self.client = client
-        self.url = utils.concat(consts.HOST, args) + '?&'['?' in args] + 'page='
+    # self.url = utils.concat(consts.HOST, args) + '?&'['?' in args] + 'page='
     
     @cache
     def get(self, index: int) -> Video:
@@ -135,15 +152,16 @@ class HQuery(JQuery):
         
         return videos
 
-class FQuery(HQuery):
+class FQuery(Query):
     '''
-    Represents a query specific to the Feed.
+    Represents a query able to parse user feeds.
     '''
     
+    BASE = consts.HOST
     PAGE_LENGTH = 14 # TODO - one of them is sus, should be 13
     
     @cache
-    def get(self, index: int) -> NotImplemented:
+    def get(self, index: int) -> FeedItem:
         '''
         Get a single item at an index.
         '''
@@ -156,8 +174,7 @@ class FQuery(HQuery):
         )
         
         return obj
-        
-        
+    
     @cache
     def _get_page(self, index: int) -> list:
         '''
@@ -166,14 +183,6 @@ class FQuery(HQuery):
         
         url = self.url + str(index + 1)
         raw = self.client.call(url).text
-        
-        items = consts.re.feed_items(raw)
-        print(f'found {len(items) = }')
-        
-        return items
-
-# <div class="container-wrapper-feeds
-# <div class="feedContent <- better
-
+        return consts.re.feed_items(raw)
 
 # EOF
