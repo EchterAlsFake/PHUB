@@ -171,6 +171,8 @@ class Client:
         Performs research on Pornhub.
         '''
         
+        print(type(feature))
+        
         key = 'name'
         args = f'search?search={query}'
         

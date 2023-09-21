@@ -25,4 +25,7 @@ Quickstart
     guides/cli-usage
     guides/gui-usage
 
+    guides/pkg-usage
+    guides/download
+
     api/index
