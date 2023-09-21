@@ -13,7 +13,12 @@ pip install --upgrade phub
 
 - Or using this repository to get the latest features:
 ```sh
-pip install --upgrade git+https://github.com/Egsagon/PHUB.git@v4
+pip install --upgrade git+https://github.com/Egsagon/PHUB.git
+```
+
+- Or, if you want to use a lower python version (down to 3.9):
+```sh
+pip install --upgrade git+https://github.com/Egsagon/PHUB.git@py-3.9
 ```
 
 ## CLI usage
@@ -44,7 +49,7 @@ video.download('.', quality = phub.Quality.BEST)
 ```
 
 ## Documentation
-You can find out more on the API [in the docs](https://phub.readthedocs.io).
+You can find out more on the API [in the docs](https://phub.readthedocs.io). (⚠️ Old docs from PHUB3)
 
 ## License
 
