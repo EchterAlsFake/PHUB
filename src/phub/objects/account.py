@@ -64,13 +64,13 @@ class Account:
         self.avatar = Image(self.client, data.get('avatar'), 'avatar')
         self.is_premium = data.get('premium_redirect_cookie') != '0'
         
-        # We assert that the account is from a normal user (not model, etc.)
-        if not 'user/' in self.user.url:
-            logger.error('Invalid user type: %s', url)
-            raise NotImplementedError('Non-user account are not supported.')
-        
         url = consts.HOST + f'/users/{self.name}'
         self.user = User(client = self.client, name = self.name, url = url)
+        
+        # We assert that the account is from a normal user (not model, etc.)
+        if not 'users/' in self.user.url:
+            logger.error('Invalid user type: %s', url)
+            raise NotImplementedError('Non-user account are not supported.')
     
     def refresh(self, refresh_login: bool = False) -> None:
         '''

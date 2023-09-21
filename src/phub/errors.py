@@ -45,3 +45,5 @@ class NoResult(Exception):
     '''
     No query result for this page.
     '''
+
+# EOF
