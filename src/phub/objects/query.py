@@ -87,9 +87,12 @@ class Query:
         
         assert isinstance(index, int)
         
-        raw = self._get_page(index // self.PAGE_LENGTH)[index % self.PAGE_LENGTH]
+        page = self._get_page(index // self.PAGE_LENGTH)
         
-        return self._parse_item(raw)
+        if len(page) > (ii := index % self.PAGE_LENGTH):
+            return self._parse_item(page[ii])
+        
+        raise errors.NoResult('Item does not exist')
     
     @cache
     def _get_page(self, index: int) -> list:
@@ -176,13 +179,25 @@ class HQuery(Query):
         container = raw.split('class="container')[1]
         return consts.re.get_videos(container)
 
+class UQuery(HQuery):
+    '''
+    Represents a Query able to parse User video data.
+    '''
+    
+    PAGE_LENGTH = 40
+    
+    def _parse_page(self, raw: str) -> list[tuple]:
+        
+        container = raw.split('class="videoSection')[1]
+        return consts.re.get_videos(container)
+
 class FQuery(Query):
     '''
     Represents a query able to parse user feeds.
     '''
     
     BASE = consts.HOST
-    PAGE_LENGTH = 14
+    PAGE_LENGTH = 14 # Unsure
     
     def _parse_item(self, raw: tuple) -> FeedItem:
         '''

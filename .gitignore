@@ -1,0 +1,7 @@
+test.py
+src/test.py
+build/
+build/*
+docs/buidl/
+docs/build/*
+build.bat

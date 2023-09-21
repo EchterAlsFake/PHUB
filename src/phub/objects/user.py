@@ -11,7 +11,7 @@ from .. import errors
 if TYPE_CHECKING:
     from ..core import Client
     from .video import Video
-    from . import HQuery
+    from . import UQuery
 
 logger = logging.getLogger(__name__)
 
@@ -105,17 +105,17 @@ class User:
         return cls(client = client, name = name, url = url)
     
     @cached_property
-    def videos(self) -> HQuery:
+    def videos(self) -> UQuery:
         '''
         Get the list of videos published by this user.
         '''
         
-        from . import HQuery
+        from . import UQuery
         
         url = self.url
         if 'model/' in url: url += '/videos'
         
-        return HQuery(client = self.client, args = url)
+        return UQuery(client = self.client, args = url)
 
     @cached_property
     def page(self) -> str:
