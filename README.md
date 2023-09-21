@@ -49,7 +49,7 @@ video.download('.', quality = phub.Quality.BEST)
 ```
 
 ## Documentation
-You can find out more on the API [in the docs](https://phub.readthedocs.io).
+You can find out more on the API [in the docs](https://phub.readthedocs.io). (⚠️ Old docs from PHUB3)
 
 ## License
 
