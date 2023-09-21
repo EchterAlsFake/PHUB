@@ -86,7 +86,7 @@ class JQuery(Query):
     Represents a query able to parse JSON data.
     '''
     
-    BASER = consts.API_ROOT
+    BASE = consts.API_ROOT
     PAGE_LENGTH = 30
     
     @cache
