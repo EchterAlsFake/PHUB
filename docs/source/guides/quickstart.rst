@@ -27,10 +27,11 @@ Optionnal dependencies:
 
     pip install --upgrade git+https://github.com/Egsagon/PHUB.git
 
-- Installing the lastest stable for python 3.9:
+- Installing for lower python versions (>=3.9):
 
 .. code-block:: bash
 
     pip install --upgrade git+https://github.com/Egsagon/PHUB.git@py-3.9
 
-
+You can use PHUB as a :doc:`CLI </guides/cli-usage>`,
+a :doc:`GUI </guides/gui-usage>` or a :doc:`Python package </guides/pkg-usage>`. 

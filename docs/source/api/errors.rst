@@ -20,3 +20,5 @@ errors.
 .. autoexception:: phub.errors.MaxRetriesExceeded
 
 .. autoexception:: phub.errors.UserNotFound
+
+.. autoexception:: phub.errors.NoResult

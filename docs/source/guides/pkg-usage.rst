@@ -33,7 +33,6 @@ like so:
 
     url = 'https://www.pornhub.com/view_video.php?viewkey=xxx'
     video = client.get(url) # (1)!
-    # video will be a phub.Video object
 
 .. code-annotations::
     #.
@@ -44,65 +43,66 @@ like so:
 
             video = client.get(key = 'xxx')
 
-Accessing video data
---------------------
+Accessing data
+--------------
 
-By default, video data will be pre-scrapped
-when you call :meth:`.Client.get`.
-You can turn that off by specifying
-``preload`` to ``False``.
+With a :py:class:`.Video` object: you can fetch all video data, e.g.:
 
+.. code-block:: pythons
 
-.. code-block:: python
-
-    >>> import phub
-    >>> client = phub.Client()
-    >>> video = client.get(key = 'xxx')
+    >>> video: phub.Video = ...
 
     >>> video.title
-    'Minecraft speedrunner vs 5 hunter'
-
+    >>> video.duration
     >>> video.like.up
-    4500000000
-
+    >>> video.like.down
+    >>> video.views
+    >>> video.tags
+    >>> video.pornstars
     >>> video.author
-    phub.Author(name = 'Dream')
+    >>> video.date
+    >>> video.image
+    # etc.
 
-At any time you can reload that data by calling
-:meth:`.Client.refresh` (useful for long-term usage).
+You can check out all video properties `here </api/objects#phub.objects.Video>`.
 
 Downloading a video
 -------------------
 
-A video can be downloaded via its :meth:`.Video.download`
-method.
+A video can be downloaded via :meth:`.Video.download`.
 
 .. code-block:: python
 
     import phub
-    from phub import Quality
+    from phub.locals import Quality
 
     video = ...
 
     video.download(path = 'my-video.mp4',
                    quality = Quality.BEST)
 
-* The ``path`` of the video can be a file or a directory, in which case the title of the video will be taken as a filename.
+You can set the quality to be ``BEST``, ``HALF`` or ``WORST``, or an :py:class:`int`
+for an absolute value.
 
-For advanced downloading, see downloading.
+.. note:: Tip: you can set the ``path`` paramater to be a directory for the video
+    to be downloaded in. The file name will automatically be the video id. 
+
+For advanced downloading, see `/guides/download`.
 
 Debugging
 ---------
 
-At any time, you can use built-in debugging to see what's wrong with
-your code or the API.
+You can use Python `logging`_ library to debug your code and see what's wrong with
+it or the API.
+
+.. _logging: https://docs.python.org/3/library/logging.html
 
 .. code-block:: python
 
     import phub
+    import logging
 
-    # Start debug
-    phub.debug(True)
+    logging.BasicConfig(level = ...)
 
     client = phub.Client()
     ...
