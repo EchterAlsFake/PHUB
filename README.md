@@ -1,6 +1,6 @@
 ![PHUB](https://github.com/Egsagon/PHUB/blob/master/assets/banner.png)
 
-# PHUB 4.0 - 3.9 port
+# PHUB 4.0 - Python 3.9 port
 
 ## Installation
 ```sh
