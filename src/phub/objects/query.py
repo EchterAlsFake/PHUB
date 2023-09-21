@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from functools import cache
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, Generator, Any
 
 from . import Video, User, FeedItem
 from .. import utils
@@ -36,6 +36,8 @@ class Query:
         page = '?&'['?' in args] + 'page='
         self.url = utils.concat(self.BASE, args) + page
         
+        self.iter_index = -1
+        
         logger.debug('Initialised new query %s', self)
     
     def __repr__(self) -> str:
@@ -47,14 +49,11 @@ class Query:
         Get one or multiple items from the query.
         '''
         
-        assert isinstance(index, (int, slice, tuple))
+        assert isinstance(index, (int, slice))
         
         if isinstance(index, int):
             return self.get(index)
-        
-        if isinstance(index, tuple):
-            return tuple(self.get(i) for i in index)
-        
+
         def wrap() -> Generator[Video, None, None]:
             # Support slices
             
@@ -65,16 +64,58 @@ class Query:
                 yield self.get(i)
         
         return wrap()
+
+    def __iter__(self):
+        
+        self.iter_index = -1
+        return self
     
-    # Methods defined by children    
+    def __next__(self):
+        
+        try:
+            self.iter_index += 1
+            return self.get(self.iter_index)
+        
+        except errors.NoResult:
+            raise StopIteration
+
+    @cache
     def get(self, index: int) -> QueryItem:
+        '''
+        Get a single item.
+        '''
+        
+        assert isinstance(index, int)
+        
+        raw = self._get_page(index // self.PAGE_LENGTH)[index % self.PAGE_LENGTH]
+        
+        return self._parse_item(raw)
+    
+    @cache
+    def _get_page(self, index: int) -> list:
+        '''
+        Get splited unparsed page items.
+        '''
+        
+        assert isinstance(index, int)
+        
+        req = self.client.call(self.url + str(index + 1),
+                               throw = False)
+        
+        if req.status_code == 404:
+            raise errors.NoResult()
+        
+        return self._parse_page(req.text)
+    
+    # Methods defined by subclasses    
+    def _parse_item(self, raw: Any) -> QueryItem:
         '''
         Get a single query item.
         '''
         
         return NotImplemented
     
-    def _get_page(self, index: int) -> list:
+    def _parse_page(self, raw: str) -> list:
         '''
         Get a query page.
         '''
@@ -89,29 +130,16 @@ class JQuery(Query):
     BASE = consts.API_ROOT
     PAGE_LENGTH = 30
     
-    @cache
-    def get(self, index: int) -> Video:
-        '''
-        Get a video at an index.
-        '''
-        
-        assert isinstance(index, int)
-        
-        data = self._get_page(index // self.PAGE_LENGTH)[index % self.PAGE_LENGTH]
+    def _parse_item(self, data: dict) -> Video:
         
         # Create the object and inject data
         video = Video(self.client, url = data['url'])
-        video.data = {f'data@{k}': v for k, v in data.items()} # NOTE - Repetitive w/ Video.fetch
+        video.data = {f'data@{k}': v for k, v in data.items()}
         
         return video
     
-    @cache
-    def _get_page(self, index: int) -> list[dict]:
-        '''
-        Fetch a page.
-        '''
+    def _parse_page(self, raw: str) -> list[dict]:
         
-        raw = self.client.call(self.url + str(index + 1)).text
         data = json.loads(raw).get('videos')
 
         if data is None:
@@ -128,30 +156,23 @@ class HQuery(Query):
     BASE = consts.HOST
     PAGE_LENGTH = 32
     
-    @cache
-    def get(self, index: int) -> Video:
+    def _parse_item(self, raw: tuple) -> Video:
         '''
         Get a single video at an index.
         '''
-        
-        video = self._get_page(index // self.PAGE_LENGTH)[index % self.PAGE_LENGTH]
-        
-        url = f'{consts.HOST}view_video.php?viewkey={video[0]}'
+                
+        url = f'{consts.HOST}view_video.php?viewkey={raw[0]}'
         
         obj = Video(self.client, url)
-        obj.data = {f'page@title': video[2]}
+        obj.data = {f'page@title': raw[2]}
         
         return obj
     
-    @cache
-    def _get_page(self, index: int) -> list:
+    def _parse_page(self, raw: str) -> list[tuple]:
         '''
         Fetch a page.
         '''
-        
-        url = self.url + str(index + 1)
-        raw = self.client.call(url).text
-        
+                
         container = raw.split('class="container')[1]
         return consts.re.get_videos(container)
 
@@ -163,13 +184,12 @@ class FQuery(Query):
     BASE = consts.HOST
     PAGE_LENGTH = 14
     
-    @cache
-    def get(self, index: int) -> FeedItem:
+    def _parse_item(self, raw: tuple) -> FeedItem:
         '''
         Get a single item at an index.
         '''
         
-        user_url, item = self._get_page(index // self.PAGE_LENGTH)[index % self.PAGE_LENGTH]
+        user_url, item = raw
         user_url = utils.concat(consts.HOST, user_url)
         
         return FeedItem(
@@ -177,14 +197,11 @@ class FQuery(Query):
             user = User.get(self.client, user_url)
         )
     
-    @cache
-    def _get_page(self, index: int) -> list:
+    def _parse_page(self, raw: str) -> list[tuple]:
         '''
         Fetch a page.
         '''
         
-        url = self.url + str(index + 1)
-        raw = self.client.call(url).text
         return consts.re.feed_items(raw)
 
 # EOF

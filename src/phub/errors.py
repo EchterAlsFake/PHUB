@@ -40,3 +40,8 @@ class UserNotFound(Exception):
     '''
     User wasn't found.
     '''
+
+class NoResult(Exception):
+    '''
+    No query result for this page.
+    '''
