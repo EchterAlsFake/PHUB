@@ -1,6 +1,8 @@
 Locals
 ======
 
+.. currentmodule:: phub
+
 Locals are constants that can be directly imported for better readability.
 
 .. autoclass:: phub.locals.Quality

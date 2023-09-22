@@ -1,56 +1,69 @@
 ![PHUB](https://github.com/Egsagon/PHUB/blob/master/assets/banner.png)
 
 # PHUB 4.0 - An API for PornHub.
-PHUB is an API wrapper for PornHub. It is able to fetch, search and download videos and supports account connections, achieved with efficient web scrapping using requests and regexes.
 
-> ⚠️ This project is probably against Pornhub TOS.
+PHUB is an hybrid API for Pornhub. It is able to communicate with Pornhub
+using both web-scraping and Pornhub's HubTraffic API. It is
+able to access most used or useful PH features, such as video searching,
+accessing account features, video downloading, and a lot more.
+
+> ⚠️ This project is probably against Pornhub TOS. Use at your own risks.
 
 ## Installation
+
 - Install using pip (python 3.11 or higher required):
 ```sh
 pip install --upgrade phub
 ```
 
-- Or using this repository to get the latest features:
+- Or directly from this repository to get latest features:
 ```sh
+# Development branch
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git
-```
 
-- Or, if you want to use a lower python version (down to 3.9):
-```sh
+# Python 3.9 branch
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git@py-3.9
 ```
 
-## CLI usage
-You can use phub like so from the terminal as as CLI script:
-```sh
-python3 -m phub
-```
+## Quickstart
 
-Example for downloading a video knowing its url, in the best available quality:
-```sh
-python3 -m phub download --url https://www.pornhub.com/view_video.php?viewkey=xxx -q 'best'
-```
-
-## UI Usage
-You can use this masterpiece made by EchterAlsFake: [EchterAlsFake/Porn_Fetch](https://github.com/EchterAlsFake/Porn_Fetch)
-
-## Package usage
-Exemple for downloading a video:
 ```python
 import phub
+from phub.locals import *
 
+# Initialise a client
 client = phub.Client()
-video = client.get('enter video URL here')
-print('Downloading:', video.title)
 
-# Download on working dir with best quality
-video.download('.', quality = phub.Quality.BEST)
+# Fetch and download a video
+video = client.get('https://...')
+video.download('my-video.mp4', Quality.BEST)
+
+# Fetch user videos
+user = client.get_user('this-user')
+for video in user.videos:
+    print(video.title)
+
+# Perform a research
+for video in client.search('my-query'):
+    print(video.title)
+
+# Connect to an account
+client = phub.Client('my-username', 'my-password')
+
+# Access account history, liked and recommended stuff
+client.account.watched
+client.account.liked
+client.account.recommended
 ```
 
-## Documentation
-You can find out more on the API [in the docs](https://phub.readthedocs.io). (⚠️ Old docs from PHUB3)
+You can check out the other available features
+in the [docs](https://phub.readthedocs.io).
 
 ## License
 
-GPLv3 - See the `LICENSE` file.
+PHUB uses GPLv3. See the `LICENSE` file.
+
+## Contributing
+
+Feel free to contribute to this project by submiting
+feature requests, issues, bugs, or whatever.

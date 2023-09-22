@@ -59,7 +59,7 @@ The progress of the video can be displayed using built-in functions, from the
         Downloading 50% [150/300]
 
 * Bar progress
-    Displays a tqd-like progress bar.
+    Displays a tqdm-like progress bar.
 
     .. code-block:: python
 
@@ -103,7 +103,7 @@ You can specify custom downloaders to download your video.
 There are a few presets available in the `phub.download` submodule.
 
 * Dummy download (default)
-    A slow, dummy downloader that fetch each segment after the another,
+    A slow, dummy downloader that fetch each segment after the other,
     concatenate them on the fly and write them to the file at the end.
 
     .. code-block:: python

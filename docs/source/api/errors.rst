@@ -22,3 +22,5 @@ errors.
 .. autoexception:: phub.errors.UserNotFound
 
 .. autoexception:: phub.errors.NoResult
+
+.. autoexception:: phub.errors.InvalidCategory

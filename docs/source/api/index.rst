@@ -7,5 +7,4 @@ API documentation
     objects
     errors
     locals
-    modules
     utils

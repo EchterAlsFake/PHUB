@@ -1,9 +1,9 @@
 API objects
 ===========
 
-Here is a list of all API objects.
-
 .. currentmodule:: phub
+
+Here is a list of all API objects.
 
 .. autoclass:: phub.core.Client
     :members:
