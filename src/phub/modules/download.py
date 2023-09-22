@@ -13,7 +13,7 @@ import threading
 import subprocess
 from typing import TYPE_CHECKING, Generator, Callable
 
-from .. import errors, consts
+from .. import consts
 
 if TYPE_CHECKING:
     from ..core import Client
@@ -49,12 +49,16 @@ def default(video: Video,
     for i, url in enumerate(segments):
         for _ in range(consts.DOWNLOAD_SEGMENT_MAX_ATTEMPS):
         
-            segment = video.client.call(url, throw = False, timeout = 4)
+            try:
+                segment = video.client.call(url, throw = False, timeout = 4)
+                
+                if segment.ok:
+                    buffer += segment.content
+                    break
+                
+            except Exception as err:
+                logger.error('Error while downloading: %s', err)
             
-            if segment.ok:
-                buffer += segment.content
-                break
-
             logger.warning('Segment %s failed. Retrying.', i)
             time.sleep(consts.DOWNLOAD_SEGMENT_ERROR_DELAY)
                 
