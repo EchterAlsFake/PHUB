@@ -65,6 +65,19 @@ class Query:
         
         return wrap()
 
+    def __len__(self) -> int:
+        '''
+        Attempts to fetch the query length.
+        '''
+        
+        raw = self._get_raw_page(0)
+        counter = consts.re.query_counter(raw, throw = False)
+                
+        if counter is None:
+            raise IndexError('This Query does not support len()')
+
+        return int(counter)
+
     def __iter__(self):
         
         self.iter_index = -1
@@ -87,6 +100,10 @@ class Query:
         
         assert isinstance(index, int)
         
+        # Support negative values
+        if index < 0:
+            index = len(self) - index
+
         page = self._get_page(index // self.PAGE_LENGTH)
         
         if len(page) > (ii := index % self.PAGE_LENGTH):
@@ -95,9 +112,9 @@ class Query:
         raise errors.NoResult('Item does not exist')
     
     @cache
-    def _get_page(self, index: int) -> list:
+    def _get_raw_page(self, index: int) -> str:
         '''
-        Get splited unparsed page items.
+        Get the raw page.
         '''
         
         assert isinstance(index, int)
@@ -107,8 +124,17 @@ class Query:
         
         if req.status_code == 404:
             raise errors.NoResult()
+
+        return req.text
+    
+    @cache
+    def _get_page(self, index: int) -> list:
+        '''
+        Get splited unparsed page items.
+        '''
         
-        return self._parse_page(req.text)
+        raw = self._get_raw_page(index)
+        return self._parse_page(raw)
     
     # Methods defined by subclasses    
     def _parse_item(self, raw: Any) -> QueryItem:

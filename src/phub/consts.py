@@ -122,5 +122,7 @@ class re:
     feed_items    = comp( p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section', engine.DOTALL )
     
     ffmpeg_line   = find( r'seg-(\d*?)-' )
+    
+    query_counter = find( r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/', engine.DOTALL )
 
 # EOF
