@@ -104,19 +104,19 @@ class Param:
         
         return NO_PARAM - self
     
-    def gen(self, key: str = 'name') -> str:
+    def gen(self, key: str = 'name') -> dict:
         '''
-        Generate the filter as an http argument string.
-        key should be name => webmasters
-                      id   => scraping
+        Generate filter dictionnary depending
+        on the key (name => hubtraffic or id => scraping).
         '''
         
-        raw = ''
+        data = {}
+        
         for key_, dps in self.value.items():
             
-            raw += f'&{key_}=' + '-'.join(getattr(dp, key) for dp in dps)
+            data[key_] = '-'.join(getattr(dp, key) for dp in dps)
         
-        return raw
+        return data
 
 NO_PARAM = Param()
 

@@ -190,16 +190,17 @@ class Client:
         Performs research on Pornhub.
         '''
         
+        url = 'search'
         key = 'name'
-        args = f'search?search={query}'
         
         if feature is HQuery:
             key = 'id'
-            args = 'video/' + args
+            url = 'video/' + url
         
-        raw_args = args + filter.gen(key)
+        args = {'search': query} | filter.gen(key)
+        raw = url + utils.urlify(args)
         
-        logger.info('Opening search query at %s', raw_args)
-        return feature(client = self, args = raw_args)
+        logger.info('Opening search query at %s', raw)
+        return feature(client = self, args = raw)
 
 # EOF

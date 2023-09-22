@@ -6,6 +6,8 @@ from functools import cached_property
 
 from . import User, Param, NO_PARAM
 
+from .. import utils
+
 if TYPE_CHECKING:
     from ..core import Client
     from ..locals import Section
@@ -25,12 +27,11 @@ class Feed:
         '''
         
         self.client = client
-        self.url = 'feeds'
         
         logger.debug('Initialised account feed: %s', self)
     
     def filter(self,
-               section: Section | Param | str = None,
+               section: Section | Param | str = NO_PARAM,
                user: User | str = None) -> FQuery: # TODO - Unify multiple types for all constants
         '''
         Creates a Feed Query with specific filters.
@@ -39,18 +40,12 @@ class Feed:
         from . import FQuery
         
         # Generate args
-        args = NO_PARAM
-        if section: args += section
-        if user: args += Param('username', user.name if isinstance(user, User) else user)
+        args = section.gen() | {'username': user.name if isinstance(user, User) else user}
         
-        raw_args = args.gen()
+        raw = utils.urlify(args)
         
-        if raw_args.startswith('&'):
-            raw_args = raw_args.replace('&', '?', 1)
-        
-        logger.info('Generating new filter feed using args `%s`', raw_args)
-        
-        return FQuery(self.client, self.url + raw_args)
+        logger.info('Generating new filter feed using args `%s`', raw)
+        return FQuery(self.client, 'feeds' + raw)
     
     @cached_property
     def feed(self) -> FQuery:

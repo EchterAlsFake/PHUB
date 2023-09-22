@@ -16,6 +16,18 @@ def concat(*args: list[str]) -> str:
     args = [arg.strip('/') for arg in args]
     return '/'.join(args)
 
+def urlify(dict_: dict) -> str:
+    '''
+    Convert a dictionnary to string arguments.
+    '''
+    
+    raw = ''
+    
+    for key, value in dict_.items():
+        raw += '?&'[bool(raw)]
+        raw += f'{key}={value}'
+    
+    return raw
 
 def closest(numbers: list[int], value: int) -> int:
     """

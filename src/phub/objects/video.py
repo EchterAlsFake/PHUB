@@ -165,10 +165,12 @@ class Video:
         logger.info('Starting download for %s at %s', self, path)
 
         # Call the backend
-        video = downloader(video = self,
-                           quality = quality,
-                           callback = display,
-                           path = path)
+        downloader(
+            video = self,
+            quality = quality,
+            callback = display,
+            path = path
+        )
         
         return path
         
