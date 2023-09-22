@@ -27,7 +27,7 @@ LOGIN_PAYLOAD = {
     'from': 'pc_login_modal_:homepage_redesign',
 }
 
-SEGMENT_LENGTH = 4 # Length of a PH video segment
+SEGMENT_LENGTH = 4 # Length of a PH video segment (in seconds)
 MAX_VIDEO_RENEW_ATTEMPTS = 3
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 DOWNLOAD_SEGMENT_ERROR_DELAY = .5
@@ -38,10 +38,23 @@ FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c c
 
 # Regex wrappers
 
-def find(pattern: str, flags: engine.RegexFlag = 0) -> Callable[[str, bool], str]:
+def eval_flags(flags: list[int]) -> int:
+    '''
+    Evaluate flags.
+    '''
+    
+    if len(flags):
+        return flags[0]
+    
+    return 0
+
+def find(*args) -> Callable[[str, bool], str]:
     '''
     Compile a single find regex and wraps handling its errors.
     '''
+    
+    *flags, pattern = args
+    flags = eval_flags(flags)
     
     regex = engine.compile(pattern, flags)
 
@@ -56,10 +69,13 @@ def find(pattern: str, flags: engine.RegexFlag = 0) -> Callable[[str, bool], str
     
     return wrapper
 
-def comp(method: Callable, pattern: str, flags: int = 0) -> Callable[[str], str]:
+def comp(*args) -> Callable[[str], str]:
     '''
     Compile a regex using a custom method with error handling.
     '''
+    
+    *flags, method, pattern = args
+    flags = eval_flags(flags)
     
     regex = engine.compile(pattern, flags)
     
@@ -75,10 +91,13 @@ def comp(method: Callable, pattern: str, flags: int = 0) -> Callable[[str], str]
     
     return wrapper
 
-def subc(pattern: str, repl: str, flags: int = 0) -> Callable[[str], str]:
+def subc(*args) -> Callable[[str], str]:
     '''
     Compile a substraction regex and apply its replacement to each call.
     '''
+    
+    *flags, pattern, repl = args
+    flags = eval_flags(flags)
     
     regex = engine.compile(pattern, flags)
     
@@ -95,34 +114,30 @@ def subc(pattern: str, repl: str, flags: int = 0) -> Callable[[str], str]:
 
 class re:
     '''
-    Web scraping regexes.
+    API regexes.
     '''
     
-    # Basic regexes
-    get_token     = find( r'token *?= \"(.*?)\",'       )
-    get_viewkey   = find( r'[&\?]viewkey=([a-z\d]{8,})' )
-    is_video_url  = comp( p.fullmatch, r'https:\/\/.{2,3}\.pornhub\..{2,3}\/view_video\.php\?viewkey=[a-z\d]{8,}' )
-    get_videos    = comp( p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"', engine.DOTALL )
-    is_url        = comp( p.fullmatch, r'https*:\/\/.*' )
-    remove_host   = subc( r'https://.{2,3}\.pornhub\..{2,3}/', '' )
+    # Find regexes
+    ffmpeg_line   = find( r'seg-(\d*?)-'                                                                ) # Get FFMPEG segment progress
+    get_flash     = find( r'var (flashvars_\d*) = ({.*});\n'                                            ) # Get flash data from a video page
+    get_token     = find( r'token *?= \"(.*?)\",'                                                       ) # Get authentification token
+    get_viewkey   = find( r'[&\?]viewkey=([a-z\d]{8,})'                                                 ) # Get video URL viewkey
+    video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<'          ) # Get video author, if channel
+    video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' ) # Get video author, if model
     
-    # Resolve regexes
-    get_flash     = find( r'var (flashvars_\d*) = ({.*});\n' )
-    rm_comments   = subc( r'\/\*.*?\*\/', ''                 )
+    query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'      ) # Get a query's video amount
+    user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/' ) # Get the user bio
     
-    # Find author regexes
-    video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<' )
-    video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' )
-
-    # User regexes
-    user_bio      = find( r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/', engine.DOTALL )
-    user_infos    = comp( p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/', engine.DOTALL )
+    # Findall regexess
+    get_videos = comp( engine.DOTALL, p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"' ) # Get all videos in a container (fetch their id, action type and title)
+    user_infos = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
+    feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section'              ) # Get all items in the Feed
     
-    # Feed regexes
-    feed_items    = comp( p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section', engine.DOTALL )
+    # Subscration regexes
+    remove_host = subc( r'https://.{2,3}\.pornhub\..{2,3}/', '' ) # Remove the HOTS root from a URL
     
-    ffmpeg_line   = find( r'seg-(\d*?)-' )
-    
-    query_counter = find( r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/', engine.DOTALL )
+    # Verification regexes
+    is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                                          ) # Check if a string is a URL
+    is_video_url = comp( p.fullmatch, r'https:\/\/.{2,3}\.pornhub\..{2,3}\/view_video\.php\?viewkey=[a-z\d]{8,}') # Check if a string is a video URL
 
 # EOF
