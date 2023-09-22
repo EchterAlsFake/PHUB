@@ -11,9 +11,11 @@ accessing account features, video downloading, and a lot more.
 
 ## Installation
 
-- Install using pip (python 3.11 or higher required):
+> Due to the recent upgrade to PHUB4, there is no stable version uploaded yet on PYPI.
+
+- Install using pip (python 3.11 or higher required): 
 ```sh
-pip install --upgrade phub
+pip install --upgrade phub==4.0b0
 ```
 
 - Or directly from this repository to get latest features:
