@@ -18,6 +18,11 @@ class Tag:
     
     name: str
     count: int = field(default = None, repr = False)
+    
+    def __eq__(self, __value: object) -> bool:
+        
+        assert isinstance(__value, Tag)
+        return self.name == __value.name
 
 @dataclass
 class Like:
