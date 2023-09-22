@@ -2,6 +2,6 @@ test.py
 src/test.py
 build/
 build/*
-docs/buidl/
+docs/build/
 docs/build/*
 build.bat

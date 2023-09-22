@@ -48,7 +48,7 @@ Accessing data
 
 With a :py:class:`.Video` object: you can fetch all video data, e.g.:
 
-.. code-block:: pythons
+.. code-block:: python
 
     >>> video: phub.Video = ...
 

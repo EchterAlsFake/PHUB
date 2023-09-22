@@ -55,6 +55,7 @@ class NoResult(Exception):
     a fetching loop:
     
     .. code-block:: python
+    
         query = ...
         for i in range(1000):
             print(query[i])
@@ -62,6 +63,7 @@ class NoResult(Exception):
     Instead, use:
     
     .. code-block:: python
+    
         query = ...
         for item in query[:1000]:
             print(item)
@@ -77,6 +79,7 @@ class InvalidCategory(Exception):
     PHUB constants:
     
     .. code-block:: bash
+    
         python -m phub update_locals
     
     '''

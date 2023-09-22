@@ -28,4 +28,6 @@ Quickstart
     guides/pkg-usage
     guides/download
 
+    features/index
+
     api/index
