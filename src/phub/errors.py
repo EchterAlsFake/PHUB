@@ -46,4 +46,10 @@ class NoResult(Exception):
     No query result for this page.
     '''
 
+class InvalidCategory(Exception):
+    '''
+    The input category is invalid
+    for a specific reason.
+    '''
+
 # EOF

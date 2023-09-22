@@ -249,4 +249,19 @@ class Category:
     
     pass
 
+class User:
+    
+    HAS_AVATAR = Param('avatar', '1')
+    IS_ONLINE = Param('online', '1')
+    IS_MODEL = Param('isPornhubModel', '1')
+    IS_STAFF = Param('staff', '1')
+    
+    class UPLOAD:
+        VIDEOS = Param('videos', '1')
+        PHOTOS = Param('photos', '1')
+        PLAYLIST = Param('playlists', '1')
+        
+    OFFER_CUSTOM_VIDEOS = Param('offering', 'customvideo')
+    OFFER_FAN_CLUBS = Param('offering', ...)
+
 # EOF

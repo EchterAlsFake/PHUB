@@ -1,6 +1,7 @@
-from typing import Self
+from typing import Any, Self
 from dataclasses import dataclass, field
 
+from .. import errors
 
 @dataclass
 class _DataParam:
@@ -116,7 +117,6 @@ class Param:
             raw += f'&{key_}=' + '-'.join(getattr(dp, key) for dp in dps)
         
         return raw
-
 
 NO_PARAM = Param()
 

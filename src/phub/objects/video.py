@@ -6,7 +6,7 @@ from functools import cached_property
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Generator, LiteralString, Callable
 
-from . import Tag, Like, User, Image
+from . import Tag, Like, User, Image, Param
 from .. import utils
 from .. import errors
 from .. import consts
@@ -14,7 +14,7 @@ from ..modules import download, parser, display
 
 if TYPE_CHECKING:
     from ..core import Client
-    from ..locals import Quality
+    from ..locals import Quality, Category
 
 logger = logging.getLogger(__name__)
 
@@ -279,19 +279,32 @@ class Video:
                 for ps in self.fetch('data@pornstars')]
     
     @cached_property
-    def categories(self) -> list[NotImplemented]:
+    def categories(self) -> Generator[Category, None, None]:
         '''
         The categories of the video.
         '''
         
+        from ..locals import Category
+        
         raw = self.fetch('data@categories')
         
-        return raw # TODO
+        for item in raw:
+            
+            constant = utils.make_constant(name := item['category'])
+            cat = getattr(Category, constant, None)
+            
+            if cat is None:
+                logger.warn('Category not found: %s. You should update PHUB locals (python -m phub update_locals)', constant)
+                
+                # Create temporary category
+                cat = Param('*', name)
+            
+            yield cat
 
     @cached_property
-    def segment(self) -> LiteralString:
+    def orientation(self) -> LiteralString:
         '''
-        Video segment (e.g. straight).
+        Video sexual orientation (e.g. straight).
         '''
         
         return self.fetch('data@segment')

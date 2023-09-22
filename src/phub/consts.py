@@ -129,9 +129,10 @@ class re:
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/' ) # Get the user bio
     
     # Findall regexess
-    get_videos = comp( engine.DOTALL, p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"' ) # Get all videos in a container (fetch their id, action type and title)
+    get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
     user_infos = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
     feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section'              ) # Get all items in the Feed
+    get_videos = comp( engine.DOTALL, p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"' ) # Get all videos in a container (fetch their id, action type and title)
     
     # Subscration regexes
     remove_host = subc( r'https://.{2,3}\.pornhub\..{2,3}/', '' ) # Remove the HOTS root from a URL

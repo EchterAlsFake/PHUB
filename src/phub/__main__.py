@@ -113,6 +113,14 @@ def user_videos(user: str, n: str, output: str, quality: str) -> None:
         
         video.download(output, quality, display = phub.display.bar(f'#{i}'))
 
+@cli.command()
+def update_locals() -> None:
+    '''
+    Update PHUB locals that depends on PH.
+    '''
+    
+    phub.utils.update_locals()
+
 if __name__ == '__main__':
     cli()
 

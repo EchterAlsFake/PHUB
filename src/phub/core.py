@@ -10,6 +10,7 @@ from .objects import (
     Query,
     JQuery,
     HQuery,
+    MQuery,
     Video,
     User,
     Account,
@@ -155,13 +156,31 @@ class Client:
         logger.debug('Fetching user %s', user)
         return User.get(self, user)
 
-    def search_user(self, query: str, filter: Param = NO_PARAM) -> HQuery:
+    def search_user(self,
+                    username: str = None,
+                    country: str = None,
+                    city: str = None,
+                    gender: str = None,
+                    orientation: str = None,
+                    filter: Param = NO_PARAM) -> HQuery:
         '''
         Search for users in the community.
         '''
         
-        # https://www.pornhub.com/user/search
-        return HQuery(self, NotImplemented + filter.gen(NotImplemented))
+        # ?username=bonjour
+        # &gender=3
+        # &orientation=1
+        # &relation=1
+        # &city=Paris
+        # &country=AX
+        
+        # &o=popular
+        # &age1=0
+        # &age2=0
+        
+        args = 'user/search'
+        
+        return MQuery(self, args + filter.gen())
 
     def search(self,
                query: str,

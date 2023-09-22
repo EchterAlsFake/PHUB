@@ -33,6 +33,21 @@ def closest(numbers: list[int], value: int) -> int:
     difference = lambda x: abs(x - value)
     return min(numbers, key=difference)
 
+def make_constant(string: str) -> str:
+    '''
+    Format the name of a variable to be a valid
+    python constant.
+    '''
+    
+    var_name = string.upper() \
+               .replace('-', '_') \
+               .replace('/', '_') \
+               .replace(' ', '_')
+
+    if var_name[0].isdigit():
+        var_name = '_' + var_name
+    
+    return var_name
 
 def update_locals():
     """
@@ -58,11 +73,7 @@ def update_locals():
     categories_str = ''
     for obj in sorted_categories:
         name = obj['category']
-        var_name = name.upper().replace('-', '_').replace('/', '_').replace(' ', '_')
-
-        if var_name[0].isdigit():
-            var_name = '_' + var_name
-
+        var_name = make_constant(name)
         name += '\''
         
         # categories_str += f'\n    {var_name: <21} = Param( {obj["id"]: >3}, \'{name: <{max_length + 1}})'

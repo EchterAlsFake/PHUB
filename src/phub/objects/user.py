@@ -10,7 +10,7 @@ from .. import errors
 
 if TYPE_CHECKING:
     from ..core import Client
-    from .video import Video
+    from . import Video, Image
     from . import UQuery
 
 logger = logging.getLogger(__name__)
@@ -146,5 +146,15 @@ class User:
         li = consts.re.user_infos(self.page)
 
         return {k: v for k, v in li} # TODO
+
+    @cached_property
+    def avatar(self) -> NotImplemented:
+        '''
+        The user avatar.
+        '''
+        
+        # return Image(self.client, )
+        
+        return NotImplemented
 
 # EOF

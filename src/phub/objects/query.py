@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-QueryItem = Video | FeedItem
+QueryItem = Video | FeedItem | User
 
 
 class Query:
@@ -244,5 +244,25 @@ class FQuery(Query):
         '''
         
         return consts.re.feed_items(raw)
+
+class MQuery(HQuery):
+    '''
+    Represents an advanced member search query.
+    '''
+    
+    def _parse_item(self, raw: tuple) -> User:
+        
+        url, image_url = raw
+        
+        obj = User.get(self.client, utils.concat(consts.HOST, url))
+        
+        # TODO - Inject image_url
+        
+        return obj
+
+    def _parse_page(self, raw: str) -> list[tuple]:
+        
+        container = raw.split('id="advanceSearchResultsWrapper')[1]
+        return consts.re.get_users(container)
 
 # EOF

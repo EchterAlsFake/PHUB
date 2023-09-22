@@ -23,12 +23,12 @@ def progress(color: bool = True) -> Callable:
             
     return wrapper
 
-def bar(desc = 'Downloading') -> Callable:
+def bar(desc = 'Downloading', format_ = ' |{bar}| [{cur}/{total}]') -> Callable:
     '''
     Progress bar.
     '''
     
-    tem = desc + ' |{bar}| [{cur}/{total}]'
+    tem = desc + format_
     
     term_size = os.get_terminal_size().columns
     
