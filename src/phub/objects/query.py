@@ -250,6 +250,8 @@ class MQuery(HQuery):
     Represents an advanced member search query.
     '''
     
+    PAGE_LENGTH = NotImplemented
+    
     def _parse_item(self, raw: tuple) -> User:
         
         url, image_url = raw
