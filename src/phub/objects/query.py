@@ -5,7 +5,7 @@ import logging
 from functools import cache
 from typing import TYPE_CHECKING, Generator, Any
 
-from . import Video, User, FeedItem
+from . import Video, User, FeedItem, Image
 from .. import utils
 from .. import consts
 from .. import errors
@@ -250,7 +250,7 @@ class MQuery(HQuery):
     Represents an advanced member search query.
     '''
     
-    PAGE_LENGTH = NotImplemented
+    PAGE_LENGTH = 14
     
     def _parse_item(self, raw: tuple) -> User:
         
@@ -258,7 +258,9 @@ class MQuery(HQuery):
         
         obj = User.get(self.client, utils.concat(consts.HOST, url))
         
-        # TODO - Inject image_url
+        # Inject image
+        obj.avatar = Image(self.client, image_url,
+                           name = f'{obj.name}-avatar')
         
         return obj
 

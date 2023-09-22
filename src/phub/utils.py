@@ -2,7 +2,6 @@
 PHUB 4 utilities.
 """
 
-import math
 import json
 import requests
 

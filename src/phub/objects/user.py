@@ -153,8 +153,9 @@ class User:
         The user avatar.
         '''
         
+        # Fetch on the user page
+        # TODO
         # return Image(self.client, )
-        
         return NotImplemented
 
 # EOF

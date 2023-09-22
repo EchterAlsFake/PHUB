@@ -5,7 +5,8 @@ PHUB 4 objects.
 __all__ = ['Image', 'Param', 'NO_PARAM',
            'Tag', 'Like', 'FeedItem',
            'User', 'Feed', 'Video', 'Account',
-           'Query', 'JQuery', 'HQuery', 'FQuery', 'UQuery', 'MQuery']
+           'Query', 'JQuery', 'HQuery', 'FQuery',
+           'UQuery', 'MQuery']
 
 # Dataclasses
 from .image import Image
