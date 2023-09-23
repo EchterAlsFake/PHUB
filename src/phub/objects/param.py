@@ -1,7 +1,8 @@
-from typing import Any, Self
+from __future__ import annotations
+
+from typing import Self
 from dataclasses import dataclass, field
 
-from .. import errors
 
 @dataclass
 class _DataParam:
@@ -13,6 +14,9 @@ class _DataParam:
     key: str = field(repr = None)
     id: str | int = field(repr = None)
     name: str = None
+    
+    single: bool = field(default = False, repr = None)
+    # incompatible: list[Param] = field(default = [], repr = None)
     
     def __post_init__(self) -> None:
         
@@ -26,8 +30,17 @@ class _DataParam:
         Insert the object in a Param dictionnary.
         '''
         
+        # if this value is single, we erase the other ones
+        if self.single:
+            _dict[self.key] = [self]
+            return
+        
         if not self.key in _dict:    
             _dict[self.key] = []
+        
+        # Erase single keys from the dict
+        for key, items in _dict.items():    
+            _dict[key] = [ item for item in items if not item.single]
         
         _dict[self.key] += [self]
 
@@ -38,7 +51,7 @@ class Param:
     concatenate to others or negate itself.
     '''
     
-    def __init__(self, *args) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         '''
         Initialise a new parameter with one filter.
         '''
@@ -46,7 +59,7 @@ class Param:
         self.value: dict[str, list[_DataParam]] = {}
         
         if args:
-            _DataParam(*args).insert(self.value)
+            _DataParam(*args, **kwargs).insert(self.value)
     
     def __repr__(self) -> str:
         '''

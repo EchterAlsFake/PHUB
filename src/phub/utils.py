@@ -22,8 +22,11 @@ def urlify(dict_: dict) -> str:
     '''
     
     raw = ''
-    
+
     for key, value in dict_.items():
+        
+        if value is None: continue
+        
         raw += '?&'[bool(raw)]
         raw += f'{key}={value}'
     

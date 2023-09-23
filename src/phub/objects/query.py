@@ -27,14 +27,15 @@ class Query:
     BASE: str = None
     PAGE_LENGTH: int = None
     
-    def __init__(self, client: Client, args: str) -> None:
+    def __init__(self, client: Client, func: str, args: dict) -> None:
         '''
         Initialise a new query.
         '''
 
         self.client = client
-        page = '?&'['?' in args] + 'page='
-        self.url = utils.concat(self.BASE, args) + page
+
+        args |= {'page': '{page}'}
+        self.url = utils.concat(self.BASE, func) + utils.urlify(args)
         
         self.iter_index = -1
         
@@ -119,7 +120,7 @@ class Query:
         
         assert isinstance(index, int)
         
-        req = self.client.call(self.url + str(index + 1),
+        req = self.client.call(self.url.format(page = index + 1),
                                throw = False)
         
         if req.status_code == 404:
@@ -250,7 +251,7 @@ class MQuery(HQuery):
     Represents an advanced member search query.
     '''
     
-    PAGE_LENGTH = 14
+    PAGE_LENGTH = 42
     
     def _parse_item(self, raw: tuple) -> User:
         

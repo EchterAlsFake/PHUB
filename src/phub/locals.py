@@ -249,19 +249,47 @@ class Category:
     
     pass
 
-class User:
+class USER: # Caps to not counfound with phub.objects.User
     
     HAS_AVATAR = Param('avatar', '1')
-    IS_ONLINE = Param('online', '1')
-    IS_MODEL = Param('isPornhubModel', '1')
-    IS_STAFF = Param('staff', '1')
+    IS_ONLINE  = Param('online', '1')
+    IS_MODEL   = Param('isPornhubModel', '1')
+    IS_STAFF   = Param('staff', '1')
     
-    class UPLOAD:
-        VIDEOS = Param('videos', '1')
-        PHOTOS = Param('photos', '1')
-        PLAYLIST = Param('playlists', '1')
-        
     OFFER_CUSTOM_VIDEOS = Param('offering', 'customvideo')
-    OFFER_FAN_CLUBS = Param('offering', ...)
+    OFFER_FAN_CLUBS     = Param('offering', 'fanclub')
+    
+    class UPLOADS:
+        VIDEOS   = Param('videos', '1')
+        PHOTOS   = Param('photos', '1')
+        PLAYLIST = Param('playlists', '1')
+    
+    class RELATION:
+        SIGNLE = Param('relation', '1', single = True)
+        TAKEN  = Param('relation', '2', single = True)
+        OPEN   = Param('relation', '3', single = True)
+    
+    class GENDER:
+        ALL           = Param('gender', '0',  single = True)
+        MALE          = Param('gender', '1',  single = True)
+        FEMALE        = Param('gender', '2',  single = True)
+        COUPLE        = Param('gender', '3',  single = True)
+        TRANS_FEMALE  = Param('gender', '5',  single = True)
+        FEMALE_COUPLE = Param('gender', '6',  single = True)
+        MALE_COUPLE   = Param('gender', '7',  single = True)
+        TRANS_MALE    = Param('gender', '9',  single = True)
+        OTHER         = Param('gender', '10', single = True)
+        NON_BINARY    = Param('gender', '11', single = True)
+    
+    class INTO:
+        NONE   = Param('orientation', '0', single = True)
+        MALE   = Param('orientation', '1', single = True)
+        FEMALE = Param('orientation', '2', single = True)
+        ALL    = Param('orientation', '3', single = True)
+
+
+class Sort:
+    
+    POPULAR = Param('o', 'popular', single = True)
 
 # EOF

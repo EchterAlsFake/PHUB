@@ -1,10 +1,12 @@
 import time
 import logging
 import requests
+from typing import Literal
 
 from . import utils
 from . import consts
 from . import errors
+from . import locals
 
 from .objects import (
     Query,
@@ -156,32 +158,6 @@ class Client:
         logger.debug('Fetching user %s', user)
         return User.get(self, user)
 
-    def search_user(self,
-                    username: str = None,
-                    country: str = None,
-                    city: str = None,
-                    gender: str = None,
-                    orientation: str = None,
-                    filter: Param = NO_PARAM) -> HQuery:
-        '''
-        Search for users in the community.
-        '''
-        
-        # ?username=bonjour
-        # &gender=3
-        # &orientation=1
-        # &relation=1
-        # &city=Paris
-        # &country=AX
-        
-        # &o=popular
-        # &age1=0
-        # &age2=0
-        
-        args = 'user/search'
-        
-        return MQuery(self, args + filter.gen())
-
     def search(self,
                query: str,
                filter: Param = NO_PARAM,
@@ -190,17 +166,37 @@ class Client:
         Performs research on Pornhub.
         '''
         
-        url = 'search'
+        func = 'search'
         key = 'name'
         
         if feature is HQuery:
             key = 'id'
-            url = 'video/' + url
+            func = 'video/' + func
         
         args = {'search': query} | filter.gen(key)
-        raw = url + utils.urlify(args)
+        logger.info('Opening search query at %s', args)
+        return feature(client = self, func = func, args = args)
+
+    def search_user(self,
+                    username: str = None,
+                    filter: Param = NO_PARAM,
+                    sort: locals.Sort | None = locals.Sort.POPULAR
+                    ) -> HQuery:
+        '''
+        Search for users in the community.
         
-        logger.info('Opening search query at %s', raw)
-        return feature(client = self, args = raw)
+        TODO
+            country: str = None,            # &country=AX
+            city: str = None,               # &city=Paris
+            age: tuple[int, int] = (0, 0),  # &age1=0
+                                            # &age2=0
+        '''
+        
+        args = dict(
+            username = username,
+            # etc.
+        ) | (filter + sort).gen()
+        
+        return MQuery(self, 'user/search', args)
 
 # EOF
