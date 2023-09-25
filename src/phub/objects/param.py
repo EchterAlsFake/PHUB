@@ -1,135 +1,81 @@
-from __future__ import annotations
-
 from typing import Self
-from dataclasses import dataclass, field
-
-
-@dataclass
-class _DataParam:
-    '''
-    Represents the core of a Param object,
-    or exactly one filter.
-    '''
-    
-    key: str = field(repr = None)
-    id: str | int = field(repr = None)
-    name: str = None
-    
-    single: bool = field(default = False, repr = None)
-    # incompatible: list[Param] = field(default = [], repr = None)
-    
-    def __post_init__(self) -> None:
-        
-        self.id = str(self.id)
-        
-        if self.name is None:
-            self.name = self.id
-    
-    def insert(self, _dict: dict) -> None:
-        '''
-        Insert the object in a Param dictionnary.
-        '''
-        
-        # if this value is single, we erase the other ones
-        if self.single:
-            _dict[self.key] = [self]
-            return
-        
-        if not self.key in _dict:    
-            _dict[self.key] = []
-        
-        # Erase single keys from the dict
-        for key, items in _dict.items():    
-            _dict[key] = [ item for item in items if not item.single]
-        
-        _dict[self.key] += [self]
+from copy import deepcopy
 
 
 class Param:
-    '''
-    Represents a parameter capable of mutating,
-    concatenate to others or negate itself.
-    '''
     
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self,
+                 key: str = None,
+                 value: str = None,
+                 single: bool = True,
+                 reverse: bool = False) -> None:
         '''
-        Initialise a new parameter with one filter.
+        Initialise a new Param object.
         '''
         
-        self.value: dict[str, list[_DataParam]] = {}
+        self.value: dict[str, set[str]] = {}
         
-        if args:
-            _DataParam(*args, **kwargs).insert(self.value)
+        self.single = single
+        self.reverse = reverse
+        
+        if key and value:
+            self.value[key] = {value}
     
     def __repr__(self) -> str:
         '''
-        Represents the parameter.
+        Represents the Param.
         '''
         
-        values = []
-        for key, items in self.value.items():
-            
-            if key.startswith('exclude-'):
-                values += ['not ' + items.pop(0).name]
-            
-            values += [dp.name for dp in items]
+        sep = ' and '
         
-        raw = ' and '.join(values)
-            
-        return f'Param({raw})'
+        items = [(k, sep.join(v)) for k, v in self.value.items()]
+        items = [f'not {v}' if 'exclude-' in k else v for k, v in items]
+        
+        return f'Param({sep.join(items)})'
     
-    def __add__(self, param: Self) -> Self:
+    def __or__(self, other: Self) -> Self:
         '''
-        Concatenate two Param objects together.
+        Add 2 Params together
         '''
         
-        assert isinstance(param, Param)
+        assert isinstance(other, Param)
         
-        for dps in param.value.values():
-            [dp.insert(self.value) for dp in dps]
-
-        return self
+        param = deepcopy(self)
+        
+        for key, set_ in other.value.items():
+            
+            if not key in self.value or other.single:
+                param.value[key] = set()
+            
+            param.value[key] |= set_
+        
+        return param
     
-    def __sub__(self, param: Self) -> Self:
-        '''
-        Add a parameter to exclude to the current
-        parameter.
-        '''
-        
-        assert isinstance(param, Param)
-        # assert len(param.value.values()) == 1
-        
-        dp = list(param.value.values())[0][0]
-        
-        _DataParam('exclude-' + dp.key,
-                   dp.id,
-                   dp.name).insert(self.value)
-        
-        return self
-
     def __neg__(self) -> Self:
         '''
-        Used when there is only one parameter
-        to exclude.
+        Reverses a Param.
+        param.reverse must be True.
         '''
         
-        assert len(self.value) == 1
+        assert self.reverse
         
-        return NO_PARAM - self
-    
-    def gen(self, key: str = 'name') -> dict:
+        param = deepcopy(self)
+        items = list(param.value.items())
+        param.value.clear()
+        
+        for key, set_ in items:
+            param.value['exclude-' + key] = set_
+        
+        return param
+
+    def __sub__(self, other: Self) -> Self:
         '''
-        Generate filter dictionnary depending
-        on the key (name => hubtraffic or id => scraping).
+        Shorthand for __neg__, without
+        the pipe operator.
         '''
         
-        data = {}
-        
-        for key_, dps in self.value.items():
-            
-            data[key_] = '-'.join(getattr(dp, key) for dp in dps)
-        
-        return data
+        assert isinstance(other, Param)
+        return self |- other
 
 NO_PARAM = Param()
 

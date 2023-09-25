@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 from functools import cached_property
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Literal, Self
 
 from .. import utils
 
@@ -52,5 +52,54 @@ class FeedItem:
         '''
         
         return NotImplemented
+
+class _BaseQuality:
+    '''
+    Represents a constant quality object that can selects
+    itself among a list of qualities.
+    '''
+    
+    def __init__(self, value: Literal['best', 'half', 'worst'] | int | Self) -> None:
+        '''
+        Initialise a new quality object.
+        '''
+        
+        self.value = value
+        
+        if isinstance(value, _BaseQuality):
+            self.value = value.value
+        
+        if isinstance(self.value, str):
+            assert self.value.lower() in ('best', 'half', 'worst')
+    
+    def select(self, qualities: dict) -> str:
+        '''
+        Select among a list of qualities.
+        
+        Args:
+            quals (dict): A dict containing qualities and URLs.
+        
+        Returns:
+            str: The chosen quality URL.
+        '''
+        
+        keys = list(qualities.keys())
+        
+        if isinstance(self.value, str):
+            # Get approximative quality
+            
+            if self.value == 'best': return qualities[max(keys)]
+            elif self.value == 'worst': return qualities[min(keys)]
+            else: return qualities[ sorted(keys)[ len(keys) // 2 ] ]
+        
+        elif isinstance(self.value, int):
+            # Get exact quality or nearest
+            
+            if (s:= str(self.value)) in keys: return qualities[s]
+            else: return qualities[utils.closest(keys, self.value)]
+        
+        # This should not happen
+        raise TypeError('Internal error: quality type is', type(self.value))
+
 
 # EOF

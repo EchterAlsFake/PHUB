@@ -5,7 +5,7 @@ PHUB 4 utilities.
 import json
 import requests
 
-from . import consts, locals 
+from . import consts, locals
 
 
 def concat(*args: list[str]) -> str:
@@ -88,10 +88,9 @@ def update_locals():
     for obj in sorted_categories:
         name = obj['category']
         var_name = make_constant(name)
-        name += '\''
+        name = f'{obj["id"]}@{name}\''
         
-        # categories_str += f'\n    {var_name: <21} = Param( {obj["id"]: >3}, \'{name: <{max_length + 1}})'
-        categories_str += f'\n    {var_name: <21} = Param( \'category\', {obj["id"]: >3}, \'{name: <{max_length + 1}})'
+        categories_str += f'\n    {var_name: <21} = Param( \'category\', \'{name: <{max_length + 1}})'
 
     start_tag = '#START@CATEGORIES'
     end_tag = '#END@CATEGORIES'

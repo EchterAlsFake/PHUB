@@ -5,7 +5,7 @@ import logging
 from functools import cache
 from typing import TYPE_CHECKING, Generator, Any
 
-from . import Video, User, FeedItem, Image
+from . import Video, User, FeedItem, Image, Param
 from .. import utils
 from .. import consts
 from .. import errors
@@ -27,17 +27,24 @@ class Query:
     BASE: str = None
     PAGE_LENGTH: int = None
     
-    def __init__(self, client: Client, func: str, args: dict) -> None:
+    def __init__(self, client: Client, func: str, param: Param) -> None:
         '''
         Initialise a new query.
         '''
 
         self.client = client
-
-        args |= {'page': '{page}'}
-        self.url = utils.concat(self.BASE, func) + utils.urlify(args)
-        
         self.iter_index = -1
+
+        # Parse param
+        param |= Param('page', '{page}')
+        self.url = utils.concat(self.BASE, func)
+        
+        add_qm = True
+        for key, set_ in param.value.items():
+            self.url += '&?'[add_qm]
+            nk, ns = self._parse_param_set(key, set_)
+            self.url += f'{nk}={ns}'
+            add_qm = False
         
         logger.debug('Initialised new query %s', self)
     
@@ -45,7 +52,7 @@ class Query:
         
         return f'phub.Query(url={self.url})'
     
-    def __getitem__(self, index: int | slice | tuple) -> QueryItem | Generator[QueryItem, None, None] | tuple[QueryItem]:
+    def __getitem__(self, index: int | slice) -> QueryItem | Generator[QueryItem, None, None]:
         '''
         Get one or multiple items from the query.
         '''
@@ -137,7 +144,17 @@ class Query:
         raw = self._get_raw_page(index)
         return self._parse_page(raw)
     
-    # Methods defined by subclasses    
+    # Methods defined by subclasses
+    def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
+        '''
+        Parse param set.
+        '''
+        
+        set_ = [v.split('@')[1] if '@' in v else v for v in set_]
+        
+        raw = '|'.join(set_)
+        return key, raw
+
     def _parse_item(self, raw: Any) -> QueryItem:
         '''
         Get a single query item.
@@ -151,6 +168,7 @@ class Query:
         '''
         
         return NotImplemented
+
 
 class JQuery(Query):
     '''
@@ -185,6 +203,16 @@ class HQuery(Query):
     
     BASE = consts.HOST
     PAGE_LENGTH = 32
+    
+    def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
+        
+        if key == 'category':
+            key = 'filter-category'
+        
+        set_ = [v.split('@')[0] if '@' in v else v for v in set_]
+        
+        raw = '|'.join(set_)
+        return key, raw
     
     def _parse_item(self, raw: tuple) -> Video:
         '''

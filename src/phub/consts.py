@@ -117,6 +117,8 @@ class re:
     API regexes.
     '''
     
+    _raw_root = r'https:\/\/.{2,3}\.pornhub\..{2,3}\/'
+    
     # Find regexes
     ffmpeg_line   = find( r'seg-(\d*?)-'                                                                ) # Get FFMPEG segment progress
     get_flash     = find( r'var (flashvars_\d*) = ({.*});\n'                                            ) # Get flash data from a video page
@@ -135,10 +137,10 @@ class re:
     get_videos = comp( engine.DOTALL, p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"' ) # Get all videos in a container (fetch their id, action type and title)
     
     # Subscration regexes
-    remove_host = subc( r'https://.{2,3}\.pornhub\..{2,3}/', '' ) # Remove the HOTS root from a URL
+    remove_host = subc( _raw_root, '' ) # Remove the HOST root from a URL
     
     # Verification regexes
-    is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                                          ) # Check if a string is a URL
-    is_video_url = comp( p.fullmatch, r'https:\/\/.{2,3}\.pornhub\..{2,3}\/view_video\.php\?viewkey=[a-z\d]{8,}') # Check if a string is a video URL
+    is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                    ) # Check if a string is a URL
+    is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}' ) # Check if a string is a video URL
 
 # EOF

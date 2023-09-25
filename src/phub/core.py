@@ -1,7 +1,6 @@
 import time
 import logging
 import requests
-from typing import Literal
 
 from . import utils
 from . import consts
@@ -160,28 +159,23 @@ class Client:
 
     def search(self,
                query: str,
-               filter: Param = NO_PARAM,
+               param: locals.constant = NO_PARAM,
                feature = JQuery) -> Query:
         '''
-        Performs research on Pornhub.
+        Performs searching on Pornhub.
         '''
         
-        func = 'search'
-        key = 'name'
+        # Assert param type
+        assert isinstance(param, Param)
+        logger.info('Opening search query for `%s`', query)
         
-        if feature is HQuery:
-            key = 'id'
-            func = 'video/' + func
-        
-        args = {'search': query} | filter.gen(key)
-        logger.info('Opening search query at %s', args)
-        return feature(client = self, func = func, args = args)
+        func = 'video/search' if feature is HQuery else 'search'
+        return feature(self, func, Param('search', query) | param)
 
     def search_user(self,
                     username: str = None,
-                    filter: Param = NO_PARAM,
-                    sort: locals.Sort | None = locals.Sort.POPULAR
-                    ) -> HQuery:
+                    param: Param = NO_PARAM,
+                    ) -> MQuery:
         '''
         Search for users in the community.
         
@@ -192,11 +186,6 @@ class Client:
                                             # &age2=0
         '''
         
-        args = dict(
-            username = username,
-            # etc.
-        ) | (filter + sort).gen()
-        
-        return MQuery(self, 'user/search', args)
+        return MQuery(self, 'user/search', Param('username', username) | param)
 
 # EOF
