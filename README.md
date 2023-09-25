@@ -9,12 +9,11 @@ accessing account features, video downloading, and a lot more.
 
 > ⚠️ This project is probably against Pornhub TOS. Use at your own risks.
 
-## Current project status
+## 🟥 Current project status 🟥
 
-The project is currently in beta. The following features are unstable:
-- searching filters
-- threaded/FFMPEG downloading
-- user search
+- :warning: Downloading is unstable
+- :warning: User search is instable
+- :awrning: Search filters are untested
 
 **Don't use the last stable version (3.2.2)** from PyPI. It is unmaintained.
 I'm just waiting to finish 4.0 to update the package.
