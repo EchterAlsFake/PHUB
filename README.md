@@ -11,19 +11,20 @@ accessing account features, video downloading, and a lot more.
 
 ## Installation
 
-> Due to the recent upgrade to PHUB4, there is no stable version uploaded yet on PYPI.
-
-- Install using pip (python 3.11 or higher required): 
+- Install using `pip` (python `3.11` or higher required, recommended version): 
 ```sh
 pip install --upgrade phub
 ```
 
-- Or directly from this repository to get latest features:
+- Or from this repo to get latest fixes/features:
 ```sh
-# Development branch
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git
+```
 
-# Python 3.9 branch
+- Or, if you need a lower python version (down to `3.9`)
+```
+pip install phub==4.0b0
+# Or, dev branch
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git@py-3.9
 ```
 
