@@ -1,3 +1,7 @@
+'''
+PHUB core module.
+'''
+
 import time
 import logging
 import requests
@@ -37,6 +41,14 @@ class Client:
                  login: bool = True) -> None:
         '''
         Initialise a new client.
+        
+        Args:
+            username (str): Optional account username/address to connect to.
+            password (str): Optional account password to connect to.
+            language (str): Language locale (fr, en, ru, etc.)
+            delay  (float): Minimum delay between requests.
+            proxies (dict): Dictionnary of proxies for the requests.
+            login   (bool): Wether to automatically login after initialisation.
         '''
         
         logger.debug('Initialised new Client %s', self)
@@ -77,6 +89,17 @@ class Client:
              throw: bool = True) -> requests.Response:
         '''
         Send a request.
+        
+        Args:
+            func      (str): URL or PH function to call.
+            method    (str): Request method.
+            data     (dict): Optional data to send to the server.
+            headers  (dict): Request optional headers.
+            timeout (float): Request maximum response time.
+            throw    (bool): Wether to raise an error when a request explicitely fails.
+        
+        Returns:
+            requests.Response: The fetched response.
         '''
         
         logger.info('Making call %s', func)
@@ -107,6 +130,13 @@ class Client:
               throw: bool = True) -> bool:
         '''
         Attempt to log in.
+        
+        Args:
+            force (bool): Wether to force the login (used to reconnect).
+            throw (bool): Wether to raise an error if this fails.
+        
+        Returns:
+            bool: Wether the login was successfull.
         '''
         
         logger.debug('Attempting login')
@@ -140,21 +170,49 @@ class Client:
     def get(self, video: str) -> Video:
         '''
         Fetch a Pornhub video.
+        
+        Args:
+            video (str): Video full URL, partial URL or viewkey.
+        
+        Returns:
+            Video: The corresponding video object.
         '''
         
         logger.debug('Fetching video at', video)
         
-        url = video if video.startswith('http') \
-              else utils.concat(consts.HOST, 'view_video.php?viewkey=' + video)
+        if 'http' in video:
+            # Support full URLs
+            url = video
+        
+        else:
+            if 'key=' in video:
+                # Support partial URLs
+                key = video.split('key=')[1]
+            
+            else:
+                # Support key only
+                key = str(video)
+            
+            url = utils.concat(consts.HOST, 'view_video.php?viewkey=' + key)
         
         return Video(self, url)
 
     def get_user(self, user: str) -> User:
         '''
         Get a specific user.
+        
+        Args:
+            user (str): user URL or name.
+        
+        Returns:
+            User: The corresponging user object.
         '''
-
+        
         logger.debug('Fetching user %s', user)
+        
+        if '/' in user and not 'http' in user:    
+            raise NotImplementedError('User partial URL are not implemented.')
+        
         return User.get(self, user)
 
     def search(self,
@@ -163,6 +221,14 @@ class Client:
                feature = JQuery) -> Query:
         '''
         Performs searching on Pornhub.
+        
+        Args:
+            query (str): The query to search.
+            param (Param): Filters parameter.
+            feature (Query): Query to use for parsing.
+        
+        Returns:
+            Query: Initialised query.
         '''
         
         # Assert param type
@@ -179,13 +245,19 @@ class Client:
         '''
         Search for users in the community.
         
+        Args:
+            username (str): The menber username.
+            param (Param): Filters parameter.
+        
+        Returns:
+            MQuery: Initialised query.
+        
         TODO
-            country: str = None,            # &country=AX
-            city: str = None,               # &city=Paris
-            age: tuple[int, int] = (0, 0),  # &age1=0
-                                            # &age2=0
+        - country: str = None,            # &country=AX
+        - city: str = None,               # &city=Paris
+        - age: tuple[int, int] = (0, 0),  # &age1=0&age2=0
         '''
         
         return MQuery(self, 'user/search', Param('username', username) | param)
 
-# EOF
+# EOFm

@@ -1,5 +1,5 @@
 '''
-PHUB 4 modules.
+PHUB submodules.
 '''
 
 __all__ = ['parser', 'display', 'download']

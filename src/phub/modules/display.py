@@ -1,5 +1,6 @@
 '''
-PHUB video download display presets.
+PHUB functions for displaying
+a download progress.
 '''
 
 import os
@@ -9,6 +10,12 @@ from typing import Callable
 def progress(color: bool = True) -> Callable:
     '''
     Simple progress display.
+    
+    Args:
+        color (bool): Wether to color the output using ANSI color codes.
+    
+    Returns:
+        Callable: A wrapper to pass to a downloader.
     '''
     
     tem = '\rDownloading: {percent}% [{cur}/{total}]'
@@ -26,9 +33,16 @@ def progress(color: bool = True) -> Callable:
     
     return wrapper
 
-def bar(desc = 'Downloading', format_ = ' |{bar}| [{cur}/{total}]') -> Callable:
+def bar(desc: str = 'Downloading', format_: str = ' |{bar}| [{cur}/{total}]') -> Callable:
     '''
-    Progress bar.
+    Simple progress bar, tqdm-like.
+    
+    Args:
+        desc    (str): Bar description.
+        format_ (str): Bar formatter.
+    
+    Returns:
+        Callable: A wrapper to pass to a downloader.
     '''
     
     tem = desc + format_
@@ -50,6 +64,12 @@ def bar(desc = 'Downloading', format_ = ' |{bar}| [{cur}/{total}]') -> Callable:
 def std(file = sys.stdout) -> Callable:
     '''
     Output to std.
+    
+    Args:
+        file (TextIO): Output file.
+    
+    Returns:
+        Callable: A wrapper to pass to a downloader.
     '''
     
     def wrapper(cur: int, total: int) -> None:

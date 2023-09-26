@@ -29,7 +29,14 @@ def default(video: Video,
             path: str,
             start: int = 0) -> None:
     '''
-    Dummy download. Can fail with slow speeds.
+    Dummy downloader. Fetch a segment after the other.
+    
+    Args:
+        video       (Video): The video object to download.
+        quality   (Quality): The video quality.
+        callback (Callable): Download progress callback.
+        path          (str): The video download path.
+        start         (int): Where to start the download from. Used for download retries.
     '''
     
     logger.info('Downloading using default downloader')
@@ -76,6 +83,13 @@ def FFMPEG(video: Video,
     '''
     Download using FFMPEG. It has to be installed to your system.
     You can override FFMPEG access with consts.FFMPEG_COMMAND
+    
+    Args:
+        video       (Video): The video object to download.
+        quality   (Quality): The video quality.
+        callback (Callable): Download progress callback.
+        path          (str): The video download path.
+        start         (int): Where to start the download from. Used for download retries.
     '''
     
     logger.info('Downloading using FFMPEG')
@@ -115,6 +129,16 @@ def _thread(req: requests.PreparedRequest,
             queue: list = None) -> bytes | None:
     '''
     Download a single segment.
+    
+    Args:
+        req (requests.PreparedRequest): The prepared request to start.
+        session     (requests.Session): The client session.
+        delay                  (float): Retry delay;
+        buffer                  (dict): Buffer to save download to.
+        queue                   (list): Download thread queue.
+    
+    Returns:
+        bytes: The raw video segment.
     '''
     
     raw = session.send(req).content
@@ -138,6 +162,13 @@ def base_thread(client: Client,
                 delay: float = .05) -> dict[str, bytes]:
     '''
     Base downloader for threaded backends.
+    
+    Args:
+        video       (Video): The video object to download.
+        quality   (Quality): The video quality.
+        callback (Callable): Download progress callback.
+        path          (str): The video download path.
+        delay       (float): Thread launch delay.
     '''
     
     logger.info('Downloading using threaded downloader')
@@ -193,6 +224,13 @@ def threaded(video: Video,
              delay: float = .05) -> bytes:
     '''
     Threaded download.
+    
+    Args:
+        video       (Video): The video object to download.
+        quality   (Quality): The video quality.
+        callback (Callable): Download progress callback.
+        path          (str): The video download path.
+        delay       (float): Thread launch delay.
     '''
     
     segments = video.get_segments(quality)

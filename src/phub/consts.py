@@ -40,6 +40,12 @@ FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c c
 def eval_flags(flags: list[int]) -> int:
     '''
     Evaluate flags.
+    
+    Args:
+        flags (list[int]): List of flags arguments.
+    
+    Returns:
+        int: The flag(s) value.
     '''
     
     if len(flags):
@@ -50,6 +56,9 @@ def eval_flags(flags: list[int]) -> int:
 def find(*args) -> Callable[[str, bool], str]:
     '''
     Compile a single find regex and wraps handling its errors.
+    
+    Returns:
+        Callable: Wrapped regex callable. If second argument evaluates to False, won't raise an error.
     '''
     
     *flags, pattern = args
@@ -71,6 +80,9 @@ def find(*args) -> Callable[[str, bool], str]:
 def comp(*args) -> Callable[[str], str]:
     '''
     Compile a regex using a custom method with error handling.
+    
+    Returns:
+        Callable: Wrapped regex callable.
     '''
     
     *flags, method, pattern = args
@@ -93,6 +105,9 @@ def comp(*args) -> Callable[[str], str]:
 def subc(*args) -> Callable[[str], str]:
     '''
     Compile a substraction regex and apply its replacement to each call.
+    
+    Returns:
+        Callable: Wrapped regex callable.
     '''
     
     *flags, pattern, repl = args

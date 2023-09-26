@@ -9,18 +9,24 @@ import requests
 from . import consts, locals
 
 def concat(*args: list[str]) -> str:
-    """
+    '''
     Concatenate multiple URL parts.
-    """
     
-    # args = [arg.strip('/') for arg in args]
-    # return '/'.join(args)
+    Returns:
+        str: The concatenated path.
+    '''
     
     return os.path.join(*args)
 
 def urlify(dict_: dict) -> str:
     '''
     Convert a dictionnary to string arguments.
+    
+    Args:
+        dict_ (dict): Parameters values.
+    
+    Returns:
+        str: A raw URL arguments string.
     '''
     
     raw = ''
@@ -35,7 +41,7 @@ def urlify(dict_: dict) -> str:
     return raw
 
 def closest(numbers: list[int], value: int) -> int:
-    """
+    '''
     Find the closest value in a list to the given value.
 
     Args:
@@ -44,7 +50,7 @@ def closest(numbers: list[int], value: int) -> int:
 
     Returns:
         int: The closest value in the list to the target value.
-    """
+    '''
     
     difference = lambda x: abs(x - value)
     return min(numbers, key=difference)
@@ -53,6 +59,12 @@ def make_constant(string: str) -> str:
     '''
     Format the name of a variable to be a valid
     python constant.
+    
+    Args:
+        string (str): The variable name.
+    
+    Returns:
+        str: A python compatible constant name.
     '''
     
     var_name = string.upper() \
@@ -65,12 +77,12 @@ def make_constant(string: str) -> str:
     
     return var_name
 
-def update_locals():
-    """
+def update_locals() -> None:
+    '''
     Update the locals.
 
     Warning: This will modify phub.locals.py.
-    """
+    '''
     
     # TODO - Refactor
     
