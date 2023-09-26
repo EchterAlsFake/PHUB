@@ -5,7 +5,7 @@ import logging
 from functools import cache
 from typing import TYPE_CHECKING, Generator, Any
 
-from . import Video, User, FeedItem, Image, Param
+from . import Video, User, FeedItem, Image, Param, NO_PARAM
 from .. import utils
 from .. import consts
 from .. import errors
@@ -27,7 +27,7 @@ class Query:
     BASE: str = None
     PAGE_LENGTH: int = None
     
-    def __init__(self, client: Client, func: str, param: Param) -> None:
+    def __init__(self, client: Client, func: str, param: Param = NO_PARAM) -> None:
         '''
         Initialise a new query.
         '''
@@ -252,20 +252,14 @@ class FQuery(Query):
     '''
     
     BASE = consts.HOST
-    PAGE_LENGTH = 14 # Unsure
+    PAGE_LENGTH = 13 # Unsure
     
     def _parse_item(self, raw: tuple) -> FeedItem:
         '''
         Get a single item at an index.
         '''
         
-        user_url, item = raw
-        user_url = utils.concat(consts.HOST, user_url)
-        
-        return FeedItem(
-            raw = item,
-            user = User.get(self.client, user_url)
-        )
+        return FeedItem(self.client, raw)
     
     def _parse_page(self, raw: str) -> list[tuple]:
         '''

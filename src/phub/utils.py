@@ -2,19 +2,21 @@
 PHUB 4 utilities.
 """
 
+import os
 import json
 import requests
 
 from . import consts, locals
-
 
 def concat(*args: list[str]) -> str:
     """
     Concatenate multiple URL parts.
     """
     
-    args = [arg.strip('/') for arg in args]
-    return '/'.join(args)
+    # args = [arg.strip('/') for arg in args]
+    # return '/'.join(args)
+    
+    return os.path.join(*args)
 
 def urlify(dict_: dict) -> str:
     '''

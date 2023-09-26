@@ -32,7 +32,7 @@ class Feed:
     
     def filter(self,
                section: Section | Param | str = NO_PARAM,
-               user: User | str = None) -> FQuery: # TODO - Unify multiple types for all constants
+               user: User | str = None) -> FQuery:
         '''
         Creates a Feed Query with specific filters.
         '''
@@ -40,12 +40,10 @@ class Feed:
         from . import FQuery
         
         # Generate args
-        args = section.gen() | {'username': user.name if isinstance(user, User) else user}
+        username = user.name if isinstance(user, User) else user
         
-        raw = utils.urlify(args)
-        
-        logger.info('Generating new filter feed using args `%s`', raw)
-        return FQuery(self.client, 'feeds' + raw)
+        logger.info('Generating new filter feed using args', )
+        return FQuery(self.client, 'feeds', Param('username', username) | section)
     
     @cached_property
     def feed(self) -> FQuery:

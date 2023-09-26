@@ -35,7 +35,6 @@ DOWNLOAD_SEGMENT_ERROR_DELAY = .5
 FFMPEG_EXECUTABLE = 'ffmpeg' # Use from PATH by default
 FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output}'
 
-
 # Regex wrappers
 
 def eval_flags(flags: list[int]) -> int:
@@ -126,6 +125,7 @@ class re:
     get_viewkey   = find( r'[&\?]viewkey=([a-z\d]{8,})'                                                 ) # Get video URL viewkey
     video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<'          ) # Get video author, if channel
     video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' ) # Get video author, if model
+    get_feed_type = find( r'data-table="(.*?)"' ) # Get feed section type
     
     query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'      ) # Get a query's video amount
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/' ) # Get the user bio
@@ -133,7 +133,9 @@ class re:
     # Findall regexess
     get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
     user_infos = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
-    feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section'              ) # Get all items in the Feed
+    # feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section'            ) # Get all items in the Feed
+    # feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\"(.*?)<\/section'                            ) # Get all items in the Feed
+    feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                            ) # Get all items in the Feed
     get_videos = comp( engine.DOTALL, p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"' ) # Get all videos in a container (fetch their id, action type and title)
     
     # Subscration regexes

@@ -5,9 +5,12 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal, Self
 
 from .. import utils
+from .. import consts
 
 if TYPE_CHECKING:
+    from .. import Client
     from . import User
+    from bs4 import BeautifulSoup as Soup
 
 
 @dataclass
@@ -41,17 +44,61 @@ class FeedItem:
     Represent an element of the user feed.
     '''
     
+    client: Client = field(default = None, repr = False)
     raw: str = field(default = None, repr = False)
-    user: User = field(default = None, repr = False)
     type: str = field(default = None, repr = False)
     
     @cached_property
-    def text(self) -> NotImplemented:
+    def _soup(self) -> Soup:
         '''
         Text representation of the item.
         '''
         
-        return NotImplemented
+        try:
+            from bs4 import BeautifulSoup as Soup
+        
+        except ImportError:
+            print('\033[91mFeed parsing requires bs4 because i\'m lazy.\033[0m')
+            exit()
+        
+        return Soup(self.raw, 'html.parser')
+
+    @cached_property
+    def html(self) -> Soup:
+        '''
+        Item content.
+        '''
+        
+        return self._soup.find('div', {'class': 'feedRight'})
+    
+    @cached_property
+    def header(self) -> str:
+        '''
+        Feed header (language dependent).
+        '''
+        
+        raw = self._soup.find('div', {'class': 'feedInfo'}).text
+        return ' '.join(raw.split()) # Strip
+    
+    @cached_property
+    def user(self) -> User:
+        
+        from . import User
+        
+        user_url = self._soup.find('a', {'class': 'userLink'}).get('href')
+        return User.get(self.client, utils.concat(consts.HOST, user_url))
+    
+    @cached_property
+    def item_type(self) -> str:
+        '''
+        Item type.
+        '''
+        
+        from .. import locals
+        
+        raw = consts.re.get_feed_type(self.raw)
+        
+        return locals.FEED_CLASS_TO_CONST.get(raw)
 
 class _BaseQuality:
     '''

@@ -23,12 +23,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-'''
-default  => Download one segment at once and concatenate them
-FFMPEG   => FFMPEG handles everything
-threaded => Threaded download + concatenation
-'''
-
 def default(video: Video,
             quality: Quality,
             callback: Callable,
@@ -144,8 +138,6 @@ def base_thread(client: Client,
                 delay: float = .05) -> dict[str, bytes]:
     '''
     Base downloader for threaded backends.
-    
-    Inspired by: https://github.com/Egsagon/neko-sama-api/blob/ad34184823072f98abbee1a90b111358a6b39cb2/src/nekosama/download.py#L112
     '''
     
     logger.info('Downloading using threaded downloader')
@@ -217,5 +209,11 @@ def threaded(video: Video,
     logger.info('Writing file')
     with open(path, 'wb') as file:
         file.write(raw)
+
+
+# Prevent monkey
+_thread = NotImplemented
+base_thread = NotImplemented
+threaded = NotImplemented
 
 # EOF

@@ -5,7 +5,7 @@ Dynamic file.
 from .objects import Param, NO_PARAM
 from .objects import _BaseQuality
 
-class Quality:
+class Quality(_BaseQuality):
     '''
     Represents a video quality.
     Can also be represented as an int
@@ -274,6 +274,14 @@ class Member:
 
 constant = Category | Production | Sort | Param
 
+FEED_CLASS_TO_CONST = {
+    'stream_videos_uploaded': Section.VIDEO,
+    'stream_favourites_videos': Section.FAVORITE,
+    'stream_grouped_comments_videos': Section.COMMENT,
+    'stream_subscriptions_pornstars': Section.VERIFIED_VIDEO,
+    # etc.
+}
+
 __all__ = [
     'NO_PARAM',
     'Quality',
@@ -281,7 +289,8 @@ __all__ = [
     'Production',
     'Category',
     'Sort',
-    'constant'
+    'constant',
+    'Member'
 ]
 
 # EOF
