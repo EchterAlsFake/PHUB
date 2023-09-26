@@ -1,0 +1,28 @@
+[project]
+name = "phub"
+version = "4.0-3.9"
+description = "An API for Pornhub"
+authors = [{name = "Egsagon", email = "egsagon.git@gmail.com"}]
+license = {file = "LICENSE"}
+readme = {file = "pypi.md", content-type = "text/markdown"}
+keywords = ["pornhub", "api", "web scrapper", "api wrapper"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+dependencies = ["requests"]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+cli = ["click"]
+
+[project.urls]
+Documentation = "https://phub.readthedocs.io"
+Repository = "https://github.com/Egsagon/PHUB"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
