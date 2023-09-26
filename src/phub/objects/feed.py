@@ -24,6 +24,9 @@ class Feed:
     def __init__(self, client: Client) -> None:
         '''
         Initialise a new feed object.
+        
+        Args:
+            client (Client): Client parent.
         '''
         
         self.client = client
@@ -35,6 +38,10 @@ class Feed:
                user: User | str = None) -> FQuery:
         '''
         Creates a Feed Query with specific filters.
+        
+        Args:
+            section (Section | Param | str): Filter parameters.
+            user (User | str): User to filter feed with.
         '''
         
         from . import FQuery

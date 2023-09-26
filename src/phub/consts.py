@@ -1,5 +1,5 @@
 '''
-PHUB 4 constants.
+PHUB constants.
 '''
 
 import logging

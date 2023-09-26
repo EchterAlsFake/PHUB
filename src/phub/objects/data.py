@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 @dataclass
 class Tag:
     '''
-    PHUB3 Tag representation
+    Video Tag representation.
     '''
     
     name: str
@@ -51,7 +51,7 @@ class FeedItem:
     @cached_property
     def _soup(self) -> Soup:
         '''
-        Text representation of the item.
+        Item soup.
         '''
         
         try:
@@ -66,7 +66,7 @@ class FeedItem:
     @cached_property
     def html(self) -> Soup:
         '''
-        Item content.
+        Item HTML content.
         '''
         
         return self._soup.find('div', {'class': 'feedRight'})
@@ -74,7 +74,7 @@ class FeedItem:
     @cached_property
     def header(self) -> str:
         '''
-        Feed header (language dependent).
+        Item header (language dependent).
         '''
         
         raw = self._soup.find('div', {'class': 'feedInfo'}).text
@@ -82,6 +82,9 @@ class FeedItem:
     
     @cached_property
     def user(self) -> User:
+        '''
+        Item target.
+        '''
         
         from . import User
         
@@ -109,6 +112,9 @@ class _BaseQuality:
     def __init__(self, value: Literal['best', 'half', 'worst'] | int | Self) -> None:
         '''
         Initialise a new quality object.
+        
+        Args:
+            value (Literal['best', 'half', 'worst'] | int | Self): String, number or quality object to initialise from.
         '''
         
         self.value = value

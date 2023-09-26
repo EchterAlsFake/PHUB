@@ -1,5 +1,5 @@
 '''
-PHUB 4 errors types.
+PHUB errors types.
 '''
 
 class ClientAlreadyLogged(Exception):

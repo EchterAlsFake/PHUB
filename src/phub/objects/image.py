@@ -27,6 +27,12 @@ class Image:
                  name: str = 'image') -> None:
         '''
         Initialise a new image object.
+        
+        Args:
+            client    (Client): Parent client.
+            url          (str): The image URL.
+            sizes (list[dict]): Image sizes/resolutions/servers.
+            name         (str): Image name.
         '''
 
         self.url = url
@@ -37,11 +43,18 @@ class Image:
         logger.debug('Generated new image object: %s', self)
     
     def __repr__(self) -> str:
+        
         return f'phub.Image(name={self.name})'
     
     def download(self, path: str = '.') -> str:
         '''
         Download the image in a certain quality.
+        
+        Args:
+            path (str): The download path.
+        
+        Returns:
+            str: The image path if modified.
         
         TODO - Handle multiple qualities/sizes
         '''

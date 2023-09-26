@@ -1,8 +1,3 @@
-'''
-PHUB functions for displaying
-a download progress.
-'''
-
 import os
 import sys
 from typing import Callable

@@ -1,6 +1,6 @@
-"""
-PHUB 4 utilities.
-"""
+'''
+PHUB utilities.
+'''
 
 import os
 import json

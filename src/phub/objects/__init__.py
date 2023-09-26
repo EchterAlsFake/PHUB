@@ -1,5 +1,5 @@
 '''
-PHUB 4 objects.
+PHUB objects.
 '''
 
 __all__ = ['Image', 'Param', 'NO_PARAM',

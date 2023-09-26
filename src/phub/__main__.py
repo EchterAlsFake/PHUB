@@ -1,5 +1,5 @@
 '''
-PHUB 4 CLI.
+PHUB CLI.
 
 Contains a bunch of features
 that can be accessed quickly. 

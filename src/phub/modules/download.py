@@ -1,7 +1,3 @@
-'''
-PHUB 4 download backends.
-'''
-
 from __future__ import annotations
 
 import copy

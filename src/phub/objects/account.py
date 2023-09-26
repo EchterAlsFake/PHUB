@@ -24,6 +24,12 @@ class Account:
     def __new__(cls, client: Client) -> Self | None:
         '''
         Check if the object creation is needed.
+        
+        Args:
+            client (Client): The client that initialised this.
+        
+        Returns:
+            Self: The Account object or None, if login is not triggered.
         '''
         
         if all(client.credentials.values()):
@@ -35,6 +41,9 @@ class Account:
     def __init__(self, client: Client) -> None:
         '''
         Initialise a new account object.
+        
+        Args:
+            client (Client): The client parent.
         '''
         
         self.client = client
@@ -58,6 +67,9 @@ class Account:
     def connect(self, data: dict) -> None:
         '''
         Update account data once login was successful.
+        
+        Args:
+            data (dict): Data fetched from the login request.
         '''
         
         self.name = data.get('username')
@@ -75,6 +87,9 @@ class Account:
     def refresh(self, refresh_login: bool = False) -> None:
         '''
         Delete the object's cache to allow items refreshing.
+        
+        Args:
+            refresh_login (bool): Wether to also attempt to re-log in.
         '''
         
         logger.info('Refreshing account %s', self)
