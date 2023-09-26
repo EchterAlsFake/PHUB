@@ -182,11 +182,10 @@ class Video:
         The video title.
         '''
         
-        if title := self.data.get('data@title'):
-            return title
+        for key in ('data@title', 'page@title'):
         
-        if title := self.data.get('page@title'):
-            return title
+            if title := self.data.get(key):
+                return title
         
         return self.fetch('data@title')
 
