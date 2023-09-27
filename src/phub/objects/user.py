@@ -24,6 +24,11 @@ class User:
     def __init__(self, client: Client, name: str, url: str) -> None:
         '''
         Initialise a new user object.
+        
+        Args:
+            client (Client): The client parent.
+            name      (str): The user name.
+            url       (str): The user page URL.
         '''
         
         self.client = client
@@ -57,6 +62,9 @@ class User:
     def from_video(cls, video: Video) -> Self:
         '''
         Find the author of a video.
+        
+        Args:
+            video (Video): A video object.
         '''
         
         if video.page is None:
@@ -77,7 +85,9 @@ class User:
         '''
         Fetch a user knowing its name or URL.
         
-        NOTE - while using names only, multiple users can be found.
+        Args:
+            client (Client): The parent client.
+            user      (str): User name or URL.
         '''
         
         if consts.re.is_url(user):

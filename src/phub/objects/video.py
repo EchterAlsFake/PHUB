@@ -4,7 +4,7 @@ import os
 import logging
 from functools import cached_property
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Generator, LiteralString, Callable
+from typing import TYPE_CHECKING, Generator, LiteralString, Callable, Any
 
 from . import Tag, Like, User, Image, Param
 from .. import utils
@@ -29,6 +29,10 @@ class Video:
     def __init__(self, client: Client, url: str) -> None:
         '''
         Initialise a new video object.
+        
+        Args:
+            client (Client): The parent client.
+            url       (str): The video URL.
         '''
         
         if not consts.re.is_video_url(url):
@@ -55,6 +59,10 @@ class Video:
     def refresh(self, page: bool = True, data: bool = True) -> None:
         '''
         Refresh video data.
+        
+        Args:
+            page (bool): Wether to refresh the video page.
+            data (bool): Wether to refresh the video data.
         '''
         
         logger.info('Refreshing %s cache', self)
@@ -69,12 +77,19 @@ class Video:
                 logger.debug('Deleting key %s', key)
                 delattr(self, key)
      
-    def fetch(self, key: str) -> None:
+    def fetch(self, key: str) -> Any:
         '''
         Lazily fetch some data.
         
         data@key => Use webmasters
-        page@key => Use web scraper
+        page@key => Use web scrapers
+        
+        Args:
+            key (str): The key to fetch.
+        
+        Returns:
+            Any: The fetched or cached object.
+        
         '''
         
         if key in self.data:
@@ -103,6 +118,12 @@ class Video:
     def get_M3U_URL(self, quality: Quality) -> str:
         '''
         The URL of the master M3U file.
+        
+        Args:
+            quality (Quality): The video quality.
+        
+        Returns:
+            str: The M3U url.
         '''
         
         from ..locals import Quality
@@ -121,6 +142,12 @@ class Video:
     def get_segments(self, quality: Quality) -> Generator[str, None, None]:
         '''
         Get the video segment URLs.
+        
+        Args:
+            quality (Quality): The video quality.
+        
+        Returns:
+            Generator: A segment URL generator.
         '''
         
         # Fetch the master file
@@ -156,6 +183,15 @@ class Video:
                  display: Callable[[int, int], None] = display.default()) -> str:
         '''
         Download the video to a file.
+        
+        Args:
+            path (str): The download path.
+            quality (Quality | str | int): The video quality.
+            downloader (Callable): The download backend.
+            display (Callable): The progress display.
+        
+        Returns:
+            str: The downloader video path.
         '''
         
         # Add a name if the path is a directory

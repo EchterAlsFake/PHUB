@@ -30,6 +30,11 @@ class Query:
     def __init__(self, client: Client, func: str, param: Param = NO_PARAM) -> None:
         '''
         Initialise a new query.
+        
+        Args:
+            client (Client): The parent client.
+            func      (str): The URL function.
+            param   (Param): Filter parameter.
         '''
 
         self.client = client
@@ -104,6 +109,12 @@ class Query:
     def get(self, index: int) -> QueryItem:
         '''
         Get a single item.
+        
+        Args:
+            index (int): The item index.
+        
+        Returns:
+            QueryItem: The item as an object representation.
         '''
         
         assert isinstance(index, int)
@@ -123,6 +134,12 @@ class Query:
     def _get_raw_page(self, index: int) -> str:
         '''
         Get the raw page.
+        
+        Args:
+            index (int): The page index.
+        
+        Returns:
+            str: The raw page content.
         '''
         
         assert isinstance(index, int)
@@ -139,6 +156,12 @@ class Query:
     def _get_page(self, index: int) -> list:
         '''
         Get splited unparsed page items.
+        
+        Args:
+            index (int): The page index:
+        
+        Returns:
+            list: a semi-parsed representation of the page.
         '''
         
         raw = self._get_raw_page(index)
@@ -148,6 +171,13 @@ class Query:
     def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
         '''
         Parse param set.
+        
+        Args:
+            key  (str): The parameter key.
+            set_ (set): The parameter value.
+        
+        Returns:
+            tuple: The final key and raw value.
         '''
         
         set_ = [v.split('@')[1] if '@' in v else v for v in set_]
@@ -158,6 +188,12 @@ class Query:
     def _parse_item(self, raw: Any) -> QueryItem:
         '''
         Get a single query item.
+        
+        Args:
+            raw (Any): The unparsed item.
+        
+        Returns:
+            QueryItem: The item object representation.
         '''
         
         return NotImplemented
@@ -165,6 +201,12 @@ class Query:
     def _parse_page(self, raw: str) -> list:
         '''
         Get a query page.
+        
+        Args:
+            raw (str): The unparsed page.
+        
+        Returns:
+            list: A semi-parsed list representation.
         '''
         
         return NotImplemented
@@ -215,9 +257,6 @@ class HQuery(Query):
         return key, raw
     
     def _parse_item(self, raw: tuple) -> Video:
-        '''
-        Get a single video at an index.
-        '''
                 
         url = f'{consts.HOST}view_video.php?viewkey={raw[0]}'
         
@@ -227,9 +266,6 @@ class HQuery(Query):
         return obj
     
     def _parse_page(self, raw: str) -> list[tuple]:
-        '''
-        Fetch a page.
-        '''
                 
         container = raw.split('class="container')[1]
         return consts.re.get_videos(container)
@@ -255,17 +291,10 @@ class FQuery(Query):
     PAGE_LENGTH = 13 # Unsure
     
     def _parse_item(self, raw: tuple) -> FeedItem:
-        '''
-        Get a single item at an index.
-        '''
         
         return FeedItem(self.client, raw)
     
     def _parse_page(self, raw: str) -> list[tuple]:
-        '''
-        Fetch a page.
-        '''
-        
         return consts.re.feed_items(raw)
 
 class MQuery(HQuery):

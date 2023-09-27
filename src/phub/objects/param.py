@@ -3,6 +3,10 @@ from copy import deepcopy
 
 
 class Param:
+    '''
+    Represents a concatenable parameter,
+    user for filtering.
+    '''
     
     def __init__(self,
                  key: str = None,
@@ -11,6 +15,12 @@ class Param:
                  reverse: bool = False) -> None:
         '''
         Initialise a new Param object.
+        
+        Args:
+            key      (str): The parameter key.
+            value    (str): The parameter value.
+            single  (bool): Wether the parameter should be single.
+            reverse (bool): Wether the parameter is reversable.
         '''
         
         self.value: dict[str, set[str]] = {}
@@ -35,7 +45,7 @@ class Param:
     
     def __or__(self, other: Self) -> Self:
         '''
-        Add 2 Params together
+        Add 2 Params together.
         '''
         
         assert isinstance(other, Param)
