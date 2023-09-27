@@ -125,7 +125,7 @@ class User:
         url = self.url
         if 'model/' in url: url += '/videos'
         
-        return UQuery(client = self.client, args = url)
+        return UQuery(client = self.client, func = url)
 
     @cached_property
     def page(self) -> str:
