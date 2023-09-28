@@ -48,7 +48,7 @@ class Param:
         Add 2 Params together.
         '''
         
-        assert isinstance(other, Param)
+        assert isinstance(other, Param), f'{other} must be a Param object ({type(other)} found)'
         
         param = deepcopy(self)
         
@@ -67,14 +67,14 @@ class Param:
         param.reverse must be True.
         '''
         
-        assert self.reverse
+        assert self.reverse, f'{self} cannot be reversed.'
         
         param = deepcopy(self)
         items = list(param.value.items())
         param.value.clear()
         
         for key, set_ in items:
-            param.value['exclude-' + key] = set_
+            param.value['exclude_' + key] = set_
         
         return param
 
@@ -84,7 +84,7 @@ class Param:
         the pipe operator.
         '''
         
-        assert isinstance(other, Param)
+        assert isinstance(other, Param), f'{other} must be a Param object ({type(other)} found)'
         return self |- other
 
 NO_PARAM = Param()

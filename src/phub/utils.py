@@ -104,7 +104,7 @@ def update_locals() -> None:
         var_name = make_constant(name)
         name = f'{obj["id"]}@{name}\''
         
-        categories_str += f'\n    {var_name: <21} = Param( \'category\', \'{name: <{max_length + 1}})'
+        categories_str += f'\n    {var_name: <21} = Param( \'category\', \'{name: <{max_length + 1}}, reverse = True)'
 
     start_tag = '#START@CATEGORIES'
     end_tag = '#END@CATEGORIES'
