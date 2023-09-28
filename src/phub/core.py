@@ -235,6 +235,12 @@ class Client:
         assert isinstance(param, Param)
         logger.info('Opening search query for `%s`', query)
         
+        # Assert sorting is compatible
+        if (not (locals._allowed_sort_types in param)
+            and locals._sort_period_types in param):
+            
+            raise errors.InvalidSortParam('Sort parameter not allowed')
+        
         func = 'video/search' if feature is HQuery else 'search'
         return feature(self, func, Param('search', query) | param)
 

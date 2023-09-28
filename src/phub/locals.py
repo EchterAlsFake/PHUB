@@ -277,6 +277,18 @@ class Member:
 
 constant = Category | Production | Sort | Param
 
+_allowed_sort_types = NO_PARAM._concat(
+    Sort.VIDEO_TOP_RATED,
+    Sort.VIDEO_MOST_VIEWS
+)
+
+_sort_period_types  = NO_PARAM._concat(
+    Sort.DAYLY,
+    Sort.WEEKLY,
+    Sort.MONTHLY,
+    Sort.YEARLY
+)
+
 FEED_CLASS_TO_CONST = {
     'stream_videos_uploaded': Section.VIDEO,
     'stream_favourites_videos': Section.FAVORITE,

@@ -84,4 +84,11 @@ class InvalidCategory(Exception):
     
     '''
 
+class InvalidSortParam(Exception):
+    '''
+    The input param contains an invalid sort sequence.
+    Only VIDEO_MOST_VIEWS and VIDEO_TOP_RATED are
+    allowed to have a sort period.
+    '''
+
 # EOF

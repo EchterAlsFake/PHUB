@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Self, Any
 from copy import deepcopy
 
 
@@ -43,23 +43,71 @@ class Param:
         
         return f'Param({sep.join(items)})'
     
-    def __or__(self, other: Self) -> Self:
+    @staticmethod
+    def _assert_self(item: Any) -> None:
         '''
-        Add 2 Params together.
+        Assert that a given item is of the same type as this object.
+        
+        Args:
+            item (Any): A suposed Param object.
         '''
         
-        assert isinstance(other, Param), f'{other} must be a Param object ({type(other)} found)'
+        if not isinstance(item, Param):
+            raise TypeError(f'Item `{item}` must be a Param object ({type(item)} found)')
+    
+    def _concat_single(self, other: Self, brute: bool = True) -> Self:
+        '''
+        Concatenate Params.
         
+        Args:
+            other: Another Param instance.
+            brute: Wether to take care of wether params should be single.
+        
+        Returns
+            Param: A new Param object.
+        '''
+        
+        self._assert_self(other)
         param = deepcopy(self)
         
         for key, set_ in other.value.items():
             
-            if not key in self.value or other.single:
+            if not key in self.value or (other.single and not brute):
                 param.value[key] = set()
             
             param.value[key] |= set_
         
         return param
+    
+    def _concat(self, *args, brute: bool = True) -> Self:
+        '''
+        Concatenate Params.
+        
+        Args:
+            args: One or multiple params to concat.
+            brute: Wether to take care of wether params should be single.
+        
+        Returns
+            Param: A new Param object.
+        '''
+    
+        # Return self if no args supplied
+        if not len(args):
+            return self
+        
+        param = self
+        
+        for item in args:
+            param = Param._concat_single(param, item, brute = brute)
+        
+        return param
+    
+    def __or__(self, other: Self) -> Self:
+        '''
+        Add 2 Params together.
+        '''
+        
+        return self._concat_single(other, brute = False)
     
     def __neg__(self) -> Self:
         '''
@@ -84,8 +132,26 @@ class Param:
         the pipe operator.
         '''
         
-        assert isinstance(other, Param), f'{other} must be a Param object ({type(other)} found)'
+        self._assert_self(other)
         return self |- other
+
+    def __contains__(self, query: Self) -> bool:
+        '''
+        Check if a Param object is inside this object.
+        '''
+        
+        # Assertions
+        self._assert_self(query)
+        assert len(query.value) == 1, f'{query} must be an un-modified Param constant to be compared.'
+        
+        item_key, item_values = list(query.value.items())[0]
+        item_value = item_values.pop()
+        
+        for key, values in self.value.items():
+            if key == item_key and item_value in values:
+                return True
+        
+        return False
 
 NO_PARAM = Param()
 
