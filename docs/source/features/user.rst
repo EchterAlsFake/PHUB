@@ -39,3 +39,67 @@ refreshable objects:
 .. code-block:: python
 
     user.refresh(page = True, data = True)
+
+Searching for users
+-------------------
+
+You can search for user accounts on the platform using :meth:`.Client.search_users`.
+
+.. code-block:: python
+
+    members = client.search_users(
+        username = 'user',
+        param = (Sort.USER_NEWEST
+                 | Member.IS_ONLINE
+                 | Member.HAS_AVATAR
+                 | Member.OPEN_RELATION
+                 | Member.GENDER_NON_BINARY)
+    )
+
+This method behaves like `.Client.search`: you can select custom filters for the
+query:
+
+- Member type 
+
+    - ``Member.IS_ONLINE``
+    - ``Member.IS_MODEL``
+    - ``Member.IS_STAFF``
+
+- Member content
+
+    - ``Member.HAS_AVATAR``
+    - ``Member.HAS_VIDEOS``
+    - ``Member.HAS_PHOTOS``
+    - ``Member.HAS_PLAYLISTS``
+    - ``Member.OFFER_CUSTOM_VIDEOS``
+    - ``Member.OFFER_FAN_CLUB``
+
+- Member relationship
+
+- ``Member.SINGLE`` 
+- ``Member.TAKEN``
+- ``Member.OPEN_RELATION``
+
+- Member gender
+
+- ``Member.GENDER_MALE``
+- ``Member.GENDER_FEMALE`` 
+- ``Member.GENDER_COUPLE`` 
+- ``Member.GENDER_TRANS_FEMALE`` 
+- ``Member.GENDER_FEMALE_COUPLE`` 
+- ``Member.GENDER_TRANS_MALE``
+- ``Member.GENDER_NON_BINARY``
+- ``Member.GENDER_OTHER``
+
+- Member interests
+
+- ``Member.INTO_NONE``
+- ``Member.INTO_MALE``
+- ``Member.INTO_FEMALE``
+- ``Member.INTO_ALL``
+
+You can also sort queries using these 2 sort filters:
+
+- ``Sort.USER_POPULAR`` (along with sort periods)
+- ``Sort.USER_NEWEST``
+

@@ -82,3 +82,13 @@ Available features
         $ python -m phub user_videos <username> -n <int> --output <dir> --quality <video quality>
 
     Download the ``n`` last liked videos.
+
+- Update PHUB constants
+
+    PHUB uses a constant system that can be updated locally.
+
+    .. code-block:: bash
+
+        $ python -m phub update_locals
+    
+    .. warning:: This will override a section of ``$PHUB/locals.py``

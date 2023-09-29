@@ -106,3 +106,4 @@ it or the API.
 
     client = phub.Client()
     ...
+
