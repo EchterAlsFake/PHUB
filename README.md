@@ -23,8 +23,6 @@ pip install --upgrade git+https://github.com/Egsagon/PHUB.git
 
 - Or, if you need a lower python version (down to `3.9`)
 ```
-pip install phub==4.0b0
-# Or, dev branch
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git@py-3.9
 ```
 
