@@ -55,7 +55,7 @@ class Param:
         if not isinstance(item, Param):
             raise TypeError(f'Item `{item}` must be a Param object ({type(item)} found)')
     
-    def _concat_single(self, other: Self, brute: bool = True) -> Self:
+    def _concat_single(self, other: Self, brute: bool = False) -> Self:
         '''
         Concatenate Params.
         
@@ -79,7 +79,7 @@ class Param:
         
         return param
     
-    def _concat(self, *args, brute: bool = True) -> Self:
+    def _concat(self, *args, brute: bool = False) -> Self:
         '''
         Concatenate Params.
         
@@ -107,7 +107,7 @@ class Param:
         Add 2 Params together.
         '''
         
-        return self._concat_single(other, brute = False)
+        return self._concat_single(other)
     
     def __neg__(self) -> Self:
         '''

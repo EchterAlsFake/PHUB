@@ -279,14 +279,16 @@ constant = Category | Production | Sort | Param
 
 _allowed_sort_types = NO_PARAM._concat(
     Sort.VIDEO_TOP_RATED,
-    Sort.VIDEO_MOST_VIEWS
+    Sort.VIDEO_MOST_VIEWS,
+    brute = True
 )
 
 _sort_period_types  = NO_PARAM._concat(
     Sort.DAYLY,
     Sort.WEEKLY,
     Sort.MONTHLY,
-    Sort.YEARLY
+    Sort.YEARLY,
+    brute = True
 )
 
 FEED_CLASS_TO_CONST = {
