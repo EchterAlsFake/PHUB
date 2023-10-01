@@ -1,0 +1,10 @@
+test.py
+src/test.py
+build/
+build/*
+docs/build/
+docs/build/*
+build.bat
+temp/
+src/temp/
+src/temp/*
