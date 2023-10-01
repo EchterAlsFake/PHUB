@@ -72,6 +72,9 @@ class Param:
         
         for key, set_ in other.value.items():
             
+            # Avoid taking default params into account
+            if other.single and None in set_: continue
+            
             if not key in self.value or (other.single and not brute):
                 param.value[key] = set()
             

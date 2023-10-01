@@ -22,8 +22,6 @@ def progress(color: bool = True) -> Callable:
         
         percent = round((cur / total) * 100)
         
-        # print(tem.format(percent = percent, cur = cur, total = total))#, end = '\r') # TODO - glitches with ffmpeg download
-        
         print(tem.format(percent = percent, cur = cur, total = total), end = '')
     
     return wrapper

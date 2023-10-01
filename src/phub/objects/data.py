@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Literal, Self
+from typing import TYPE_CHECKING, Literal, Self, Callable
 
 from .. import utils
 from .. import consts
@@ -154,5 +154,45 @@ class _BaseQuality:
         # This should not happen
         raise TypeError('Internal error: quality type is', type(self.value))
 
+class Callback:
+    
+    def __init__(self, total: int) -> None:
+        '''
+        Initialise the callback with the segments count.
+        '''
+        
+        self.total = total
+    
+    def on_download(self, progress: int) -> None:
+        '''
+        Called on download update.
+        '''
+        
+    def on_write(self, progress: int) -> None:
+        '''
+        Called on file write update.
+        '''
+        
+    @classmethod
+    def new(cls, obj: object | Callable, total: int) -> Self:
+        '''
+        Generate a new Callback given another
+        Callback or a simple callback.
+        '''
+        
+        if isinstance(obj, Callback):
+            return Callback
+        
+        elif callable(obj):
+            res = cls(total = total)
+            
+            def wrapper(_, progress):
+                obj(progress, getattr(res, 'total'))
+            
+            cls.on_download = wrapper # Inject to on_download
+            return res
+        
+        else:
+            raise TypeError(f'Callback must be a function or a Callback instance')
 
 # EOF

@@ -1,27 +1,29 @@
 from __future__ import annotations
 
-import copy
 import time
 import logging
 
-import requests
-import threading
-import subprocess
-from typing import TYPE_CHECKING, Generator, Callable
+import os
+from typing import TYPE_CHECKING, Callable
+from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
 
 from .. import consts
+from ..objects import Callback
 
 if TYPE_CHECKING:
-    from ..core import Client
+    from .. import Client
     from ..objects import Video
     from ..locals import Quality
 
+
 logger = logging.getLogger(__name__)
+
+CallbackType = Callable[[int, int], None] | Callback
 
 
 def default(video: Video,
             quality: Quality,
-            callback: Callable,
+            callback: CallbackType,
             path: str,
             start: int = 0) -> None:
     '''
@@ -41,6 +43,8 @@ def default(video: Video,
     
     segments = list(video.get_segments(quality))[start:]
     length = len(segments)
+    
+    callback = Callback.new(callback, length)
     
     # Fetch segments
     for i, url in enumerate(segments):
@@ -74,7 +78,7 @@ def default(video: Video,
 
 def FFMPEG(video: Video,
            quality: Quality,
-           callback: Callable,
+           callback: CallbackType,
            path: str) -> None:
     '''
     Download using FFMPEG. It has to be installed to your system.
@@ -83,7 +87,7 @@ def FFMPEG(video: Video,
     Args:
         video       (Video): The video object to download.
         quality   (Quality): The video quality.
-        callback (Callable): Download progress callback.
+        callback (Callable): Download progress callback (Unused).
         path          (str): The video download path.
         start         (int): Where to start the download from. Used for download retries.
     '''
@@ -91,163 +95,141 @@ def FFMPEG(video: Video,
     logger.info('Downloading using FFMPEG')
     M3U = video.get_M3U_URL(quality)
     
-    # Estimate video segment count
-    length = int(video.duration.total_seconds() // consts.SEGMENT_LENGTH)
+    callback = Callback.new(callback, 1)
     command = consts.FFMPEG_COMMAND.format(input = M3U, output = path)
-    
     logger.info('Executing `%s`', command)
     
-    # Call FFMPEG
-    proc = subprocess.Popen(command,
-                            stdout = subprocess.PIPE,
-                            stderr = subprocess.STDOUT,
-                            universal_newlines = True)
-    
-    logger.info('Process summoned')
-    
-    while 1:
-        line = proc.stdout.readline()
-        if (sig := proc.poll()) != None:
-            logger.info('Process exited with signal %s', sig)
-            break
-        
-        if 'Opening \'https' in line and '/seg' in line:
-            
-            index = consts.re.ffmpeg_line(line)
-            callback(int(index), length)
-    
-    logger.info('Download ended')
+    # Execute
+    callback = Callback.new(callback, 0)
+    os.system(command)
+    callback = Callback.new(callback, 1)
 
-def _thread(req: requests.PreparedRequest,
-            session: requests.Session,
-            delay: float,
-            buffer: dict = None,
-            queue: list = None) -> bytes | None:
+def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
     Download a single segment.
-    
-    Args:
-        req (requests.PreparedRequest): The prepared request to start.
-        session     (requests.Session): The client session.
-        delay                  (float): Retry delay;
-        buffer                  (dict): Buffer to save download to.
-        queue                   (list): Download thread queue.
-    
-    Returns:
-        bytes: The raw video segment.
     '''
     
-    raw = session.send(req).content
-    
-    while b'<html>' in raw:
-        
-        # If request fails, put it back in todo
-        if queue is not None:
-            return queue.append(req)
-        
-        time.sleep(delay)
-        raw = session.send(req).content
-    
-    else:
-        if buffer is None: return raw
-        buffer[req.url] = raw
+    return client.call(url, timeout = timeout).content
 
-def base_thread(client: Client,
-                segments: Generator,
-                callback: Callable,
-                delay: float = .05) -> dict[str, bytes]:
+def _base_threaded(client: Client,
+                   segments: list[str],
+                   callback: CallbackType,
+                   max_workers: int = 50,
+                   timeout: int = 10) -> dict[str, bytes]:
     '''
-    Base downloader for threaded backends.
-    
-    Args:
-        video       (Video): The video object to download.
-        quality   (Quality): The video quality.
-        callback (Callable): Download progress callback.
-        path          (str): The video download path.
-        delay       (float): Thread launch delay.
+    base thread downloader for threaded backends.
     '''
     
-    logger.info('Downloading using threaded downloader')
+    logger.info('Threaded download amorced')
     
-    # Prepare requests
-    reqs = [
-        client.session.prepare_request(
-            requests.Request(
-                'GET', segment, consts.HEADERS | client.language
-            )
-        )
-        for segment in segments
-    ]
-    
-    buffer = {}
-    length = len(list(reqs))
-    queue = copy.deepcopy(reqs)
-    
-    logger.info('Prepared %s requests', length)
-    logger.info('Starting threads')
-    
-    while len(queue):
-        current = queue.pop(0)
-
-        thread = threading.Thread(
-            target = _thread,
-            kwargs = dict(req = current, session = client.session,
-                         buffer = buffer, queue = queue, delay = delay)
-        )
+    with Pool(max_workers = max_workers) as executor:
         
-        thread.start()
-        time.sleep(delay) # Decay thread starting
-        callback(len(buffer), length)
-    
-    logger.info('Threads process finished')
-    
-    # Check for missing chunks
-    for i, req in enumerate(reqs):
-        if not req.url in buffer.keys():
+        buffer: dict[str, bytes] = {}
+        
+        while 1:
             
-            logger.warning('Segment %s missing. Downloading.', i)
-            buffer[req.url] = _thread(req, client.session, delay, client.session)
-            callback(i, length)
+            futures = {executor.submit(_thread, client, url, timeout): url
+                       for url in segments}
+            logger.info('%s futures submited', len(futures))
+            
+            for future in as_completed(futures):
+                
+                url = futures[future]
+                
+                try:
+                    segment = future.result()
+                    buffer[url] = segment
+                    
+                    # Remove future and call callback
+                    futures.pop(future)
+                    callback.on_download(len(buffer))
+                
+                except Exception as err:
+                    logger.warn('Segment %s failed: %s', url, err)
+                    future.cancel()
+            
+            if lns := len(futures):
+                logger.warn('%s segments failed to download, retrying...', lns)
+                
+                print('\n', futures)
+                
+                continue
+            
+            break
     
-    logger.info('Download finished')
-    callback(length, length)
+    logger.info('Threaded download finished')
+    
     return buffer
 
-def threaded(video: Video,
-             quality: Quality,
-             callback: Callable,
-             path: str,
-             delay: float = .05) -> bytes:
+def threaded(max_workers: int = 100,
+             timeout: int = 30) -> Callable:
     '''
-    Threaded download.
+    Simple threaded downloader.
     
     Args:
-        video       (Video): The video object to download.
-        quality   (Quality): The video quality.
-        callback (Callable): Download progress callback.
-        path          (str): The video download path.
-        delay       (float): Thread launch delay.
+        max_workers (int): How many downloads can take place simoultaneously.
+        timeout (int): Maximum time before considering a download failed.
+    
+    Returns:
+        Callable: A download wrapper.
     '''
     
-    segments = video.get_segments(quality)
-    buffer = base_thread(video.client, segments, callback, delay)
-    items = sorted(buffer.items(), key = lambda row: row[0])
+    def wrapper(video: Video,
+                quality: Quality,
+                callback: CallbackType,
+                path: str) -> None:
+        '''
+        Wrapper.
+        '''
+        
+        segments = list(video.get_segments(quality))
+        total = len(segments)
+        callback = Callback.new(callback, total)
+        
+        buffer = _base_threaded(
+            client = video.client,
+            segments = segments,
+            callback = callback,
+            max_workers = max_workers,
+            timeout = timeout)
+        
+        # Concatenate and write
+        with open(path, 'wb') as file:
+            for i, url in enumerate(segments):
+                file.write(buffer.get(url, b''))
+                callback.on_write(i)
     
-    raw = b''
-    
-    logger.info('Concatenating urls')
-    for url, value in items:
-        raw += value
-    
-    # Write to file
-    logger.info('Writing file')
-    with open(path, 'wb') as file:
-        file.write(raw)
+    return wrapper
 
+def threaded_FFMPEG(max_workers: int = 10,
+                    timeout: int = 5) -> Callable:
+    '''
+    Wrapper.
+    '''
+    
+    def wrapper(video: Video,
+                quality: Quality,
+                callback: CallbackType,
+                path: str) -> None:
+        '''
+        Wrapper.
+        '''
+        
+        raise NotImplementedError()
+        
+        segments = list(video.get_segments(quality))
+        total = len(segments)
+        callback = Callback.new(callback, total)
+        
+        buffer = _base_threaded(
+            client = video.client,
+            segments = segments,
+            callback = callback,
+            max_workers = max_workers,
+            timeout = timeout)
+        
+        # TODO
 
-# Prevent monkey
-_thread = NotImplemented
-base_thread = NotImplemented
-threaded = NotImplemented
+    return wrapper
 
 # EOF

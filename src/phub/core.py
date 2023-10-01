@@ -246,24 +246,33 @@ class Client:
 
     def search_user(self,
                     username: str = None,
+                    country: str = None,
+                    city: str = None,
+                    age: tuple[int] = None,
                     param: Param = NO_PARAM,
                     ) -> MQuery:
         '''
         Search for users in the community.
         
         Args:
-            username (str): The menber username.
+            username (str): The member username.
+            coutrny (str): The member **country code** (AF, FR, etc.)
             param (Param): Filters parameter.
         
         Returns:
             MQuery: Initialised query.
         
-        TODO
-        - country: str = None,            # &country=AX
-        - city: str = None,               # &city=Paris
-        - age: tuple[int, int] = (0, 0),  # &age1=0&age2=0
         '''
         
-        return MQuery(self, 'user/search', Param('username', username) | param)
+        params = (param
+                  | Param('username', username)
+                  | Param('city', city)
+                  | Param('country', country))
+        
+        if age:
+            params |= Param('age1', age[0])
+            params |= Param('age2', age[1])
+        
+        return MQuery(self, 'user/search', params)
 
-# EOFm
+# EOF
