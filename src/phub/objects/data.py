@@ -185,9 +185,9 @@ class Callback:
         
         elif callable(obj):
             res = cls(total = total)
-            
-            def wrapper(_, progress):
-                obj(progress, getattr(res, 'total'))
+
+            def wrapper(self, progress, total):
+                obj(progress, total)
             
             cls.on_download = wrapper # Inject to on_download
             return res
