@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Callable
 from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
 
 from .. import consts
-from ..objects import Callback
 
 if TYPE_CHECKING:
     from .. import Client
@@ -18,7 +17,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-CallbackType = Callable[[int, int], None] | Callback
+CallbackType = Callable[[int, int], None]
 
 
 def default(video: Video,
@@ -44,9 +43,6 @@ def default(video: Video,
     segments = list(video.get_segments(quality))[start:]
     length = len(segments)
     
-    callback = Callback.new(callback, length)
-    callback.on_start()
-    
     # Fetch segments
     for i, url in enumerate(segments):
         for _ in range(consts.DOWNLOAD_SEGMENT_MAX_ATTEMPS):
@@ -56,9 +52,9 @@ def default(video: Video,
                 
                 if segment.ok:
                     buffer += segment.content
-                    callback.on_write(i + 1)
+                    callback(i + 1, length)
                     break
-                
+            
             except Exception as err:
                 logger.error('Error while downloading: %s', err)
             
@@ -68,8 +64,6 @@ def default(video: Video,
         else:
             logger.error('Maximum attempts reached. Refreshing M3U...')
             return default(video, quality, callback, i - 1)
-        
-        callback.on_download(i + 1)
     
     # Concatenate
     logger.info('Concatenating buffer to %s', path)
@@ -77,7 +71,6 @@ def default(video: Video,
         file.write(buffer)
     
     logger.info('Downloading successfull.')
-    callback.on_end()
 
 def FFMPEG(video: Video,
            quality: Quality,
@@ -98,15 +91,13 @@ def FFMPEG(video: Video,
     logger.info('Downloading using FFMPEG')
     M3U = video.get_M3U_URL(quality)
     
-    callback = Callback.new(callback, 1)
-    callback.on_start()
-    
     command = consts.FFMPEG_COMMAND.format(input = M3U, output = path)
     logger.info('Executing `%s`', command)
     
     # Execute
+    callback(0, 1)
     os.system(command)
-    callback.on_end()
+    callback(1, 1)
 
 def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
@@ -125,6 +116,7 @@ def _base_threaded(client: Client,
     '''
     
     logger.info('Threaded download amorced')
+    length = len(segments)
     
     with Pool(max_workers = max_workers) as executor:
         
@@ -146,7 +138,7 @@ def _base_threaded(client: Client,
                     
                     # Remove future and call callback
                     futures.pop(future)
-                    callback.on_download(len(buffer))
+                    callback(len(buffer), length)
                 
                 except Exception as err:
                     logger.warn('Segment %s failed: %s', url, err)
@@ -185,8 +177,6 @@ def threaded(max_workers: int = 100,
         
         segments = list(video.get_segments(quality))
         total = len(segments)
-        callback = Callback.new(callback, total)
-        callback.on_start()
         
         buffer = _base_threaded(
             client = video.client,
@@ -197,11 +187,8 @@ def threaded(max_workers: int = 100,
         
         # Concatenate and write
         with open(path, 'wb') as file:
-            for i, url in enumerate(segments):
+            for url in segments:
                 file.write(buffer.get(url, b''))
-                callback.on_write(i)
-        
-        callback.on_end()
     
     return wrapper
 
@@ -223,8 +210,6 @@ def threaded_FFMPEG(max_workers: int = 10,
         
         segments = list(video.get_segments(quality))
         total = len(segments)
-        callback = Callback.new(callback, total)
-        callback.on_start()
         
         buffer = _base_threaded(
             client = video.client,
@@ -234,9 +219,7 @@ def threaded_FFMPEG(max_workers: int = 10,
             timeout = timeout)
         
         # TODO
-        
-        callback.on_end()
-
+    
     return wrapper
 
 # EOF
