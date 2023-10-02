@@ -68,7 +68,7 @@ def default(video: Video,
             logger.error('Maximum attempts reached. Refreshing M3U...')
             return default(video, quality, callback, i - 1)
         
-        callback.on_download(i + 1, length)
+        callback.on_download(i + 1)
     
     # Concatenate
     logger.info('Concatenating buffer to %s', path)
@@ -100,12 +100,13 @@ def FFMPEG(video: Video,
     command = consts.FFMPEG_COMMAND.format(input = M3U, output = path)
     logger.info('Executing `%s`', command)
     
+    callback.on_download(0)
+    callback.on_write(0)
+    
     # Execute
-    callback = Callback.on_download(callback, 0)
-    callback = Callback.on_write(callback, 0)
     os.system(command)
-    callback = Callback.on_write(callback, 1)
-    callback = Callback.on_download(callback, 1)
+    callback.on_write(1)
+    callback.on_download(1)
 
 def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
