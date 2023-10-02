@@ -178,7 +178,7 @@ class Callback:
         Called on file write update.
         '''
     
-    def on_end() -> None:
+    def on_end(self) -> None:
         '''
         Called on download end.
         '''
@@ -196,10 +196,16 @@ class Callback:
         elif callable(obj):
             res = cls(total = total)
             
-            def wrapper(_, progress):
+            def on_download_wrapper(_, progress):
                 obj(progress, getattr(res, 'total'))
             
-            cls.on_download = wrapper # Inject to on_download
+            def on_end_wrapper(_):
+                total = getattr(res, 'total')
+                obj(total, total)
+            
+            # Inject wrappers
+            cls.on_download = on_download_wrapper
+            cls.on_end = on_end_wrapper
             return res
         
         else:
