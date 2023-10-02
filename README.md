@@ -64,12 +64,6 @@ in the [docs](https://phub.readthedocs.io).
 
 PHUB uses GPLv3. See the `LICENSE` file.
 
-## TODO
-
-- [ ] Make downloading more stable
-- [ ] User search filters
-- [ ] Fix FFMPEG and threaded downloader
-
 ## Contributing
 
 Feel free to contribute to this project by submiting
