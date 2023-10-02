@@ -190,8 +190,8 @@ class Callback:
         Callback or a simple callback.
         '''
         
-        if isinstance(obj, Callback):
-            return Callback
+        if issubclass(obj, Callback):
+            return Callback(total = total)
         
         elif callable(obj):
             res = cls(total = total)

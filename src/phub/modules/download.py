@@ -154,9 +154,6 @@ def _base_threaded(client: Client,
             
             if lns := len(futures):
                 logger.warn('%s segments failed to download, retrying...', lns)
-                
-                print('\n', futures)
-                
                 continue
             
             break

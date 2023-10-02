@@ -1,5 +1,5 @@
 '''
-PHUB v4.0
+PHUB v4.1
 
 See https://github.com/Egsagon/PHUB for docs.
 '''
