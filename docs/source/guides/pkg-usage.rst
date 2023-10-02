@@ -87,7 +87,7 @@ for an absolute value.
 .. note:: Tip: you can set the ``path`` paramater to be a directory for the video
     to be downloaded in. The file name will automatically be the video id. 
 
-For advanced downloading, see `/guides/download`.
+For advanced downloading, see `downloading </guides/download>`.
 
 Debugging
 ---------

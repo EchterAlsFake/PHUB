@@ -15,6 +15,7 @@ Search filters
 
 You can specify search filters by adding :py:class:`.Param` objects.
 There is a list of constant Parameters you can import from ``phub.locals``.
+You can see `here </api/locals>` a list of possible filters.
 
 .. code-block:: python
 

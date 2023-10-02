@@ -88,3 +88,9 @@ Here is a list of all API objects.
     :undoc-members:
     :private-members:
     :special-members: __init__
+
+.. autoclass:: phub.objects.Callback
+    :members:
+    :undoc-members:
+    :private-members:
+    :special-members: __init__

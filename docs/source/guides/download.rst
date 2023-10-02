@@ -26,10 +26,13 @@ Output path
 
 The video output path can be either a path to a file, in which
 case the given file will be erased, or a directory. If that is
-the case, 
+the case, the final path of the file can be found by capturing the output of
+the :meth:`.Video.download` method.
 
-The final path of the file can be found by capturing the output of
-the :meth:`.Video.download` method. 
+.. code-block:: python
+
+    video.download('video.mp4')  # video.mp4 
+    video.download('dir/')       # dir/<video-key>.mp4
 
 ^^^^^^^^^^^^^
 Video quality
@@ -41,9 +44,19 @@ The quality of the video can be designed as:
 * An absolute value (`int`): 1080, 720, etc.
 * A string representing `phub.Quality` constants, like `best`, `half`, `worst`.
 
-^^^^^^^^^^^^^^^^
-Progress display
-^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+    from phub import Quality
+
+    quality = Quality.BEST             # Using a constant
+    quality = Quality('best')          # Using a string
+    quality = Quality(1080)            # Using an int
+    quality = Quality(Quality('best')) # Using an object
+
+^^^^^^^^^^^^^^^^^^^^^^^
+Simple progress display
+^^^^^^^^^^^^^^^^^^^^^^^
 
 The progress of the video can be displayed using built-in functions, from the
 `phub.display` submodule.
@@ -93,11 +106,31 @@ and the total segment to process.
 
     video.download(..., display = show_progress)
 
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Advanced progress display
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can display advanced download options by inheriting the
+:py:class:`.Callback` object.
+
+.. code-block:: python
+    
+    from phub import Callback
+
+    class Tracker(Callback):
+        def on_download(progress: int):
+            # Do something on download
+            print('Downloading', progress, '/', self.total)
+        
+        def on_write(progress: int):
+            # Do something on download
+            print('Writing:', progress, '/', self.total)
+    
+    video.download(..., display = Tracker)
+
 ^^^^^^^^^^^
 Downloaders
 ^^^^^^^^^^^
-
-.. warning:: Unstable feature
 
 You can specify custom downloaders to download your video.
 There are a few presets available in the `phub.download` submodule.
@@ -116,6 +149,13 @@ There are a few presets available in the `phub.download` submodule.
     FFMPEG atomatically set the apropriate download speeds
     between segments download and codecs stuff, which makes it
     much faster and reliable than some presets.
+    
+    .. note:: You need to have FFMPEG installed to your system
+        to use this feature.
+    
+    .. note:: As FFMPEG is a CLI tool, download progress tracking is
+        not available. If you pass in a display callback, it will
+        only be called at the start and at the end of the download.
 
     .. code-block:: python
 
@@ -123,16 +163,22 @@ There are a few presets available in the `phub.download` submodule.
         video.download(..., downloader = FFMPEG)
 
 * Threaded download
-    .. warning:: Unstable: Currently in development.
 
     This preset will use threads to download segments as fast as
     it can, and writing them after.
+    You can set the maximum threads working in parrallel and the
+    maximum requests timeout.
+    
+    You might have to adjust these values
+    depending on your configuration, e.g. reduce the workers count
+    if you have a weak CPU and add more timeout if you have a low
+    quality connection.
 
     .. code-block:: python
 
         from phub.download import threaded
-        video.download(..., downloader = threaded)
-
+        video.download(..., downloader = threaded(max_workers = 50,
+                                                  timeout = 10))
 
 You can also specify custom downloaders.
 
