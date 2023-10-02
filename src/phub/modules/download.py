@@ -55,6 +55,7 @@ def default(video: Video,
                 
                 if segment.ok:
                     buffer += segment.content
+                    callback.on_write(i + 1)
                     break
                 
             except Exception as err:
@@ -67,7 +68,7 @@ def default(video: Video,
             logger.error('Maximum attempts reached. Refreshing M3U...')
             return default(video, quality, callback, i - 1)
         
-        callback(i + 1, length)
+        callback.on_download(i + 1, length)
     
     # Concatenate
     logger.info('Concatenating buffer to %s', path)
@@ -100,9 +101,11 @@ def FFMPEG(video: Video,
     logger.info('Executing `%s`', command)
     
     # Execute
-    callback = Callback.new(callback, 0)
+    callback = Callback.on_download(callback, 0)
+    callback = Callback.on_write(callback, 0)
     os.system(command)
-    callback = Callback.new(callback, 1)
+    callback = Callback.on_write(callback, 1)
+    callback = Callback.on_download(callback, 1)
 
 def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
