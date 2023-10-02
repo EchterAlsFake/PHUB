@@ -45,6 +45,7 @@ def default(video: Video,
     length = len(segments)
     
     callback = Callback.new(callback, length)
+    callback.on_start()
     
     # Fetch segments
     for i, url in enumerate(segments):
@@ -74,8 +75,9 @@ def default(video: Video,
     logger.info('Concatenating buffer to %s', path)
     with open(path, 'wb') as file:
         file.write(buffer)
-        
+    
     logger.info('Downloading successfull.')
+    callback.on_end()
 
 def FFMPEG(video: Video,
            quality: Quality,
@@ -97,16 +99,14 @@ def FFMPEG(video: Video,
     M3U = video.get_M3U_URL(quality)
     
     callback = Callback.new(callback, 1)
+    callback.on_start()
+    
     command = consts.FFMPEG_COMMAND.format(input = M3U, output = path)
     logger.info('Executing `%s`', command)
     
-    callback.on_download(0)
-    callback.on_write(0)
-    
     # Execute
     os.system(command)
-    callback.on_write(1)
-    callback.on_download(1)
+    callback.on_end()
 
 def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
@@ -189,6 +189,7 @@ def threaded(max_workers: int = 100,
         segments = list(video.get_segments(quality))
         total = len(segments)
         callback = Callback.new(callback, total)
+        callback.on_start()
         
         buffer = _base_threaded(
             client = video.client,
@@ -202,6 +203,8 @@ def threaded(max_workers: int = 100,
             for i, url in enumerate(segments):
                 file.write(buffer.get(url, b''))
                 callback.on_write(i)
+        
+        callback.on_end()
     
     return wrapper
 
@@ -224,6 +227,7 @@ def threaded_FFMPEG(max_workers: int = 10,
         segments = list(video.get_segments(quality))
         total = len(segments)
         callback = Callback.new(callback, total)
+        callback.on_start()
         
         buffer = _base_threaded(
             client = video.client,
@@ -233,6 +237,8 @@ def threaded_FFMPEG(max_workers: int = 10,
             timeout = timeout)
         
         # TODO
+        
+        callback.on_end()
 
     return wrapper
 

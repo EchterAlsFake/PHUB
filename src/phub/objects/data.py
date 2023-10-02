@@ -163,6 +163,11 @@ class Callback:
         
         self.total = total
     
+    def on_start(self) -> None:
+        '''
+        Called on download process start.
+        '''
+    
     def on_download(self, progress: int) -> None:
         '''
         Called on download update.
@@ -171,6 +176,11 @@ class Callback:
     def on_write(self, progress: int) -> None:
         '''
         Called on file write update.
+        '''
+    
+    def on_end() -> None:
+        '''
+        Called on download end.
         '''
         
     @classmethod
