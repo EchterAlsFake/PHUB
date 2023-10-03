@@ -4,7 +4,6 @@ build/
 build/*
 docs/build/
 docs/build/*
-build.bat
 temp/
 src/temp/
 src/temp/*

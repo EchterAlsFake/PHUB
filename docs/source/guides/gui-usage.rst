@@ -4,6 +4,7 @@ GUI Usage
 If you want a simpler usage of PHUB, you can check out
 EtcherAlsFake's `Porn Fetch`_ project.
 
-[ Insert screenshot here ]
+.. image:: ../assets/porn_fetch.png
+    :width: 800
 
 .. _Porn Fetch: https://github.com/EchterAlsFake/Porn_Fetch
