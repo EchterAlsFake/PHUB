@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="300" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
+</p>
+
 # PHUB - An API wrapper for PornHub.
 
 PHUB is an hybrid API for Pornhub. It is able to communicate with Pornhub

@@ -1,4 +1,6 @@
-![PHUB](https://github.com/Egsagon/PHUB/blob/master/assets/banner.png)
+<p align="center">
+  <img width="300" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
+</p>
 
 # PHUB - An API for PornHub.
 

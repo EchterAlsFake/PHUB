@@ -6,6 +6,9 @@ using both web-scraping and wraping the Pornhub's HubTraffic API. It is
 able to access most used or useful PH features, like video searching,
 accessing account features, and more like video downloading.
 
+.. image:: assets/logo.svg
+   :align: center
+
 .. warning:: PHUB is probably against PH's TOS. Use at your own risks.
 
 .. note:: **Early dev**
