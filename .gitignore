@@ -7,3 +7,4 @@ docs/build/*
 temp/
 src/temp/
 src/temp/*
+build.bat
