@@ -24,3 +24,6 @@ errors.
 .. autoexception:: phub.errors.NoResult
 
 .. autoexception:: phub.errors.InvalidCategory
+
+.. autoexception:: phub.errors.InvalidSortParam
+

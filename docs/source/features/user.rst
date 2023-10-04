@@ -1,7 +1,7 @@
 Users
 =====
 
-:py:class:`.User` objects represents Pornhub users.
+:py:class:`phub.User` objects represents Pornhub users.
 
 .. note:: There is a difference between Users and
     Account objects. Account represents *your*
@@ -10,7 +10,7 @@ Users
 Exploiting data
 ---------------
 
-Following data can be harvested from :py:class:`.User`
+Following data can be harvested from :py:class:`phub.User`
 objects.
 
 .. code-block:: python
@@ -43,7 +43,7 @@ refreshable objects:
 Searching for users
 -------------------
 
-You can search for user accounts on the platform using :meth:`.Client.search_users`.
+You can search for user accounts on the platform using :meth:`phub.Client.search_users`.
 
 .. code-block:: python
 
@@ -56,50 +56,60 @@ You can search for user accounts on the platform using :meth:`.Client.search_use
                  | Member.GENDER_NON_BINARY)
     )
 
-This method behaves like `.Client.search`: you can select custom filters for the
+This method behaves like :meth:`phub.Client.search`: you can select custom filters for the
 query:
 
 - Member type 
 
-    - ``Member.IS_ONLINE``
-    - ``Member.IS_MODEL``
-    - ``Member.IS_STAFF``
+    .. code-block:: python
+
+        Member.IS_ONLINE
+        Member.IS_MODEL
+        Member.IS_STAFF
 
 - Member content
 
-    - ``Member.HAS_AVATAR``
-    - ``Member.HAS_VIDEOS``
-    - ``Member.HAS_PHOTOS``
-    - ``Member.HAS_PLAYLISTS``
-    - ``Member.OFFER_CUSTOM_VIDEOS``
-    - ``Member.OFFER_FAN_CLUB``
+    .. code-block:: python
+
+        Member.HAS_AVATAR
+        Member.HAS_VIDEOS
+        Member.HAS_PHOTOS
+        Member.HAS_PLAYLISTS
+        Member.OFFER_CUSTOM_VIDEOS
+        Member.OFFER_FAN_CLUB
 
 - Member relationship
 
-- ``Member.SINGLE`` 
-- ``Member.TAKEN``
-- ``Member.OPEN_RELATION``
+    .. code-block:: python
+
+        Member.SINGLE
+        Member.TAKEN
+        Member.OPEN_RELATION
 
 - Member gender
 
-- ``Member.GENDER_MALE``
-- ``Member.GENDER_FEMALE`` 
-- ``Member.GENDER_COUPLE`` 
-- ``Member.GENDER_TRANS_FEMALE`` 
-- ``Member.GENDER_FEMALE_COUPLE`` 
-- ``Member.GENDER_TRANS_MALE``
-- ``Member.GENDER_NON_BINARY``
-- ``Member.GENDER_OTHER``
+    .. code-block:: python
+
+        Member.GENDER_MALE
+        Member.GENDER_FEMALE
+        Member.GENDER_COUPLE
+        Member.GENDER_TRANS_FEMALE
+        Member.GENDER_FEMALE_COUPLE
+        Member.GENDER_TRANS_MALE
+        Member.GENDER_NON_BINARY
+        Member.GENDER_OTHER
 
 - Member interests
 
-- ``Member.INTO_NONE``
-- ``Member.INTO_MALE``
-- ``Member.INTO_FEMALE``
-- ``Member.INTO_ALL``
+    .. code-block:: python
 
-You can also sort queries using these 2 sort filters:
+        Member.INTO_NONE
+        Member.INTO_MALE
+        Member.INTO_FEMALE
+        Member.INTO_ALL
 
-- ``Sort.USER_POPULAR`` (along with sort periods)
-- ``Sort.USER_NEWEST``
+- You can also sort queries using these 2 sort filters:
 
+    .. code-block:: python
+        Sort.USER_POPULAR # Alongside with sort periods
+        Sort.USER_NEWEST

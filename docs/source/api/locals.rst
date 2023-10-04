@@ -24,3 +24,13 @@ Locals are constants that can be directly imported for better readability.
     :members:
     :undoc-members:
     :private-members:
+
+.. autoclass:: phub.locals.Member
+    :members:
+    :undoc-members:
+    :private-members:
+
+.. autoclass:: phub.locals.Sort
+    :members:
+    :undoc-members:
+    :private-members:

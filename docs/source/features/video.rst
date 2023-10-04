@@ -1,12 +1,12 @@
 Using Videos
 ============
 
-:py:class:`.Video` objects are emitted by:
+:py:class:`phub.Video` objects are emitted by:
 
-- :meth:`.Client.get` when searching for a specific video
-- :meth:`.Query.get` when enumerating for videos in a query
+- :meth:`phub.Client.get` when searching for a specific video
+- :meth:`phub.Query.get` when enumerating for videos in a query
 
-Once initialised, a :py:class:`.Video` object does not do anything.
+Once initialised, a :py:class:`phub.Video` object does not do anything.
 It manages requests and caching automatically to be as fast as possible.
 
 You can use the following properties on a video:
@@ -60,14 +60,14 @@ You can use the following properties on a video:
 * Video tags
 
     The tags of the video. Each tag is represented as a
-    :py:class:`.Tag` object.
+    :py:class:`phub.Tag` object.
     
     :literal:`video.tags`
 
 * Video likes
 
     Both upvotes and downvotes are represented with the
-    :py:class:`.Like` object.
+    :py:class:`phub.Like` object.
 
     :literal:`video.like.up`
     
@@ -100,14 +100,14 @@ You can use the following properties on a video:
 * Video pornstars
 
     The pornstars in the video, represented as a list of
-    :py:class:`.User` objects.
+    :py:class:`phub.User` objects.
 
     :literal:`video.pornstars`
 
 * Video categories
 
     The categories the video is referenced in. Represented as a
-    :py:class:`.Category` generator.
+    :py:class:`phub.Category` generator.
 
     :literal:`video.categories`
 
@@ -133,7 +133,7 @@ You can use the following properties on a video:
 
 * Video author
 
-    The user account that posted the video, as a :py:class:`.User`
+    The user account that posted the video, as a :py:class:`phub.User`
     object.
 
     :literal:`video.author`
@@ -150,7 +150,7 @@ Refreshing data
 ---------------
 
 For long-term usage, you might want to refresh all
-this data, which is cached by all :py:class:`.Video`
+this data, which is cached by all :py:class:`phub.Video`
 objects.
 
 You can simply do:

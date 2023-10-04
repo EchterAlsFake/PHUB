@@ -64,7 +64,7 @@ With a :py:class:`.Video` object: you can fetch all video data, e.g.:
     >>> video.image
     # etc.
 
-You can check out all video properties `here </api/objects#phub.objects.Video>`.
+You can check out all video properties in the :py:class:`.Video` API docs.
 
 Downloading a video
 -------------------
@@ -87,7 +87,7 @@ for an absolute value.
 .. note:: Tip: you can set the ``path`` paramater to be a directory for the video
     to be downloaded in. The file name will automatically be the video id. 
 
-For advanced downloading, see `downloading </guides/download>`.
+For advanced downloading, see :doc:`downloading </guides/download>`.
 
 Debugging
 ---------

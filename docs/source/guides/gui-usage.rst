@@ -2,7 +2,7 @@ GUI Usage
 =========
 
 If you want a simpler usage of PHUB, you can check out
-EtcherAlsFake's `Porn Fetch`_ project.
+EchterAlsFake's `Porn Fetch`_ project.
 
 .. image:: ../assets/porn_fetch.png
     :width: 800

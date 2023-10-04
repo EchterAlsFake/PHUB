@@ -1,4 +1,5 @@
 Features guide
+==============
 
 This is the index of all documented PHUB features.
 
@@ -6,7 +7,7 @@ This is the index of all documented PHUB features.
     :maxdepth: 2
 
     video.rst
-    user.rst
     search.rst
-    feed.rst
+    user.rst
     account.rst
+    feed.rst

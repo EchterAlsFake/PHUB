@@ -1,7 +1,7 @@
 Account feed
 ============
 
-If an :py:class:`.Account` objects initialises
+If an :py:class:`phub.Account` objects initialises
 successfully, you can access your account feed.
 
 .. note::
@@ -9,8 +9,8 @@ successfully, you can access your account feed.
     notifications from your subscribtions, comments,
     video uploads, etc.
 
-The :py:class:`.Feed` object is a utility object that
-distributes :py:class:`Query` objects.
+The :py:class:`phub.Feed` object is a utility object that
+distributes :py:class:`phub.Query` objects.
 
 You can get the raw feed this way:
 
