@@ -129,10 +129,9 @@ class Video:
         from ..locals import Quality
         
         # Get qualities
-        raw = self.fetch('page@mediaDefinitions')
-        
         qualities = {int(v): q['videoUrl']
-                     for q in raw if str(v := q['quality']).isdigit()}
+                     for q in self.fetch('page@mediaDefinitions')
+                     if str(v := q['quality']).isdigit()}
         
         logger.info('Extracted %s qualities from %s', len(qualities), self)
         
