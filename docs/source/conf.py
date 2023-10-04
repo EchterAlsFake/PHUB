@@ -31,7 +31,7 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 html_static_path = ["_static"]
 html_theme = "sphinx_immaterial"
 
-html_logo = 'assets/logo.svg'
+html_logo = 'assets/logo-dark.svg'
 
 html_theme_options = {
     "icon": {
