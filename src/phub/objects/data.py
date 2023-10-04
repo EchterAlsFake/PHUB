@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Literal, Self, Callable
+from typing import TYPE_CHECKING, Literal, Self
 
 from .. import utils
 from .. import consts

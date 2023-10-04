@@ -128,12 +128,11 @@ class Video:
         
         from ..locals import Quality
         
-        # Get the quality master file
-        qualities = {
-            int(el['quality']): el['videoUrl']
-            for el in self.fetch('page@mediaDefinitions')
-            if el['quality'] in ['1080', '720', '480', '240']
-        }
+        # Get qualities
+        raw = self.fetch('page@mediaDefinitions')
+        
+        qualities = {int(v): q['videoUrl']
+                     for q in raw if str(v := q['quality']).isdigit()}
         
         logger.info('Extracted %s qualities from %s', len(qualities), self)
         
