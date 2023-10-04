@@ -66,7 +66,8 @@ The following Queries are created and cached by :py:class:`.Account`.
 All those queries behave like :doc:`normal search queries </features/search>`.
 
 Accessing the feed
+------------------
 
-The feed is accessible through :literal:`client.account.feed`.
+The feed is accessible through :py:obj:`.Account.feed`.
 
 You can learn more about the feed :doc:`here </features/feed>`.

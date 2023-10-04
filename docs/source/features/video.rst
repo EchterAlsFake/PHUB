@@ -13,103 +13,79 @@ You can use the following properties on a video:
 
 .. default-literal-role:: python
 
-* Video title
+* :literal:`video.title`
 
     The original video title. It might
     depend on the :doc:`client language </api/objects>`.
-    
-    :literal:`video.title`
 
-* Video image
+* :literal:`video.image`
 
-    The video thumbnail, as a :py:class:`.Image` object.
-    
-    :literal:`video.image`
+    The video thumbnail, as an :py:class:`.Image` object.
 
     You can download the image or access its URL for embedding:
     
     :literal:`video.image.url`
-
     :literal:`video.image.download('.')`
 
-* Video orientation (portrait/landscape)
+* :literal:`video.is_vertical`
 
     Wether the video is in vertical (phone) mode, as a
     :py:class:`bool`.
-    
-    :literal:`video.is_vertical`
 
-* Video orientation (the other orientation)
+* :literal:`video.orientation`
 
     The sexual orientation of the video (straight, gay, etc.).
-    Also called ``segment``.
-    
-    :literal:`video.orientation`
+    Also called :literal:`segment`.
 
-* Video duration
+* :literal:`video.duration`
 
     The length of the video, as a :py:class:`datetime.timedelta`
     object.
-    
-    :literal:`video.duration`
 
     You can access its total seconds, or do other stuff:
-    
     :literal:`video.duration.total_seconds()`
 
-* Video tags
+* :literal:`video.tags`
 
     The tags of the video. Each tag is represented as a
     :py:class:`.Tag` object.
-    
-    :literal:`video.tags`
 
-* Video likes
+* :literal:`video.like`
 
     Both upvotes and downvotes are represented with the
     :py:class:`.Like` object.
 
-    :literal:`video.like.up`
-    
-    :literal:`video.like.down`
-    
-    :literal:`video.like.ratings` (votes coefficient)
+    .. code-block:: python
+        
+        video.like.up       # Upvotes
+        video.like.down     # Downvotes
+        video.like.ratings  # coefficient
 
-* Video views
+* :literal:`video.views`
 
     The video views, as an :py:class:`int`.
 
-    :literal:`video.views`
-
-* Video hotspots
+* :literal:`video.hotspots`
 
     The video hotspots. This is used by Pornhub to display
     the bar above the player progress bar, and probably the
     video preview. It is represented as a :py:class:`int`
     generator.
 
-    :literal:`video.hotspots`
-
-* Video release date
+* :literal:`video.date`
 
     The video release date, as a :py:class:`datetime.datetime`
     object.
 
-    :literal:`video.date`
-
-* Video pornstars
+* :literal:`video.pornstars`
 
     The pornstars in the video, represented as a list of
     :py:class:`.User` objects.
 
-    :literal:`video.pornstars`
-
-* Video categories
+* :literal:`video.categories`
 
     The categories the video is referenced in. Represented as a
     :py:class:`.Category` generator.
-
-    :literal:`video.categories`
 
     .. default-literal-role::
 
@@ -131,12 +107,10 @@ You can use the following properties on a video:
             print(category)
             query = client.search(filter = category)
 
-* Video author
+* :literal:`video.author`
 
     The user account that posted the video, as a :py:class:`.User`
     object.
-
-    :literal:`video.author`
 
     E.g.:
 

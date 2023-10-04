@@ -111,5 +111,6 @@ query:
 - You can also sort queries using these 2 sort filters:
 
     .. code-block:: python
+        
         Sort.USER_POPULAR # Alongside with sort periods
         Sort.USER_NEWEST
