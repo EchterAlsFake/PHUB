@@ -145,12 +145,12 @@ class re:
     query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'      ) # Get a query's video amount
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/' ) # Get the user bio
     
+    # feed item user = .*?userLink.*?href=\"(.*?)\"
+    
     # Findall regexess
     get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
     user_infos = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
-    # feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\".*?feedInfo\">(.*?)<\/section'            ) # Get all items in the Feed
-    # feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\".*?userLink.*?href=\"(.*?)\"(.*?)<\/section'                            ) # Get all items in the Feed
-    feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                            ) # Get all items in the Feed
+    feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                                                        ) # Get all items in the Feed
     get_videos = comp( engine.DOTALL, p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"' ) # Get all videos in a container (fetch their id, action type and title)
     
     # Subscration regexes
