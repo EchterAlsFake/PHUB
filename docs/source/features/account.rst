@@ -4,7 +4,7 @@ Account object
 Using a client to login
 -----------------------
 
-You can use the :py:class:`phub.Client` object to login
+You can use the :py:class:`.Client` object to login
 to some Pornhub account:
 
 .. code-block:: python
@@ -30,10 +30,10 @@ If you want to disable this behavior, set ``login`` to False.
     client.login()
 
 If you created an account while specifying some credentials,
-wether you enabled login or not, an :py:class:`phub.Account`
-object will be created and connected to the :py:class:`phub.Client`.
+wether you enabled login or not, an :py:class:`.Account`
+object will be created and connected to the :py:class:`.Client`.
 
-If that is not the case, The :py:class:`phub.Account` object will
+If that is not the case, The :py:class:`.Account` object will
 evaluate to :py:class:`None`.
 
 Accessing data
@@ -54,7 +54,7 @@ The following account data is available:
 Account Queries
 ---------------
 
-The following Queries are created and cached by :py:class:`phub.Account`.
+The following Queries are created and cached by :py:class:`.Account`.
 (Refreshable with :literal:`client.account.refresh()` of course)
 
 * Recommended videos (:literal:`client.account.recommended`)

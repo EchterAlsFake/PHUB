@@ -4,7 +4,7 @@ Video downloading
 Downloading a video
 -------------------
 
-A video can be downloaded via its :meth:`phub.Video.download`
+A video can be downloaded via its :meth:`.Video.download`
 method.
 
 .. code-block:: python
@@ -27,7 +27,7 @@ Output path
 The video output path can be either a path to a file, in which
 case the given file will be erased, or a directory. If that is
 the case, the final path of the file can be found by capturing the output of
-the :meth:`phub.Video.download` method.
+the :meth:`.Video.download` method.
 
 .. code-block:: python
 
@@ -40,9 +40,9 @@ Video quality
 
 The quality of the video can be designed as:
 
-* A constant from `phub.Quality`, e.g. `phub.Quality.BEST`.
+* A constant from `.Quality`, e.g. `.Quality.BEST`.
 * An absolute value (`int`): 1080, 720, etc.
-* A string representing `phub.Quality` constants, like `best`, `half`, `worst`.
+* A string representing `.Quality` constants, like `best`, `half`, `worst`.
 
 
 .. code-block:: python
@@ -59,7 +59,7 @@ Simple progress display
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 The progress of the video can be displayed using built-in functions, from the
-`phub.display` submodule.
+`.display` submodule.
 
 * Simple progress (default)
     Displays a colored output progress.
@@ -111,7 +111,7 @@ Downloaders
 ^^^^^^^^^^^
 
 You can specify custom downloaders to download your video.
-There are a few presets available in the `phub.download` submodule.
+There are a few presets available in the `.download` submodule.
 
 * Dummy download (default)
     A slow, dummy downloader that fetch each segment after the other,
@@ -190,15 +190,15 @@ You can also specify custom downloaders.
 Even more advanced downloading
 ------------------------------
 
-If :meth:`phub.Video.download` is not advanced enough for you,
+If :meth:`.Video.download` is not advanced enough for you,
 here are a few other more bare-bone methods. 
 
-You can use :meth:`phub.Video.get_segments`, which outputs a
+You can use :meth:`.Video.get_segments`, which outputs a
 generator containing a list segment URLs. See the
 ``my_downloader`` exemple above.
 
 If you want something even more bare-bone, use
-:meth:`phub.Video.get_M3U_url`. This outputs the URL of the master
+:meth:`.Video.get_M3U_url`. This outputs the URL of the master
 M3U file for a desired quality. This can be used, for exemple,
 with FFMPEG (if you want to have more control over it than with
 ``phub.download.FFMPEG``).

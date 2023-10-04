@@ -1,7 +1,7 @@
 Users
 =====
 
-:py:class:`phub.User` objects represents Pornhub users.
+:py:class:`.User` objects represents Pornhub users.
 
 .. note:: There is a difference between Users and
     Account objects. Account represents *your*
@@ -10,7 +10,7 @@ Users
 Exploiting data
 ---------------
 
-Following data can be harvested from :py:class:`phub.User`
+Following data can be harvested from :py:class:`.User`
 objects.
 
 .. code-block:: python
@@ -43,7 +43,7 @@ refreshable objects:
 Searching for users
 -------------------
 
-You can search for user accounts on the platform using :meth:`phub.Client.search_users`.
+You can search for user accounts on the platform using :meth:`.Client.search_users`.
 
 .. code-block:: python
 
@@ -56,7 +56,7 @@ You can search for user accounts on the platform using :meth:`phub.Client.search
                  | Member.GENDER_NON_BINARY)
     )
 
-This method behaves like :meth:`phub.Client.search`: you can select custom filters for the
+This method behaves like :meth:`.Client.search`: you can select custom filters for the
 query:
 
 - Member type 

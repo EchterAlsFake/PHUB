@@ -1,7 +1,7 @@
 Searching
 =========
 
-You can easily perform a research on Pornhub with :meth:`phub.Client.search`.
+You can easily perform a research on Pornhub with :meth:`.Client.search`.
 
 .. code-block:: python
 
@@ -13,7 +13,7 @@ You can easily perform a research on Pornhub with :meth:`phub.Client.search`.
 Search filters
 --------------
 
-You can specify search filters by adding :py:class:`phub.Param` objects.
+You can specify search filters by adding :py:class:`.Param` objects.
 There is a list of constant Parameters you can import from ``phub.locals``.
 You can see :doc:`here </api/locals>` a list of possible filters.
 
@@ -46,11 +46,11 @@ You can use multiple Parameters objects by adding or substracting them, e.g.:
 Exploiting search results
 -------------------------
 
-When calling :meth:`phub.Client.search`, nothing is actually fetched. Instead, a
-:py:class:`phub.Query` is created. This object is responsible for automatically managing
+When calling :meth:`.Client.search`, nothing is actually fetched. Instead, a
+:py:class:`.Query` is created. This object is responsible for automatically managing
 the search requests and caches to make it as efficient as it can be.
 
-You can access its content directly using list item syntax, or :meth:`phub.Query.get`.
+You can access its content directly using list item syntax, or :meth:`.Query.get`.
 
 .. code-block:: python
 
@@ -75,7 +75,7 @@ To exploit video data, see :doc:`here </features/video>`.
 Using different Query types
 ---------------------------
 
-There can be different subclasses of :py:class:`phub.Query`, which
+There can be different subclasses of :py:class:`.Query`, which
 have their own usage. For exemple:
 
 .. list-table:: Query types
@@ -85,35 +85,35 @@ have their own usage. For exemple:
       - Page length
       - Description
 
-    * - :py:class:`phub.Query`
+    * - :py:class:`.Query`
       - Unknown
       - Base class for all queries. Responsible for handling item distribution. 
 
-    * - :py:class:`phub.JQuery`
+    * - :py:class:`.JQuery`
       - 30 
       - The default Query for searching. It uses the HubTraffic API to fetch data faster.
     
-    * - :py:class:`phub.HQuery`
+    * - :py:class:`.HQuery`
       - 32
-      - Web-scrapper equivalent of :py:class:`phub.JQuery`. It provides the most accurate results.
+      - Web-scrapper equivalent of :py:class:`.JQuery`. It provides the most accurate results.
     
-    * - :py:class:`phub.FQuery`
+    * - :py:class:`.FQuery`
       - 14
-      - Query dedicated to the :py:class:`phub.Feed` object.
+      - Query dedicated to the :py:class:`.Feed` object.
 
-    * - :py:class:`phub.MQuery`
+    * - :py:class:`.MQuery`
       - Unknown
       - Query dedicated to search for users.
 
-    * - :py:class:`phub.UQuery`
+    * - :py:class:`.UQuery`
       - 40
       - Query dedicated to search for videos on a user page.
 
-While searching, you can use either :py:class:`phub.JQuery` or :py:class:`phub.HQuery`
-(or your own :py:class:`phub.Query` subclass).
+While searching, you can use either :py:class:`.JQuery` or :py:class:`.HQuery`
+(or your own :py:class:`.Query` subclass).
 
-Note that :py:class:`phub.JQuery` is faster because it fetches less data,
-but it also *probably* use a different algorithm than :py:class:`phub.HQuery`,
+Note that :py:class:`.JQuery` is faster because it fetches less data,
+but it also *probably* use a different algorithm than :py:class:`.HQuery`,
 which is more accurate but slower.
 
 .. warning:: As of now, HQueries don't obey well to their parameters.
