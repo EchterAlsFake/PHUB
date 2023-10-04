@@ -31,11 +31,13 @@ intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
 html_static_path = ["_static"]
 html_theme = "sphinx_immaterial"
 
+html_logo = 'assets/logo.svg'
+
 html_theme_options = {
     "icon": {
         "repo": "fontawesome/brands/github",
         "edit": "material/file-edit-outline",
-        "logo": "material/download-box-outline"
+        "logo": "material/download-box-outline" # fallback logo
     },
     "site_url": "https://phub.readthedocs.io",
     "repo_url": "https://github.com/Egsagon/PHUB",
