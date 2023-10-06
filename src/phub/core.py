@@ -54,14 +54,8 @@ class Client:
         logger.debug('Initialised new Client %s', self)
         
         # Initialise session
-        self.session = requests.Session()
+        self.reset()
         
-        # Bypass age disclaimer
-        self.session.cookies.set('accessAgeDisclaimerPH', '1')
-        self.session.cookies.set('accessAgeDisclaimerUK', '1')
-        self.session.cookies.set('accessPH', '1')
-        self.session.cookies.set('age_verified', '1')
-
         self.proxies = proxies
         self.language = {'Accept-Language': language}
         self.credentials = {'username': username,
@@ -79,6 +73,19 @@ class Client:
         if login and self.account:
             logger.debug('Automatic login triggered')
             self.login()
+    
+    def reset(self) -> None:
+        '''
+        Reset the client requests session.
+        '''
+        
+        self.session = requests.Session()
+        
+        # Bypass age disclaimer
+        self.session.cookies.set('accessAgeDisclaimerPH', '1')
+        self.session.cookies.set('accessAgeDisclaimerUK', '1')
+        self.session.cookies.set('accessPH', '1')
+        self.session.cookies.set('age_verified', '1')
     
     def call(self,
              func: str,
