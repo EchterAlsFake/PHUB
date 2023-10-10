@@ -95,7 +95,7 @@ class User:
             name = url.split('/')[-1]
         
         else:
-            name = user.replace(' ', '-')
+            name = '-'.join(user.split())
             
             # Guess the user type
             for type_ in ('model', 'pornstar', 'channels'):            

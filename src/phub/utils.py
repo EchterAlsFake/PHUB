@@ -2,7 +2,6 @@
 PHUB utilities.
 '''
 
-import os
 import json
 import requests
 
@@ -16,7 +15,18 @@ def concat(*args: list[str]) -> str:
         str: The concatenated path.
     '''
     
-    return os.path.join(*args)
+    string: str = args[0].strip()
+        
+    for arg in args[1:]:
+        arg = arg.strip()
+        a = string.endswith('/')
+        b = arg.startswith('/')
+        
+        if a ^ b:     string += arg       # 1 '/'
+        elif a and b: string += arg[1:]   # 2 '/'
+        else:         string += '/' + arg # 0 '/'
+    
+    return string
 
 def urlify(dict_: dict) -> str:
     '''
