@@ -79,6 +79,7 @@ class Client:
         Reset the client requests session.
         '''
         
+        # Initialise session
         self.session = requests.Session()
         
         # Bypass age disclaimer

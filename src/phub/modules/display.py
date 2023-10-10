@@ -23,6 +23,8 @@ def progress(color: bool = True) -> Callable:
         percent = round((cur / total) * 100)
         
         print(tem.format(percent = percent, cur = cur, total = total), end = '')
+        
+        if cur == total: print()
     
     return wrapper
 

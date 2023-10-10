@@ -4,6 +4,7 @@ import time
 import logging
 
 import os
+import requests.adapters
 from typing import TYPE_CHECKING, Callable
 from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
 
@@ -110,7 +111,8 @@ def _base_threaded(client: Client,
                    segments: list[str],
                    callback: CallbackType,
                    max_workers: int = 50,
-                   timeout: int = 10) -> dict[str, bytes]:
+                   timeout: int = 10,
+                   disable_client_delay: bool = True) -> dict[str, bytes]:
     '''
     base thread downloader for threaded backends.
     '''
@@ -118,39 +120,51 @@ def _base_threaded(client: Client,
     logger.info('Threaded download amorced')
     length = len(segments)
     
+    # Mount special adapter for handling large requests
+    logger.info('Mounting download adapter')
+    old_adapter = client.session.adapters.get('https://')
+    adapter = requests.adapters.HTTPAdapter(pool_maxsize = max_workers)
+    client.session.mount('https://', adapter)
+
     with Pool(max_workers = max_workers) as executor:
+        logger.info('Opened executor')
         
         buffer: dict[str, bytes] = {}
+        segments = segments.copy() # Avoid deleting parsed segments
         
         while 1:
-            
             futures = {executor.submit(_thread, client, url, timeout): url
                        for url in segments}
-            logger.info('%s futures submited', len(futures))
+            
+            logger.info('Submited %s futures, starting executor', len(futures))
             
             for future in as_completed(futures):
                 
                 url = futures[future]
+                segment_name = consts.re.ffmpeg_line(url)
+                
+                # Disable delay
+                client.start_delay = not disable_client_delay
                 
                 try:
                     segment = future.result()
                     buffer[url] = segment
                     
                     # Remove future and call callback
-                    futures.pop(future)
+                    segments.remove(url)
                     callback(len(buffer), length)
                 
                 except Exception as err:
-                    logger.warn('Segment %s failed: %s', url, err)
-                    future.cancel()
+                    logger.warning('Segment `%s` failed: %s', segment_name, err)
             
-            if lns := len(futures):
-                logger.warn('%s segments failed to download, retrying...', lns)
+            if lns := len(segments):
+                logger.warning('Retrying to fetch %s segments', lns)
                 continue
             
             break
     
-    logger.info('Threaded download finished')
+    logger.info('Threaded download finished, mounting back old adapter')
+    client.session.mount('https://', old_adapter)
     
     return buffer
 
@@ -176,49 +190,22 @@ def threaded(max_workers: int = 100,
         '''
         
         segments = list(video.get_segments(quality))
-        total = len(segments)
         
         buffer = _base_threaded(
             client = video.client,
             segments = segments,
             callback = callback,
             max_workers = max_workers,
-            timeout = timeout)
+            timeout = timeout
+        )
         
         # Concatenate and write
+        logger.info('Writing buffer to file')
         with open(path, 'wb') as file:
             for url in segments:
                 file.write(buffer.get(url, b''))
-    
-    return wrapper
-
-def threaded_FFMPEG(max_workers: int = 10,
-                    timeout: int = 5) -> Callable:
-    '''
-    Wrapper.
-    '''
-    
-    def wrapper(video: Video,
-                quality: Quality,
-                callback: CallbackType,
-                path: str) -> None:
-        '''
-        Wrapper.
-        '''
         
-        raise NotImplementedError()
-        
-        segments = list(video.get_segments(quality))
-        total = len(segments)
-        
-        buffer = _base_threaded(
-            client = video.client,
-            segments = segments,
-            callback = callback,
-            max_workers = max_workers,
-            timeout = timeout)
-        
-        # TODO
+        logger.info('Successfully wrote file to %s', path)
     
     return wrapper
 
