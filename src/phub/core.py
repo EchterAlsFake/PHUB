@@ -217,10 +217,6 @@ class Client:
         '''
         
         logger.debug('Fetching user %s', user)
-        
-        if '/' in user and not 'http' in user:    
-            raise NotImplementedError('User partial URL are not implemented.')
-        
         return User.get(self, user)
 
     def search(self,
