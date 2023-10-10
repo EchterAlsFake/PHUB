@@ -216,12 +216,8 @@ class Video:
         The video title.
         '''
         
-        for key in ('data@title', 'page@title'):
-        
-            if title := self.data.get(key):
-                return title
-        
-        return self.fetch('data@title')
+        return (self.data.get('page@title')  # Use page title if cached
+                or self.fetch('data@title')) # Use HubTraffic by default
 
     @cached_property
     def image(self) -> Image:
