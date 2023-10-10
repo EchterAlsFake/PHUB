@@ -74,19 +74,21 @@ class Image:
         
         with open(path, 'wb') as file:
             
-            while 1:
-                try:
-                    raw = self.client.call(url).content
-                    file.write(raw)
-                    return path
+            try:
+                raw = self.client.call(url).content
+                file.write(raw)
+                return path
                 
-                except Exception as err:
-                    
-                    logger.warning('Failed to get image `%s`', url)
-                    if not self._servers: raise err
-                    
-                    server = self._servers[0]
-                    url = server['src']
-                    logger.info('Retrying download with server %s', server)
+            except Exception as err:
+                
+                logger.warning('Failed to get image `%s`', url)
+                if not self._servers: raise err
+                
+                # Pop server and retry
+                server = self._servers.pop(0)
+                logger.info('Retrying download with server %s', server)
+                self.url = server['src']
+                self.download(path)
+                
 
 # EOF
