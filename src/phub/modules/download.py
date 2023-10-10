@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import os
 import time
 import logging
-
-import os
-import requests.adapters
 from typing import TYPE_CHECKING, Callable
 from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
+
+import requests.adapters
 
 from .. import consts
 
@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from .. import Client
     from ..objects import Video
     from ..locals import Quality
-
 
 logger = logging.getLogger(__name__)
 

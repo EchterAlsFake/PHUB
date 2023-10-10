@@ -45,7 +45,7 @@ def bar(desc: str = 'Downloading', format_: str = ' |{bar}| [{cur}/{total}]') ->
     term_size = os.get_terminal_size().columns
     
     def wrapper(cur: int, total: int) -> None:
-        
+
         raw = tem.format(cur = cur, total = total, bar = '{bar}')
         bar_length = term_size - len(tem) + 10
         percent = round((cur / total) * bar_length)

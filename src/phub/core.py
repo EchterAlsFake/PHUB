@@ -4,6 +4,7 @@ PHUB core module.
 
 import time
 import logging
+
 import requests
 
 from . import utils
@@ -12,15 +13,9 @@ from . import errors
 from . import locals
 
 from .objects import (
-    Query,
-    JQuery,
-    HQuery,
-    MQuery,
-    Video,
-    User,
-    Account,
-    Param,
-    NO_PARAM
+    Param, NO_PARAM,
+    Video, User, Account,
+    Query, JQuery, HQuery, MQuery
 )
 
 logger = logging.getLogger(__name__)

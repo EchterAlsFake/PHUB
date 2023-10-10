@@ -84,6 +84,8 @@ class User:
     def get(cls, client: Client, user: str) -> Self:
         '''
         Fetch a user knowing its name or URL.
+        Note - Using only a username makes the fetch between
+        1 and 3 times slower.
         
         Args:
             client (Client): The parent client.
@@ -101,9 +103,13 @@ class User:
             for type_ in ('model', 'pornstar', 'channels'):            
                 
                 guess = utils.concat(type_, name)
-                response = client.call(guess, throw = False)
-            
-                if response.ok:
+                response = client.call(guess, 'HEAD', throw = False)
+
+                # We need to verify that the guess is correct.
+                # Pornhub redirects are weird, they depend on the
+                # type of the user, so we need to make sure that
+                # we are not redirected toi avoid discret 404 pages
+                if response.ok and type_ in response.url:
                     logger.info('Guessing type of %s is %s', user, type_)
                     url = response.url
                     break

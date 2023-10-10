@@ -5,9 +5,10 @@ Contains a bunch of features
 that can be accessed quickly. 
 '''
 
-import phub
 import click
 import getpass
+
+import phub
 
 @click.group()
 def cli(): pass

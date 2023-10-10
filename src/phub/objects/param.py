@@ -1,6 +1,5 @@
-from typing import Self, Any
 from copy import deepcopy
-
+from typing import Self, Any
 
 class Param:
     '''

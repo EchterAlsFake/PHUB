@@ -4,9 +4,11 @@ import os
 import logging
 from functools import cached_property
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Generator, LiteralString, Callable, Any
+from typing import (TYPE_CHECKING, Generator,
+                    LiteralString, Callable, Any)
 
-from . import Tag, Like, User, Image, Param
+from . import (Tag, Like, User,
+               Image, Param)
 from .. import utils
 from .. import errors
 from .. import consts
@@ -298,7 +300,7 @@ class Video:
         '''
         
         raw = self.fetch('data@publish_date')
-        return datetime.strptime(raw, '%Y-%m-%d %H:%M:%S') # TODO check if %d-%m or %m-%d
+        return datetime.strptime(raw, '%Y-%m-%d %H:%M:%S')
         
     @cached_property
     def pornstars(self) -> list[User]:
@@ -306,7 +308,7 @@ class Video:
         The pornstars present in the video.
         '''
         
-        return [User(ps['pornstar_name'])
+        return [User.get(self.client, ps['pornstar_name'])
                 for ps in self.fetch('data@pornstars')]
     
     @cached_property
@@ -325,7 +327,7 @@ class Video:
             cat = getattr(Category, constant, None)
             
             if cat is None:
-                logger.warn('Category not found: %s. You should update PHUB locals (python -m phub update_locals)', constant)
+                logger.warning('Category not found: %s. You should update PHUB locals (python -m phub update_locals)', constant)
                 
                 # Create temporary category
                 cat = Param('*', name)

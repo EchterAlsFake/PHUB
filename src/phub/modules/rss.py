@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime
 from xml.etree import ElementTree
+from typing import Generator, TYPE_CHECKING
 
 from .. import consts
-
-from typing import Generator, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .. import Client, Video

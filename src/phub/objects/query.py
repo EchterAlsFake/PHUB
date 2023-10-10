@@ -5,7 +5,9 @@ import logging
 from functools import cache
 from typing import TYPE_CHECKING, Generator, Any
 
-from . import Video, User, FeedItem, Image, Param, NO_PARAM
+from . import (Video, User, FeedItem,
+               Image, Param, NO_PARAM)
+
 from .. import utils
 from .. import consts
 from .. import errors

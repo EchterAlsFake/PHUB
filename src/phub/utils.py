@@ -62,8 +62,7 @@ def closest(numbers: list[int], value: int) -> int:
         int: The closest value in the list to the target value.
     '''
     
-    difference = lambda x: abs(x - value)
-    return min(numbers, key=difference)
+    return min(numbers, key = lambda x: abs(x - value))
 
 def make_constant(string: str) -> str:
     '''
@@ -97,7 +96,7 @@ def update_locals() -> None:
     # TODO - Refactor
     
     url = concat(consts.API_ROOT, 'categories')
-    response = requests.get(url)
+    response = requests.get(url, timeout = 30)
     response.raise_for_status()
 
     sorted_categories = sorted(
@@ -119,7 +118,7 @@ def update_locals() -> None:
     start_tag = '#START@CATEGORIES'
     end_tag = '#END@CATEGORIES'
 
-    with open(locals.__file__, 'r+') as file:
+    with open(locals.__file__, 'r+', encoding = 'utf-8') as file:
         content = file.read()
         content = content.split(start_tag)[0] + start_tag + \
                   categories_str + '\n' + '    ' + end_tag + \

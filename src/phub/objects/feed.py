@@ -6,8 +6,6 @@ from functools import cached_property
 
 from . import User, Param, NO_PARAM
 
-from .. import utils
-
 if TYPE_CHECKING:
     from ..core import Client
     from ..locals import Section
