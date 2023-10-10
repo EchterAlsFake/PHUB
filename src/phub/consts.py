@@ -27,6 +27,8 @@ LOGIN_PAYLOAD = {
     'from': 'pc_login_modal_:homepage_redesign',
 }
 
+RSS = 'https://www.pornhub.com/video/webmasterss'
+
 SEGMENT_LENGTH = 4 # Length of a PH video segment (in seconds)
 MAX_VIDEO_RENEW_ATTEMPTS = 3
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
