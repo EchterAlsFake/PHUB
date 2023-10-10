@@ -14,17 +14,17 @@ accessing account features, video downloading, and a lot more.
 ## Installation
 
 - Install using `pip` (python `3.11` or higher required, recommended version): 
-```sh
+```shell
 pip install --upgrade phub
 ```
 
 - Or from this repo to get latest fixes/features:
-```sh
+```shell
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git
 ```
 
 - Or, for python 3.9 and higher (:warning: not updated as often)
-```
+```shell
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git@py-3.9
 ```
 
