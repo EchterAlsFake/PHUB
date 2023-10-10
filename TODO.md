@@ -3,10 +3,9 @@
 TODO for 4.2:
 - [x] An actual good logo
 - [x] Fix threaded downloader
+- [x] Account long term usage
+- [x] Handle multiple images sources
 - [ ] Lighter feed parsing
-- [ ] Handle multiple images sources
-- [ ] Support even more long term usage
-- [ ] Better user bio/stuff parsing
 
 Possible PH features to add:
 - [ ] Recommended users

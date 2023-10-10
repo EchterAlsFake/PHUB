@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import logging
 from typing import TYPE_CHECKING
-from functools import cached_property
 
 from .. import utils
 
@@ -23,7 +22,7 @@ class Image:
     def __init__(self,
                  client: Client,
                  url: str,
-                 sizes: list[dict] = None,
+                 servers: list[dict] = None,
                  name: str = 'image') -> None:
         '''
         Initialise a new image object.
@@ -37,10 +36,16 @@ class Image:
 
         self.url = url
         self.name = name
-        self._sizes = sizes
         self.client = client
+        self._servers = servers
         
         logger.debug('Generated new image object: %s', self)
+        
+        # Check server image sizes
+        sizes = [s.get('size') for s in servers]
+        
+        if len(set(sizes)) != 1:
+            logger.warning('Detected different image sizes on alt servers: %s', sizes)
     
     def __repr__(self) -> str:
         
@@ -69,9 +74,19 @@ class Image:
         
         with open(path, 'wb') as file:
             
-            raw = self.client.call(url).content
-            file.write(raw)
-        
-        return path
+            while 1:
+                try:
+                    raw = self.client.call(url).content
+                    file.write(raw)
+                    return path
+                
+                except Exception as err:
+                    
+                    logger.warning('Failed to get image `%s`', url)
+                    if not self._servers: raise err
+                    
+                    server = self._servers[0]
+                    url = server['src']
+                    logger.info('Retrying download with server %s', server)
 
 # EOF

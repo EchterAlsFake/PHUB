@@ -227,7 +227,7 @@ class Video:
         
         return Image(client = self.client,
                      url = self.fetch('data@thumb'),
-                     sizes = self.fetch('data@thumbs'),
+                     servers = self.fetch('data@thumbs'),
                      name = f'thumb-{self.key}')
     
     @cached_property
