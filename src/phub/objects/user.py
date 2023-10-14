@@ -21,7 +21,7 @@ class User:
     Represents a Pornhub user.
     '''
 
-    def __init__(self, client: Client, name: str, url: str) -> None:
+    def __init__(self, client: Client, name: str, type: str, url: str) -> None:
         '''
         Initialise a new user object.
         
@@ -33,6 +33,7 @@ class User:
         
         self.client = client
         self.name = name
+        self._type = type
         self.url = consts.re.remove_host(url)
         
         # Save data keys so far, so we can make a difference with the
@@ -94,7 +95,8 @@ class User:
         
         if consts.re.is_url(user):
             url = user
-            name = url.split('/')[-1]
+            user_type = (path := url.split('/'))[-2]
+            name = path[-1]
         
         else:
             name = '-'.join(user.split())
@@ -112,13 +114,14 @@ class User:
                 if response.ok and type_ in response.url:
                     logger.info('Guessing type of %s is %s', user, type_)
                     url = response.url
+                    user_type = type_
                     break
             
             else:
                 logger.error('Could not guess type of %s', user)
                 raise errors.UserNotFound(f'User {user} not found.')
         
-        return cls(client = client, name = name, url = url)
+        return cls(client = client, name = name, type = user_type, url = url)
     
     @cached_property
     def videos(self) -> UQuery:

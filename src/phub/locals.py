@@ -2,6 +2,8 @@
 Dynamic file.
 '''
 
+from typing import Literal
+
 from .objects import Param, NO_PARAM
 from .objects import _BaseQuality
 
@@ -274,6 +276,7 @@ class Member:
     OFFER_CUSTOM_VIDEOS = Param('offering', 'customvideo')
     OFFER_FAN_CLUBS     = Param('offering', 'fanclub')
 
+Segment = Literal['female', 'male', 'straight', 'gay', 'transgender', 'miscellaneous', 'uncategorized']
 
 constant = Category | Production | Sort | Param
 

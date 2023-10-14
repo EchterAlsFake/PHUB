@@ -15,7 +15,8 @@ from . import locals
 from .objects import (
     Param, NO_PARAM,
     Video, User, Account,
-    Query, JQuery, HQuery, MQuery
+    Query, JQuery, HQuery,
+    MQuery, PQuery
 )
 
 logger = logging.getLogger(__name__)
@@ -248,14 +249,14 @@ class Client:
                     country: str = None,
                     city: str = None,
                     age: tuple[int] = None,
-                    param: Param = NO_PARAM,
+                    param: Param = NO_PARAM
                     ) -> MQuery:
         '''
         Search for users in the community.
         
         Args:
             username (str): The member username.
-            coutrny (str): The member **country code** (AF, FR, etc.)
+            country (str): The member **country code** (AF, FR, etc.)
             param (Param): Filters parameter.
         
         Returns:
@@ -273,5 +274,26 @@ class Client:
             params |= Param('age2', age[1])
         
         return MQuery(self, 'user/search', params)
+    
+    def search_pornstar(self,
+                        name: str = None,
+                        param: Param = NO_PARAM) -> PQuery:
+        '''
+        Search for pornstars.
+        
+        Args:
+            name (str): The pornstar name.
+            param (Param): Query parameters (exclusively Sort params).
+        
+        Returns:
+            PQuery: Initialised query.
+        '''
+        
+        # TODO
+        # assert param in o mp/mv/nv
+        
+        param |= Param('search', '+'.join(name.split())) # Format name
+        
+        return PQuery(self, 'pornstars/search', param)
 
 # EOF

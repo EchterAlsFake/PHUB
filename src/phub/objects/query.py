@@ -323,4 +323,17 @@ class MQuery(HQuery):
         container = raw.split('id="advanceSearchResultsWrapper')[1]
         return consts.re.get_users(container)
 
+class PQuery(MQuery):
+    '''
+    Represents a pornstar search query.
+    '''
+    
+    PAGE_LENGTH = 16
+    
+    def _parse_page(self, raw: str) -> list[tuple]:
+        
+        container = raw.split('id="pornstarsSearchResult')[1]
+        # return consts.re.get_users(container)
+        return NotImplemented
+
 # EOF
