@@ -134,7 +134,7 @@ class User:
         return UQuery(client = self.client, func = url)
 
     @cached_property
-    def page(self) -> str:
+    def _page(self) -> str:
         '''
         The user page.
         '''
@@ -147,7 +147,7 @@ class User:
         The user bio.
         '''
         
-        return consts.re.user_bio(self.page, throw = False)
+        return consts.re.user_bio(self._page, throw = False)
 
     @cached_property
     def info(self) -> dict[str, str]:
@@ -159,19 +159,20 @@ class User:
         Warning: keys depends on the lanugage.
         '''
         
-        li = consts.re.user_infos(self.page)
+        li = consts.re.user_infos(self._page)
 
         return {k: v for k, v in li} # TODO
 
     @cached_property
-    def avatar(self) -> NotImplemented:
+    def avatar(self) -> Image:
         '''
         The user avatar.
         '''
         
-        # Fetch on the user page
-        # TODO
-        # return Image(self.client, )
-        return NotImplemented
+        from . import Image
+        
+        return Image(client = self.client,
+                     url = consts.re.user_avatar(self._page),
+                     name = f'{self.name}-avatar')
 
 # EOF

@@ -142,12 +142,10 @@ class re:
     get_viewkey   = find( r'[&\?]viewkey=([a-z\d]{8,})'                                                 ) # Get video URL viewkey
     video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<'          ) # Get video author, if channel
     video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' ) # Get video author, if model
-    get_feed_type = find( r'data-table="(.*?)"' ) # Get feed section type
-    
-    query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'      ) # Get a query's video amount
-    user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/' ) # Get the user bio
-    
-    # feed item user = .*?userLink.*?href=\"(.*?)\"
+    get_feed_type = find( r'data-table="(.*?)"'                                                         ) # Get feed section type
+    user_avatar   = find( engine.DOTALL, r'previewAvatarPicture\">.*?src=\"(.*?)\"'                     ) # get the user avatar
+    query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'                 ) # Get a query's video amount
+    user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'            ) # Get the user bio
     
     # Findall regexess
     get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
@@ -161,5 +159,7 @@ class re:
     # Verification regexes
     is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                    ) # Check if a string is a URL
     is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}' ) # Check if a string is a video URL
+    
+    # feed item user = .*?userLink.*?href=\"(.*?)\"
 
 # EOF

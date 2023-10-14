@@ -5,6 +5,7 @@ TODO for 4.2:
 - [x] Fix threaded downloader
 - [x] Account long term usage
 - [x] Handle multiple images sources
+- [x] Implement default user avatar
 - [ ] Lighter feed parsing
 
 Possible PH features to add:

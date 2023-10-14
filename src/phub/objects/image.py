@@ -22,7 +22,7 @@ class Image:
     def __init__(self,
                  client: Client,
                  url: str,
-                 servers: list[dict] = None,
+                 servers: list[dict] = [],
                  name: str = 'image') -> None:
         '''
         Initialise a new image object.
@@ -44,7 +44,7 @@ class Image:
         # Check server image sizes
         sizes = [s.get('size') for s in servers]
         
-        if len(set(sizes)) != 1:
+        if len(set(sizes)) > 1:
             logger.warning('Detected different image sizes on alt servers: %s', sizes)
     
     def __repr__(self) -> str:
@@ -89,6 +89,5 @@ class Image:
                 logger.info('Retrying download with server %s', server)
                 self.url = server['src']
                 self.download(path)
-                
 
 # EOF
