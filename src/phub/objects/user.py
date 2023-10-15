@@ -21,7 +21,7 @@ class User:
     Represents a Pornhub user.
     '''
 
-    def __init__(self, client: Client, name: str, type: str, url: str) -> None:
+    def __init__(self, client: Client, name: str, url: str, type: str = None) -> None:
         '''
         Initialise a new user object.
         
@@ -33,8 +33,8 @@ class User:
         
         self.client = client
         self.name = name
-        self._type = type
         self.url = consts.re.remove_host(url)
+        self.type = type or consts.re.get_user_type(url)
         
         # Save data keys so far, so we can make a difference with the
         # cached property ones.
@@ -86,7 +86,8 @@ class User:
         '''
         Fetch a user knowing its name or URL.
         Note - Using only a username makes the fetch between
-        1 and 3 times slower.
+        1 and 3 times slower, you might prefer to use a direct
+        URL.
         
         Args:
             client (Client): The parent client.
