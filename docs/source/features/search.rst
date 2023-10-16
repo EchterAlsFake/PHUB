@@ -108,6 +108,10 @@ have their own usage. For exemple:
     * - :py:class:`.UQuery`
       - 40
       - Query dedicated to search for videos on a user page.
+    
+    * - :py:class:`.PQuery`
+      - 16
+      - Query dedicated to search for pornstars.
 
 While searching, you can use either :py:class:`.JQuery` or :py:class:`.HQuery`
 (or your own :py:class:`.Query` subclass).
@@ -139,7 +143,7 @@ way to refresh a query is to make another one.
 
   args = dict(
     query = 'my query',
-    filter = Category.FRENCH # Or every filter you want
+    filter = Category.FRENCH # Or/and any filter you want
     # Other parameters if you want
   )
 
@@ -150,5 +154,5 @@ way to refresh a query is to make another one.
 
     print(f'First result is: {query[0].title}!')
 
-    time.sleep(60 *10) # Wait 10 min
+    time.sleep(60 * 10) # Wait 10 min
 

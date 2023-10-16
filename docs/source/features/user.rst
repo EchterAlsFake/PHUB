@@ -30,6 +30,8 @@ objects.
 
     user.videos # Query containing the videos posted by the user.
 
+    user.type # The type of the user (model, channels, pornstar, users, etc.)
+
 Refreshing User data
 --------------------
 
@@ -43,11 +45,11 @@ refreshable objects:
 Searching for users
 -------------------
 
-You can search for user accounts on the platform using :meth:`.Client.search_users`.
+You can search for user accounts on the platform using :meth:`.Client.search_user`.
 
 .. code-block:: python
 
-    members = client.search_users(
+    members = client.search_user(
         username = 'user',
         param = (Sort.USER_NEWEST
                  | Member.IS_ONLINE
@@ -114,3 +116,21 @@ query:
         
         Sort.USER_POPULAR # Alongside with sort periods
         Sort.USER_NEWEST
+
+Searching for pornstars
+-----------------------
+
+The :meth:`.Client.search_user` method only search for community members.
+If you want to search specifically for pornstars, you can uesr the
+:meth:`.Client.search_pornstar` method.
+
+.. code-block:: python
+
+    users = core.search_pornstar(name = 'Target',
+                                   sort_param = ...)
+
+There is no custom pornstar search filters in Pornhub, so the only filters
+available are the sort params.
+
+Note that the results will be a query containing :py:class:`.User` objects.
+Their :attr:`.User.type` will be :literal:`'pornstar'`.

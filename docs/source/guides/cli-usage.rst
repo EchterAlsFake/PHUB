@@ -3,6 +3,10 @@ CLI Usage
 
 PHUB comes with a built-in CLI with the most useful features.
 
+It uses the `click`_ dependency.
+
+.. _click: https://pypi.org/project/click/
+
 .. code-block:: bash
 
     $ python -m phub

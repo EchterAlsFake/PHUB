@@ -7,5 +7,5 @@ TODO for 4.2:
 - [x] Handle multiple images sources
 - [x] Implement default user avatar
 - [x] RSS flux (very bare-bone)
+- [x] Pornstar search
 - [ ] Lighter feed parsing
-- [ ] Pornstar search with custom filters and cross category search

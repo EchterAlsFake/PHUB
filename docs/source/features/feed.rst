@@ -10,7 +10,8 @@ successfully, you can access your account feed.
     video uploads, etc.
 
 The :py:class:`.Feed` object is a utility object that
-distributes :py:class:`.Query` objects.
+initialises custom :py:class:`.Query` objects. These
+queries contain :py:class:`.FeedItem` objects.
 
 You can get the raw feed this way:
 

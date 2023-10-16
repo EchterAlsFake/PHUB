@@ -277,23 +277,24 @@ class Client:
     
     def search_pornstar(self,
                         name: str = None,
-                        param: Param = NO_PARAM) -> PQuery:
+                        sort_param: Param = NO_PARAM) -> PQuery:
         '''
         Search for pornstars.
         
         Args:
             name (str): The pornstar name.
-            param (Param): Query parameters (exclusively Sort params).
+            sort_param (Param): Query sort parameter.
         
         Returns:
             PQuery: Initialised query.
         '''
         
         # TODO
-        # assert param in o mp/mv/nv
+        if sort_param.value: # Should be o => mp/mv/nv
+            raise NotImplementedError('PS search parameters are not implemented')
+                
+        sort_param |= Param('search', '+'.join(name.split())) # Format name
         
-        param |= Param('search', '+'.join(name.split())) # Format name
-        
-        return PQuery(self, 'pornstars/search', param)
+        return PQuery(self, 'pornstars/search', sort_param)
 
 # EOF

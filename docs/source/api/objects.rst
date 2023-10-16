@@ -89,6 +89,11 @@ Here is a list of all API objects.
     :private-members:
     :special-members: __init__
 
+.. autoclass:: phub.objects.PQuery
+    :members:
+    :undoc-members:
+    :private-members:
+    :special-members: __init__
 
 .. autoclass:: phub.objects.User
     :members:

@@ -59,8 +59,7 @@ client.account.liked
 client.account.recommended
 ```
 
-You can check out the other available features
-in the [docs](https://phub.readthedocs.io).
+#### You can check out the other available features in the [docs](https://phub.readthedocs.io).
 
 ## License
 
