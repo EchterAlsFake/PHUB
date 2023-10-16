@@ -73,7 +73,7 @@ class Account:
         '''
         
         self.name = data.get('username')
-        self.avatar = Image(self.client, data.get('avatar'), 'avatar')
+        self.avatar = Image(self.client, data.get('avatar'), name = 'avatar')
         self.is_premium = data.get('premium_redirect_cookie') != '0'
         
         url = consts.HOST + f'/users/{self.name}'
