@@ -311,11 +311,7 @@ class MQuery(HQuery):
         url, image_url = raw
         
         obj = User.get(self.client, utils.concat(consts.HOST, url))
-        
-        # Inject image
-        obj.avatar = Image(self.client, image_url,
-                           name = f'{obj.name}-avatar')
-        
+        obj._cached_avatar_url = image_url # Inject image url
         return obj
 
     def _parse_page(self, raw: str) -> list[tuple]:
@@ -340,12 +336,7 @@ class PQuery(MQuery):
                    type = 'pornstar',
                    url = url)
         
-        # Inject avatar
-        # TODO inject int(videos)
-        # TODO make this overide disapear on user refresh, for self and other queries
-        obj.avatar = Image(self.client,
-                           avatar,
-                           name = f'{name}-avatar')
+        obj._cached_avatar_url = avatar # Inject avatar
         
         return obj
     

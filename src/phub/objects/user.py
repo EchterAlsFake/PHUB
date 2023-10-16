@@ -41,6 +41,9 @@ class User:
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
         
         logger.debug('Initialised new user object %s', self)
+        
+        # This attribute will be deleted if a refresh is triggered
+        self._cached_avatar_url: str = None
     
     def __repr__(self) -> str:
         
@@ -175,8 +178,11 @@ class User:
         
         from . import Image
         
+        url = (getattr(self, '_cached_avatar_url')
+               or consts.re.user_avatar(self._page))
+        
         return Image(client = self.client,
-                     url = consts.re.user_avatar(self._page),
+                     url = url,
                      name = f'{self.name}-avatar')
 
 # EOF
