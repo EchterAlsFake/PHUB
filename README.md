@@ -2,7 +2,7 @@
   <img width="300" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
 </p>
 
-# PHUB - An API for PornHub.
+# PHUB - An API for Pornhub.
 
 PHUB is an hybrid API for Pornhub. It is able to communicate with Pornhub
 using both web-scraping and Pornhub's HubTraffic API. It is
