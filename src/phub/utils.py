@@ -4,6 +4,7 @@ PHUB utilities.
 
 import json
 import requests
+from typing import Generator
 
 from . import consts, locals
 
@@ -127,5 +128,48 @@ def update_locals() -> None:
         file.seek(0)
         file.write(content)
         file.truncate()
+
+def serialize(object_: object) -> object:
+    '''
+    Simple serializer for PHUB objects.
+    '''
+    
+    # if object is a built-in
+    if isinstance(object_, str | int | float | bool):
+        ser = object_
+    
+    # If object is a PHUB object
+    elif hasattr(object_, 'dictify'):
+        ser = object_.dictify()
+    
+    # If object is a soup
+    elif object_.__class__.__name__ == 'BeautifulSoup':
+        ser = object_.decode()
+    
+    # If object is a dict
+    elif isinstance(object_, dict):
+        ser = {k: (serialize(v)) for k, v in object_.items()}
+    
+    # If object is a list or a generator
+    elif isinstance(object_, list | tuple | Generator | map):
+        ser = [serialize(value) for value in object_]
+    
+    else:
+        ser = str(object_)
+    
+    return ser
+
+def dictify(object_: object,
+            keys: str | list[str],
+            all_: list[str]) -> dict:
+    '''
+    Dictify an object.
+    '''
+    
+    if isinstance(keys, str): keys = [keys]
+    if 'all' in keys: keys = all_
+    
+    return {key: serialize(getattr(object_, key))
+            for key in keys}
 
 # EOF

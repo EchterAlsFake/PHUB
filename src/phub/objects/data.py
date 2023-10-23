@@ -26,6 +26,19 @@ class Tag:
         
         assert isinstance(__value, Tag)
         return self.name == __value.name
+    
+    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+        '''
+        Convert the object to a dictionnary.
+        
+        Args:
+            keys (str): The data keys to include.
+        
+        Returns:
+            dict: Dict version of the object.
+        '''
+        
+        return utils.dictify(self, keys, ['name', 'count'])
 
 @dataclass
 class Like:
@@ -35,8 +48,20 @@ class Like:
     
     up: int
     down: int
-    
     ratings: float = field(repr = False)
+    
+    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+        '''
+        Convert the object to a dictionnary.
+        
+        Args:
+            keys (str): The data keys to include.
+        
+        Returns:
+            dict: Dict version of the object.
+        '''
+        
+        return utils.dictify(self, keys, ['up', 'down', 'ratings'])
 
 @dataclass
 class FeedItem:
@@ -47,6 +72,22 @@ class FeedItem:
     client: Client = field(default = None, repr = False)
     raw: str = field(default = None, repr = False)
     type: str = field(default = None, repr = False)
+    
+    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+        '''
+        Convert the object to a dictionnary.
+        
+        Args:
+            keys (str): The data keys to include.
+        
+        Returns:
+            dict: Dict version of the object.
+        '''
+        
+        obj = utils.dictify(self, keys, ['user', 'header', 'item_type'])
+        if 'html' in keys: obj['html'] = self.html.decode()
+        
+        return obj
     
     @cached_property
     def _soup(self) -> Soup:

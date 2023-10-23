@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from .. import utils
 
@@ -90,4 +90,17 @@ class Image:
                 self.url = server['src']
                 self.download(path)
 
+    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+        '''
+        Convert the object to a dictionnary.
+        
+        Args:
+            keys (str): The data keys to include.
+            
+        Returns:
+            dict: Dict version of the object.
+        '''
+        
+        return utils.dictify(self, keys, ['url', 'name', '_servers'])
+    
 # EOF

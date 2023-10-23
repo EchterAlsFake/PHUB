@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, Literal
 
+from .. import utils
 from .. import consts
 from . import User, Image
 
@@ -144,6 +145,19 @@ class Account:
         from . import Feed
 
         return Feed(self.client)
+    
+    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+        '''
+        Convert the object to a dictionnary.
+        
+        Args:
+            keys (str): The data keys to include.
+        
+        Returns:
+            dict: Dict version of the object.
+        '''
+        
+        return utils.dictify(self, keys, ['name', 'avatar', 'is_premium', 'user'])
     
     # TODO - Recommended users /user/discover/popular_verified_members
 

@@ -4,7 +4,7 @@ import os
 import logging
 from functools import cached_property
 from datetime import datetime, timedelta
-from typing import (TYPE_CHECKING, Generator,
+from typing import (TYPE_CHECKING, Generator, Literal,
                     LiteralString, Callable, Any)
 
 from . import (Tag, Like, User,
@@ -114,6 +114,23 @@ class Video:
             self.data |= {f'page@{k}': v for k, v in data.items()}
         
         return self.data.get(key)
+
+    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+        '''
+        Convert the object to a dictionnary.
+        
+        Args:
+            keys (str): The data keys to include.
+        
+        Returns:
+            dict: Dict version of the object.
+        '''
+        
+        return utils.dictify(self, keys, [
+            'url', 'key', 'title', 'image', 'is_vertical', 'duration',
+            'tags', 'like', 'views', 'hotspots', 'date', 'pornstars',
+            'categories', 'orientation', 'author'
+        ])
 
     # === Download methods === #
     

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, Literal
 
 from .. import utils
 from .. import consts
@@ -61,6 +61,20 @@ class User:
             if not key in self.loaded_keys:
                 logger.debug('Deleting key %s', key)
                 delattr(self, key)
+
+    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+            '''
+            Convert the object to a dictionnary.
+            
+            Args:
+                keys (str): The data keys to include.
+                
+            Returns:
+                dict: Dict version of the object.
+            '''
+            
+            return utils.dictify(self, keys, ['name', 'url', 'type',
+                                              'bio', 'info', 'avatar'])
 
     @classmethod
     def from_video(cls, video: Video) -> Self:
