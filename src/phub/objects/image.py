@@ -51,7 +51,7 @@ class Image:
         
         return f'phub.Image(name={self.name})'
     
-    def download(self, path: str = '.') -> str:
+    def download(self, path: os.PathLike = '.') -> str:
         '''
         Download the image in a certain quality.
         

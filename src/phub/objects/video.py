@@ -190,7 +190,7 @@ class Video:
                 yield dns + line
     
     def download(self,
-                 path: str,
+                 path: os.PathLike,
                  quality: Quality | str = 'best',
                  *,
                  downloader: Callable[[Video,
