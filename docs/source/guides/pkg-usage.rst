@@ -107,3 +107,90 @@ it or the API.
     client = phub.Client()
     ...
 
+Compatibility
+-------------
+
+Most of the PHUB objects pocess a ``dictify`` method that allows
+them to be converted to serialized objects.
+
+This can be used with other languages as a shell command, and
+as a server.
+
+.. code-block:: python
+
+    import phub
+    import flask
+
+    client = phub.Client()
+    app = flask.Flask(__name__)
+
+    @app.route('/get')
+    def get():
+        try:
+            url = flask.request.args.get('url')
+            video = client.get(url)
+            res = video.dictify()
+        
+        except Exception as err:
+            res = {'error': repr(err)}
+        
+        return flask.jsonify(res)
+
+    if __name__ == '__main__':
+        app.run()
+
+For instance, this script will use flask to run a web server
+that can fetch video data:
+
+.. code-block:: bash
+
+    $ curl <localhost>/get?url=https://www.pornhub.com/view_video.php?viewkey=...
+    Response:
+    {
+        "name": "...",
+        # etc.
+    }
+
+Each ``dictify`` method can take as argument a :py:class`list[str]` of keys,
+if you want to avoid fetching specific things.
+
+For exemple, by default a serialized :py:class:`.User` object will also serialize
+its avatar (:py:class:`.Image` object).
+
+Below is a list of all serializeable PHUB objects, along with their keys and Special
+keys (objects that require further fetching and seriadszddsfkation)
+
+.. list-table:: Serializeable objects
+    :header-rows: 1
+
+    * - Object
+      - Default keys
+      - Special keys
+
+    * - :py:class:`.Video`
+      - ``url``, ``key``, ``is_vertical``, ``duration``, ``views``, ``date``, ``orientation``
+      - ``image``, ``tags``, ``like``, ``pornstars``, ``categories``, ``author``
+    
+    * - :py:class:`.User`
+      - ``name``, ``url``, ``type``, ``bio``, ``info``
+      - ``avatar``
+
+    * - :py:class:`.Image`
+      - ``url``, ``name``, ``_servers``
+      - /
+
+    * - :py:cass:`.Account`
+      - ``name``, ``avatar``, ``is_premium``
+      - ``user``
+    
+    * - :py:class:`.Tag`
+      - ``name``, ``count``
+      - /
+    
+    * - :py:class:`.Like`
+      - ``up``, ``down``, ``ratings``
+      - /
+    
+    * - :py:class:`.FeedItem`
+      - ``user``, ``header``, ``item_type``
+      - /
