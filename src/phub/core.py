@@ -171,7 +171,7 @@ class Client:
         self.logged = bool(success)
         return self.logged
     
-    def get(self, video: str) -> Video:
+    def get(self, video: str | Video) -> Video:
         '''
         Fetch a Pornhub video.
         
@@ -183,8 +183,13 @@ class Client:
         '''
         
         logger.debug('Fetching video at', video)
+
+        if isinstance(video, Video):
+            # User might want to re-init a video,
+            # or use another client
+            url = video.url
         
-        if 'http' in video:
+        elif 'http' in video:
             # Support full URLs
             url = video
         
