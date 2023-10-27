@@ -86,32 +86,36 @@ have their own usage. For exemple:
       - Description
 
     * - :py:class:`.Query`
-      - Unknown
+      - N/A
       - Base class for all queries. Responsible for handling item distribution. 
 
-    * - :py:class:`.JQuery`
+    * - :py:class:`.JSONQuery`
       - 30 
       - The default Query for searching. It uses the HubTraffic API to fetch data faster.
     
-    * - :py:class:`.HQuery`
+    * - :py:class:`.HTMLQuery`
       - 32
       - Web-scrapper equivalent of :py:class:`.JQuery`. It provides the most accurate results.
     
-    * - :py:class:`.FQuery`
+    * - :py:class:`.FeedQuery`
       - 14
       - Query dedicated to the :py:class:`.Feed` object.
 
-    * - :py:class:`.MQuery`
-      - Unknown
+    * - :py:class:`.MemberQuery`
+      - N/A
       - Query dedicated to search for users.
 
-    * - :py:class:`.UQuery`
+    * - :py:class:`.UserQuery`
       - 40
       - Query dedicated to search for videos on a user page.
     
-    * - :py:class:`.PQuery`
+    * - :py:class:`.PSQuery`
       - 16
       - Query dedicated to search for pornstars.
+
+    * - :py:class:`.SubQuery`
+      - N/A
+      - SUbclass of :py:class:`.MemberQuery` dedicated to account subscription parsing.
 
 While searching, you can use either :py:class:`.JQuery` or :py:class:`.HQuery`
 (or your own :py:class:`.Query` subclass).

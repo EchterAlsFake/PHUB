@@ -15,8 +15,8 @@ from . import locals
 from .objects import (
     Param, NO_PARAM,
     Video, User, Account,
-    Query, JQuery, HQuery,
-    MQuery, PQuery
+    Query, JSONQuery, HTMLQuery,
+    MemberQuery, PSQuery
 )
 
 logger = logging.getLogger(__name__)
@@ -223,7 +223,7 @@ class Client:
     def search(self,
                query: str,
                param: locals.constant = NO_PARAM,
-               feature = JQuery) -> Query:
+               feature = JSONQuery) -> Query:
         '''
         Performs searching on Pornhub.
         
@@ -246,7 +246,7 @@ class Client:
             
             raise errors.InvalidSortParam('Sort parameter not allowed')
         
-        func = 'video/search' if feature is HQuery else 'search'
+        func = 'video/search' if feature is HTMLQuery else 'search'
         return feature(self, func, Param('search', query) | param)
 
     def search_user(self,
@@ -255,7 +255,7 @@ class Client:
                     city: str = None,
                     age: tuple[int] = None,
                     param: Param = NO_PARAM
-                    ) -> MQuery:
+                    ) -> MemberQuery:
         '''
         Search for users in the community.
         
@@ -278,11 +278,11 @@ class Client:
             params |= Param('age1', age[0])
             params |= Param('age2', age[1])
         
-        return MQuery(self, 'user/search', params)
+        return MemberQuery(self, 'user/search', params)
     
     def search_pornstar(self,
                         name: str = None,
-                        sort_param: Param = NO_PARAM) -> PQuery:
+                        sort_param: Param = NO_PARAM) -> PSQuery:
         '''
         Search for pornstars.
         
@@ -300,6 +300,6 @@ class Client:
                 
         sort_param |= Param('search', '+'.join(name.split())) # Format name
         
-        return PQuery(self, 'pornstars/search', sort_param)
+        return PSQuery(self, 'pornstars/search', sort_param)
 
 # EOF

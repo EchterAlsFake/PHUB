@@ -11,7 +11,7 @@ from .. import errors
 if TYPE_CHECKING:
     from ..core import Client
     from . import Video, Image
-    from . import UQuery
+    from . import UserQuery
 
 logger = logging.getLogger(__name__)
 
@@ -142,17 +142,17 @@ class User:
         return cls(client = client, name = name, type = user_type, url = url)
     
     @cached_property
-    def videos(self) -> UQuery:
+    def videos(self) -> UserQuery:
         '''
         Get the list of videos published by this user.
         '''
         
-        from . import UQuery
+        from .query import UserQuery
         
         url = self.url
         if 'model/' in url: url += '/videos'
         
-        return UQuery(client = self.client, func = url)
+        return UserQuery(client = self.client, func = url)
 
     @cached_property
     def _page(self) -> str:

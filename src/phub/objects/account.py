@@ -10,7 +10,7 @@ from . import User, Image
 
 if TYPE_CHECKING:
     from ..core import Client
-    from . import Feed, HQuery, SQuery
+    from . import Feed, HTMLQuery, SubQuery
 
 logger = logging.getLogger(__name__)
 
@@ -107,34 +107,34 @@ class Account:
                 delattr(self, key)
     
     @cached_property
-    def recommended(self) -> HQuery:
+    def recommended(self) -> HTMLQuery:
         '''
         Videos recommended to the account.
         '''
         
-        from . import HQuery
+        from .query import HTMLQuery
         
-        return HQuery(self.client, 'recommended')
+        return HTMLQuery(self.client, 'recommended')
     
     @cached_property
-    def watched(self) -> HQuery:
+    def watched(self) -> HTMLQuery:
         '''
         Account video history.
         '''
         
-        from . import HQuery
+        from .query import HTMLQuery
         
-        return HQuery(self.client, f'users/{self.name}/videos/recent')
+        return HTMLQuery(self.client, f'users/{self.name}/videos/recent')
     
     @cached_property
-    def liked(self) -> HQuery:
+    def liked(self) -> HTMLQuery:
         '''
         Videos liked by the account.
         '''
         
-        from . import HQuery
+        from .query import HTMLQuery
         
-        return HQuery(self.client, f'users/{self.name}/videos/favorites')
+        return HTMLQuery(self.client, f'users/{self.name}/videos/favorites')
     
     @cached_property
     def feed(self) -> Feed:
@@ -142,7 +142,7 @@ class Account:
         The account feed.
         '''
         
-        from . import Feed
+        from .query import Feed
 
         return Feed(self.client)
     
@@ -160,13 +160,13 @@ class Account:
         return utils.dictify(self, keys, ['name', 'avatar', 'is_premium', 'user'])
     
     @cached_property
-    def subscriptions(self) -> SQuery:
+    def subscriptions(self) -> SubQuery:
         '''
         Get the account subscriptions.
         '''
         
-        from . import SQuery
+        from .query import SubQuery
         
-        return SQuery(self.client, f'users/{self.name}/subscriptions')
+        return SubQuery(self.client, f'users/{self.name}/subscriptions')
 
 # EOF

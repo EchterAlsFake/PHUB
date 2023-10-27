@@ -5,8 +5,7 @@ import logging
 from functools import cache
 from typing import TYPE_CHECKING, Generator, Any
 
-from . import (Video, User, FeedItem,
-               Param, NO_PARAM)
+from . import Video, User, FeedItem, Param, NO_PARAM
 
 from .. import utils
 from .. import consts
@@ -214,7 +213,7 @@ class Query:
         return NotImplemented
 
 
-class JQuery(Query):
+class JSONQuery(Query):
     '''
     Represents a query able to parse JSON data.
     '''
@@ -240,7 +239,7 @@ class JQuery(Query):
 
         return data
 
-class HQuery(Query):
+class HTMLQuery(Query):
     '''
     Represents a Query able to parse HTML data.
     '''
@@ -272,7 +271,7 @@ class HQuery(Query):
         container = raw.split('class="container')[1]
         return consts.re.get_videos(container)
 
-class UQuery(HQuery):
+class UserQuery(HTMLQuery):
     '''
     Represents a Query able to parse User video data.
     '''
@@ -284,7 +283,7 @@ class UQuery(HQuery):
         container = raw.split('class="videoSection')[1]
         return consts.re.get_videos(container)
 
-class FQuery(Query):
+class FeedQuery(Query):
     '''
     Represents a query able to parse user feeds.
     '''
@@ -299,7 +298,7 @@ class FQuery(Query):
     def _parse_page(self, raw: str) -> list[tuple]:
         return consts.re.feed_items(raw)
 
-class MQuery(HQuery):
+class MemberQuery(HTMLQuery):
     '''
     Represents an advanced member search query.
     '''
@@ -319,7 +318,7 @@ class MQuery(HQuery):
         container = raw.split('id="advanceSearchResultsWrapper')[1]
         return consts.re.get_users(container)
 
-class PQuery(MQuery):
+class PSQuery(MemberQuery):
     '''
     Represents a pornstar search query.
     '''
@@ -345,19 +344,13 @@ class PQuery(MQuery):
         container = raw.split('id="pornstarsSearchResult')[1].split('</ul')[0]
         return consts.re.get_ps(container)
 
-class SQuery(Query):
+class SubQuery(MemberQuery):
     
-    PAGE_LENGTH = 37
-    
-    def _parse_item(self, raw: Any) -> User:
-        
-        return NotImplemented
+    PAGE_LENGTH = int(1e100) # Unsure
     
     def _parse_page(self, raw: str) -> list:
         
         container = raw.split('<div id="profileContent">')[1]
-        return NotImplemented
-        
-    
+        return consts.re.get_users(container)
 
 # EOF
