@@ -7,7 +7,7 @@ __all__ = [
     'Tag', 'Like', 'FeedItem',
     'User', 'Feed', 'Video', 'Account',
     'Query', 'JQuery', 'HQuery', 'FQuery',
-    'UQuery', 'MQuery', 'PQuery', '_BaseQuality'
+    'UQuery', 'MQuery', 'PQuery', '_BaseQuality', 'SQuery'
 ]
 
 # Dataclasses
@@ -23,7 +23,7 @@ from .account import Account
 from .query import (
     Query, JQuery, HQuery,
     FQuery, UQuery, MQuery,
-    PQuery
+    PQuery, SQuery
 )
 
 # EOF

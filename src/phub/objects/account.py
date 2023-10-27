@@ -10,7 +10,7 @@ from . import User, Image
 
 if TYPE_CHECKING:
     from ..core import Client
-    from . import Feed, HQuery
+    from . import Feed, HQuery, SQuery
 
 logger = logging.getLogger(__name__)
 
@@ -159,6 +159,14 @@ class Account:
         
         return utils.dictify(self, keys, ['name', 'avatar', 'is_premium', 'user'])
     
-    # TODO - Recommended users /user/discover/popular_verified_members
+    @cached_property
+    def subscriptions(self) -> SQuery:
+        '''
+        Get the account subscriptions.
+        '''
+        
+        from . import SQuery
+        
+        return SQuery(self.client, f'users/{self.name}/subscriptions')
 
 # EOF

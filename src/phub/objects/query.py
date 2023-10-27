@@ -6,7 +6,7 @@ from functools import cache
 from typing import TYPE_CHECKING, Generator, Any
 
 from . import (Video, User, FeedItem,
-               Image, Param, NO_PARAM)
+               Param, NO_PARAM)
 
 from .. import utils
 from .. import consts
@@ -344,5 +344,20 @@ class PQuery(MQuery):
         
         container = raw.split('id="pornstarsSearchResult')[1].split('</ul')[0]
         return consts.re.get_ps(container)
+
+class SQuery(Query):
+    
+    PAGE_LENGTH = 37
+    
+    def _parse_item(self, raw: Any) -> User:
+        
+        return NotImplemented
+    
+    def _parse_page(self, raw: str) -> list:
+        
+        container = raw.split('<div id="profileContent">')[1]
+        return NotImplemented
+        
+    
 
 # EOF
