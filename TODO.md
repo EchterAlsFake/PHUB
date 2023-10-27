@@ -8,5 +8,5 @@ TODO for 4.2:
 - [x] Implement default user avatar
 - [x] RSS flux (very bare-bone)
 - [x] Pornstar search
-- [ ] Fetch account subscriptions
+- [x] Fetch account subscriptions
 - [ ] Lighter feed parsing
