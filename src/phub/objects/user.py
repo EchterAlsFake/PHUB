@@ -11,7 +11,7 @@ from .. import errors
 if TYPE_CHECKING:
     from ..core import Client
     from . import Video, Image
-    from . import UserQuery
+    from . import UserQuery, UPSQuery
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,20 @@ class User:
     Represents a Pornhub user.
     '''
 
+    def __new__(cls, client: Client, name: str, url: str, type: str = None) -> Self | Pornstar:
+        '''
+        Check user type.
+        '''
+        
+        user_type = type or consts.re.get_user_type(url)
+        
+        if user_type == 'pornstar':
+            return Pornstar(client, name, url, user_type)
+        
+        # ...
+        
+        return object.__new__(cls)
+    
     def __init__(self, client: Client, name: str, url: str, type: str = None) -> None:
         '''
         Initialise a new user object.
@@ -128,7 +142,7 @@ class User:
                 # We need to verify that the guess is correct.
                 # Pornhub redirects are weird, they depend on the
                 # type of the user, so we need to make sure that
-                # we are not redirected toi avoid discret 404 pages
+                # we are not redirected to avoid discret 404 pages
                 if response.ok and type_ in response.url:
                     logger.info('Guessing type of %s is %s', user, type_)
                     url = response.url
@@ -150,7 +164,8 @@ class User:
         from .query import UserQuery
         
         url = self.url
-        if 'model/' in url: url += '/videos'
+        # if 'model/' in url: url += '/videos'
+        url = utils.concat(self.url, 'videos')
         
         return UserQuery(client = self.client, func = url)
 
@@ -198,5 +213,37 @@ class User:
         return Image(client = self.client,
                      url = url,
                      name = f'{self.name}-avatar')
+
+class Pornstar(User):
+    '''
+    Represents a Pornstar.
+    '''
+    
+    def __new__(cls, *args, **kwargs) -> Self:
+        return object.__new__(cls)
+    
+    def __repr__(self) -> str:
+        
+        return f'phub.Pornstar(name={self.name})'
+    
+    @cached_property
+    def uploads(self) -> UserQuery:
+        '''
+        The pornstar's custom uploads.
+        '''
+        
+        from .query import UserQuery
+        
+        return UserQuery(self.client, utils.concat(self.url, 'videos/upload'))
+    
+    @cached_property
+    def videos(self) -> UPSQuery:
+        '''
+        The pornstar's videos.
+        '''
+        
+        from .query import UPSQuery
+        
+        return UPSQuery(self.client, utils.concat(self.url, 'videos'))
 
 # EOF

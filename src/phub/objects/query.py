@@ -280,7 +280,18 @@ class UserQuery(HTMLQuery):
     
     def _parse_page(self, raw: str) -> list[tuple]:
         
-        return consts.re.get_videos(raw)
+        container = raw.split('class="videoSection')[1]
+        return consts.re.get_videos(container)
+
+class UPSQuery(UserQuery):
+    '''
+    Represents a Query abloe to parse Pornstar videos. 
+    '''
+    
+    def _parse_page(self, raw: str) -> list[tuple]:
+        
+        container = raw.split('class="videoSection')[-1]
+        return consts.re.get_videos(container)
 
 class FeedQuery(Query):
     '''

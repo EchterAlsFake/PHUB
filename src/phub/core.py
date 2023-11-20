@@ -14,7 +14,7 @@ from . import locals
 
 from .objects import (
     Param, NO_PARAM,
-    Video, User, Account,
+    Video, User, Pornstar, Account,
     Query, JSONQuery, HTMLQuery,
     MemberQuery, PSQuery
 )
@@ -206,7 +206,7 @@ class Client:
         
         return Video(self, url)
 
-    def get_user(self, user: str) -> User:
+    def get_user(self, user: str) -> User | Pornstar:
         '''
         Get a specific user.
         
