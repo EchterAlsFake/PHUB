@@ -6,7 +6,7 @@ Initialising a session
 
 First thing to do is setting up a client.
 A client represents one connection to PH,
-but you can use multiple at the same time.
+and you can use multiple at the same time.
 You can also specify a custom language
 locale (``en`` by default). This will
 affect searching preferences, video titles,
@@ -46,23 +46,20 @@ like so:
 Accessing data
 --------------
 
-With a :py:class:`.Video` object: you can fetch all video data, e.g.:
+A :py:class:`.Video` object has several properties you can use to fetch
+data on a video. By default, no data is actually fetched until you call
+a property for optimization purposes. Once fetched, data is cached for
+each property. If you want to refresh the data, you will have to clear
+the cache by calling :meth:``.Video.refresh``.
+
+.. note::
+  
+  You can find out all the available properties
+  in :doc:`downloading </features/video>`.
 
 .. code-block:: python
 
-    >>> video: phub.Video = ...
-
-    >>> video.title
-    >>> video.duration
-    >>> video.like.up
-    >>> video.like.down
-    >>> video.views
-    >>> video.tags
-    >>> video.pornstars
-    >>> video.author
-    >>> video.date
-    >>> video.image
-    # etc.
+    print(f'The "{video.title}" has {video.like.up} likes!')
 
 You can check out all video properties in the :py:class:`.Video` API docs.
 
@@ -110,8 +107,15 @@ it or the API.
 Compatibility
 -------------
 
-Most of the PHUB objects pocess a ``dictify`` method that allows
+Most of the PHUB objects have a ``dictify`` method that allows
 them to be converted to serialized objects.
+
+.. warning::
+
+  PHUB objects are often linked between each others (especially videos, images and users).
+  Calling a ``dictify`` method on a object can make several other objects fetched, parsed
+  and ``dictify``ed at the same time. You can manage this feature by specifying which keys
+  are made into the response dictionnary using the ``keys`` parameter.  
 
 This can be used with other languages as a shell command, and
 as a server.
@@ -127,7 +131,7 @@ as a server.
     @app.route('/get')
     def get():
         try:
-            url = flask.request.args.get('url')
+            url = flask.request.args.get('video')
             video = client.get(url)
             res = video.dictify()
         
@@ -144,10 +148,9 @@ that can fetch video data:
 
 .. code-block:: bash
 
-    $ curl <localhost>/get?url=https://www.pornhub.com/view_video.php?viewkey=...
-    Response:
+    $ curl <localhost>/get?video=abcdef1234
     {
-        "name": "...",
+        "name": "A cool video"
         # etc.
     }
 
