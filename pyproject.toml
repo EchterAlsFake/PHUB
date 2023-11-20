@@ -1,6 +1,6 @@
 [project]
 name = "phub"
-version = "4.1.3"
+version = "4.1.3-1"
 description = "An API for Pornhub"
 authors = [{name = "Egsagon", email = "egsagon.git@gmail.com"}]
 license = {file = "LICENSE"}
