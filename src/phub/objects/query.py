@@ -280,8 +280,7 @@ class UserQuery(HTMLQuery):
     
     def _parse_page(self, raw: str) -> list[tuple]:
         
-        container = raw.split('class="mainSection')[1]
-        return consts.re.get_videos(container)
+        return consts.re.get_videos(raw)
 
 class FeedQuery(Query):
     '''
