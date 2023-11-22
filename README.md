@@ -9,7 +9,11 @@ using both web-scraping and Pornhub's HubTraffic API. It is
 able to access most used or useful PH features, such as video searching,
 accessing account features, video downloading, and a lot more.
 
-> ⚠️ This project is probably against Pornhub TOS. Use at your own risks.
+> [!WARNING]
+> This project is probably against Pornhub TOS. Use at your own risks.
+
+> [!CAUTION]
+> The documentation for this project is a bit outdated. I don't have the time to do it, but if you are willing to help, PRs are welcome!
 
 ## Installation
 
@@ -29,6 +33,9 @@ pip install --upgrade git+https://github.com/Egsagon/PHUB.git@py-3.9
 ```
 
 ## Quickstart
+
+> [!NOTE]
+> You can find the docs on this project [here](https://phub.readthedocs.io).
 
 ```python
 import phub
@@ -58,8 +65,6 @@ client.account.watched
 client.account.liked
 client.account.recommended
 ```
-
-#### You can check out the other available features in the [docs](https://phub.readthedocs.io).
 
 ## License
 
