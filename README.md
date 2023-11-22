@@ -10,10 +10,11 @@ able to access most used or useful PH features, such as video searching,
 accessing account features, video downloading, and a lot more.
 
 > [!WARNING]
-> This project is probably against Pornhub TOS. Use at your own risks.
+> The documentation for this project is a bit outdated. I don't have the time to do it, but if you are willing to help, PRs are welcome!
 
 > [!CAUTION]
-> The documentation for this project is a bit outdated. I don't have the time to do it, but if you are willing to help, PRs are welcome!
+> This project is probably against Pornhub TOS. Use at your own risks.
+
 
 ## Installation
 
