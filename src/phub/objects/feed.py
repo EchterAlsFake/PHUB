@@ -31,6 +31,10 @@ class Feed:
         
         logger.debug('Initialised account feed: %s', self)
     
+    def __repr__(self) -> str:
+        
+        return f'phub.FeedCreator(for={self.client.account.name})'
+    
     def filter(self,
                section: Section | Param | str = NO_PARAM,
                user: User | str = None) -> FeedQuery:

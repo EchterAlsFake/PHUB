@@ -112,7 +112,7 @@ class Account:
         Videos recommended to the account.
         '''
         
-        from .query import HTMLQuery
+        from . import HTMLQuery
         
         return HTMLQuery(self.client, 'recommended')
     
@@ -122,7 +122,7 @@ class Account:
         Account video history.
         '''
         
-        from .query import HTMLQuery
+        from . import HTMLQuery
         
         return HTMLQuery(self.client, f'users/{self.name}/videos/recent')
     
@@ -132,7 +132,7 @@ class Account:
         Videos liked by the account.
         '''
         
-        from .query import HTMLQuery
+        from . import HTMLQuery
         
         return HTMLQuery(self.client, f'users/{self.name}/videos/favorites')
     
@@ -142,7 +142,7 @@ class Account:
         The account feed.
         '''
         
-        from .query import Feed
+        from . import Feed
 
         return Feed(self.client)
     
@@ -165,7 +165,7 @@ class Account:
         Get the account subscriptions.
         '''
         
-        from .query import SubQuery
+        from . import SubQuery
         
         return SubQuery(self.client, f'users/{self.name}/subscriptions')
 
