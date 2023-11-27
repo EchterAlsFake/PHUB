@@ -5,6 +5,7 @@ import time
 import logging
 from typing import TYPE_CHECKING, Callable
 from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
+from ffmpeg_progress_yield import FfmpegProgress
 
 import requests.adapters
 
@@ -75,29 +76,38 @@ def default(video: Video,
 def FFMPEG(video: Video,
            quality: Quality,
            callback: CallbackType,
-           path: str) -> None:
+           path: str,
+           start: int = 0) -> None:
     '''
-    Download using FFMPEG. It has to be installed to your system.
-    You can override FFMPEG access with consts.FFMPEG_COMMAND
-    
+    Download using FFMPEG with real-time progress reporting.
+    FFMPEG must be installed on your system.
+    You can override FFMPEG access with consts.FFMPEG_COMMAND.
+
     Args:
         video       (Video): The video object to download.
         quality   (Quality): The video quality.
-        callback (Callable): Download progress callback (Unused).
+        callback (Callable): Download progress callback.
         path          (str): The video download path.
         start         (int): Where to start the download from. Used for download retries.
     '''
-    
+
     logger.info('Downloading using FFMPEG')
     M3U = video.get_M3U_URL(quality)
-    
-    command = consts.FFMPEG_COMMAND.format(input = M3U, output = path)
-    logger.info('Executing `%s`', command)
-    
-    # Execute
-    callback(0, 1)
-    os.system(command)
-    callback(1, 1)
+
+    # Build the command for FFMPEG
+    command = consts.FFMPEG_COMMAND.format(input=M3U, output=path).split()
+
+    # Removes quotation marks from the url
+    command[2] = command[2].strip('"')
+
+    logger.info('Executing `%s`', ' '.join(command))
+
+    # Initialize FfmpegProgress and execute the command
+    ff = FfmpegProgress(command)
+    for progress in ff.run_command_with_progress():
+        # Update the callback with the current progress
+        callback(round(progress), 100)
+
 
 def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
