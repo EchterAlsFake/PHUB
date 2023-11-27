@@ -71,7 +71,7 @@ def default(video: Video,
     with open(path, 'wb') as file:
         file.write(buffer)
     
-    logger.info('Downloading successfull.')
+    logger.info('Downloading successful.')
 
 def FFMPEG(video: Video,
            quality: Quality,
@@ -103,11 +103,17 @@ def FFMPEG(video: Video,
     logger.info('Executing `%s`', ' '.join(command))
 
     # Initialize FfmpegProgress and execute the command
-    ff = FfmpegProgress(command)
-    for progress in ff.run_command_with_progress():
-        # Update the callback with the current progress
-        print(progress)
-        callback(progress, 100)
+    try:
+        ff = FfmpegProgress(command)
+        for progress in ff.run_command_with_progress():
+            # Update the callback with the current progress
+            callback(progress, 100)
+
+            if progress == 100:
+                logger.info("Download successful")
+
+    except Exception as err:
+        logger.error('Error while downloading: %s', err)
 
 
 def _thread(client: Client, url: str, timeout: int) -> bytes:
@@ -116,6 +122,7 @@ def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
     
     return client.call(url, timeout = timeout).content
+
 
 def _base_threaded(client: Client,
                    segments: list[str],
