@@ -106,7 +106,8 @@ def FFMPEG(video: Video,
     ff = FfmpegProgress(command)
     for progress in ff.run_command_with_progress():
         # Update the callback with the current progress
-        callback(round(progress), 100)
+        print(progress)
+        callback(progress, 100)
 
 
 def _thread(client: Client, url: str, timeout: int) -> bytes:
