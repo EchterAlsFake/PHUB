@@ -129,7 +129,7 @@ def update_locals() -> None:
         file.write(content)
         file.truncate()
 
-def serialize(object_: object) -> object:
+def serialize(object_: object, recursive: bool = False) -> object:
     '''
     Simple serializer for PHUB objects.
     '''
@@ -139,8 +139,8 @@ def serialize(object_: object) -> object:
         ser = object_
     
     # If object is a PHUB object
-    elif hasattr(object_, 'dictify'):
-        ser = object_.dictify()
+    elif hasattr(object_, 'dictify') and recursive:
+        ser = object_.dictify(recursive = recursive)
     
     # If object is a soup
     elif object_.__class__.__name__ == 'BeautifulSoup':
@@ -148,11 +148,11 @@ def serialize(object_: object) -> object:
     
     # If object is a dict
     elif isinstance(object_, dict):
-        ser = {k: (serialize(v)) for k, v in object_.items()}
+        ser = {k: (serialize(v, True)) for k, v in object_.items()}
     
     # If object is a list or a generator
     elif isinstance(object_, list | tuple | Generator | map):
-        ser = [serialize(value) for value in object_]
+        ser = [serialize(value, True) for value in object_]
     
     else:
         ser = str(object_)
@@ -161,7 +161,8 @@ def serialize(object_: object) -> object:
 
 def dictify(object_: object,
             keys: str | list[str],
-            all_: list[str]) -> dict:
+            all_: list[str],
+            recursive: bool) -> dict:
     '''
     Dictify an object.
     '''
@@ -169,7 +170,7 @@ def dictify(object_: object,
     if isinstance(keys, str): keys = [keys]
     if 'all' in keys: keys = all_
     
-    return {key: serialize(getattr(object_, key))
+    return {key: serialize(getattr(object_, key), recursive)
             for key in keys}
 
 # EOF

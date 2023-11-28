@@ -29,6 +29,11 @@ For instance, this query will be restrained to search in the French category.
 
 You can use multiple Parameters objects by adding or substracting them, e.g.:
 
+.. warning::
+  
+    As of now, Pornhub only supports searching in one Category at a time.
+    But you can still exclude as many as you want!
+
 .. code-block:: python
 
     # Search in the French category for homemade production
@@ -40,17 +45,15 @@ You can use multiple Parameters objects by adding or substracting them, e.g.:
     # Search for everything but BBW
     client.search(..., -Category.BBW)
 
-.. warning:: As of now, Pornhub only supports searching in one Category at a time.
-    But you can still exclude as many as you want!
+Using queries
+-------------
 
-Exploiting search results
--------------------------
+When calling :meth:`.Client.search` or any other query method, nothing is actually
+fetched. Instead, a :py:class:`.Query` is created. This object is responsible for
+automatically managing the requests and caches to make the query as efficient as it
+can be (hopefully).
 
-When calling :meth:`.Client.search`, nothing is actually fetched. Instead, a
-:py:class:`.Query` is created. This object is responsible for automatically managing
-the search requests and caches to make it as efficient as it can be.
-
-You can access its content directly using list item syntax, or :meth:`.Query.get`.
+You can access its content directly using python list item syntax, or :meth:`.Query.get`.
 
 .. code-block:: python
 
@@ -72,74 +75,29 @@ You can also use it as a generator to get multiple videos:
 
 To exploit video data, see :doc:`here </features/video>`.
 
-Using different Query types
----------------------------
+Using different Query types while searching
+-------------------------------------------
 
-There can be different subclasses of :py:class:`.Query`, which
-have their own usage. For exemple:
-
-.. list-table:: Query types
-    :header-rows: 1
-
-    * - Object
-      - Page length
-      - Description
-
-    * - :py:class:`.Query`
-      - N/A
-      - Base class for all queries. Responsible for handling item distribution. 
-
-    * - :py:class:`.JSONQuery`
-      - 30 
-      - The default Query for searching. It uses the HubTraffic API to fetch data faster.
-    
-    * - :py:class:`.HTMLQuery`
-      - 32
-      - Web-scrapper equivalent of :py:class:`.JQuery`. It provides the most accurate results.
-    
-    * - :py:class:`.FeedQuery`
-      - 14
-      - Query dedicated to the :py:class:`.Feed` object.
-
-    * - :py:class:`.MemberQuery`
-      - N/A
-      - Query dedicated to search for users.
-
-    * - :py:class:`.UserQuery`
-      - 40
-      - Query dedicated to search for videos on a user page.
-    
-    * - :py:class:`.PSQuery`
-      - 16
-      - Query dedicated to search for pornstars.
-
-    * - :py:class:`.SubQuery`
-      - N/A
-      - SUbclass of :py:class:`.MemberQuery` dedicated to account subscription parsing.
-
-While searching, you can use either :py:class:`.JQuery` or :py:class:`.HQuery`
-(or your own :py:class:`.Query` subclass).
-
-Note that :py:class:`.JQuery` is faster because it fetches less data,
-but it also *probably* use a different algorithm than :py:class:`.HQuery`,
-which is more accurate but slower.
-
-.. warning:: As of now, HQueries don't obey well to their parameters.
-    You might prefer to use JQueries.
-
-You can specify which one to use with the ``feature`` argument:
+With searching only, you can choose to use 2 diffent queries subclasses.
+You should choose which one to use depending on what you want to do.
 
 .. code-block:: python
 
-    query = client.search(..., feature = phub.HQuery)
+    import phub
+
+    client = phub.Client()
+
+    # JSONQuery (recommended, uses HubTraffic) - faster, but less data
+    query = client.search(..., feature = phub.JSONQuery)
+
+    # HTMLQuery - slower, but fetches all of the video data
+    query = client.search(..., feature = phub.HTMLQuery)
 
 Refreshing queries
 ------------------
 
-Queries are not meant to be refresh.
-I mean, they can be refreshed by cleaning their cache,
-but it might lead to misunderstandings so the best
-way to refresh a query is to make another one.
+As of right now, queries cannot be refreshed. Instead, you need
+to initialise a new query.
 
 .. code-block:: python
 
@@ -159,4 +117,3 @@ way to refresh a query is to make another one.
     print(f'First result is: {query[0].title}!')
 
     time.sleep(60 * 10) # Wait 10 min
-

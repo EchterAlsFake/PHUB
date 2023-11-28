@@ -115,12 +115,15 @@ class Video:
         
         return self.data.get(key)
 
-    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+    def dictify(self,
+                keys: Literal['all'] | list[str] = 'all',
+                recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionnary.
         
         Args:
             keys (str): The data keys to include.
+            recursive (bool): Whether to allow other PHUB objects dictify. 
         
         Returns:
             dict: Dict version of the object.
@@ -130,7 +133,7 @@ class Video:
             'url', 'key', 'title', 'image', 'is_vertical', 'duration',
             'tags', 'like', 'views', 'hotspots', 'date', 'pornstars',
             'categories', 'orientation', 'author'
-        ])
+        ], recursive)
 
     # === Download methods === #
     

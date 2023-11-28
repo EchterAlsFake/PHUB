@@ -4,6 +4,14 @@ Account object
 Using a client to login
 -----------------------
 
+.. warning::
+
+    None of your data is being saved by PHUB.
+    It only sends your credentials to the official Pornhub
+    servers. Fore more information, have a look at the source `code`_.
+
+.. _code: https://github.com/Egsagon/PHUB 
+
 You can use the :py:class:`.Client` object to login
 to some Pornhub account:
 
@@ -20,42 +28,41 @@ If you want to disable this behavior, set ``login`` to False.
 
     import phub
 
-    client = phub.Client(
-        'my-username',
-        'my-password',
-        login = False
-    )
+    client = phub.Client('my-username',
+                         'my-password',
+                         login = False)
 
-    # Login afterwards
+    # Login manually
     client.login()
 
-If you created an account while specifying some credentials,
-wether you enabled login or not, an :py:class:`.Account`
-object will be created and connected to the :py:class:`.Client`.
+Whether you decide to connect or not, an :py:class:`.Account` object
+will be created at `client.account`. This is where you will be able
+to view account related data.
 
-If that is not the case, The :py:class:`.Account` object will
-evaluate to :py:class:`None`.
+If you did not enter credentials, this object won't be created.
 
 Accessing data
 --------------
 
-The following account data is available:
+Once a client is logged in, the following data is available:
 
 .. code-block:: python
 
     client.account.name # The account name
-    client.avatar # The account user avatar as an Image object.
+    client.avatar # The account user avatar as an phub.Image object.
     client.is_premium # Wether the account has premium enabled.
 
-    client.user # Public representation of the account
-    # This is useful if you want to access your own account's
-    # videos or infos.
+    client.user # Public representation of the account. This is useful
+                # if you want to access your own account's data/videos.
 
 Account Queries
 ---------------
 
-The following Queries are created and cached by :py:class:`.Account`.
-(Refreshable with :literal:`client.account.refresh()` of course)
+.. note::
+    
+    For more information on how to use PHUB Queries, see :doc:`searching </features/search>`.
+
+Theses queries emit :py:class:`.Video` objects and are refreshable with :meth:`.Account.refresh`. 
 
 * Recommended videos (:literal:`client.account.recommended`)
 
@@ -63,11 +70,22 @@ The following Queries are created and cached by :py:class:`.Account`.
 
 * Video history (:literal:`client.account.watched`)
 
-All those queries behave like :doc:`normal search queries </features/search>`.
+Here is an exemple on how to view your account history.
+
+.. code-block:: python
+
+    import phub
+
+    client = phub.Client('my-username', 'my-password')
+
+    history_length = 40
+
+    for i, video in enumerate(client.account.watched):
+        print(f'{i}. [{video.key}] "{video.title}"')
 
 Accessing the feed
 ------------------
 
-The feed is accessible through :py:obj:`.Account.feed`.
+The account feed is accessible through :py:obj:`.Account.feed`.
 
 You can learn more about the feed :doc:`here </features/feed>`.

@@ -76,19 +76,22 @@ class User:
                 logger.debug('Deleting key %s', key)
                 delattr(self, key)
 
-    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+    def dictify(self,
+                keys: Literal['all'] | list[str] = 'all',
+                recursive: bool = False) -> dict:
             '''
             Convert the object to a dictionnary.
             
             Args:
                 keys (str): The data keys to include.
+                recursive (bool): Whether to allow other PHUB objects dictify. 
                 
             Returns:
                 dict: Dict version of the object.
             '''
             
             return utils.dictify(self, keys, ['name', 'url', 'type',
-                                              'bio', 'info', 'avatar'])
+                                              'bio', 'info', 'avatar'], recursive)
 
     @classmethod
     def from_video(cls, video: Video) -> Self:

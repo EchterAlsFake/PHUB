@@ -4,16 +4,15 @@ Quick Start
 Installation
 ------------
 
-Required dependencies:
+PHUB uses the following dependencies:
 
 - `requests`_
-
-Optionnal dependencies:
-
-- `click`_
+- `click`_ (optionnal, used for the built-in CLI)
+- `ffmpeg-progress-yield`_ (v4.1.5+)
 
 .. _requests: https://pypi.org/project/requests/
 .. _click: https://pypi.org/project/click/
+.. _ffmpeg-progress-yield: https://pypi.org/project/ffmpeg-progress-yield/
 
 - Installing the lastest stable release (python 3.11 or higher):
 
@@ -21,13 +20,13 @@ Optionnal dependencies:
 
     pip install --upgrade phub
 
-- Installing the latest unstable release (python 3.11 or higher):
+- Installing the latest unstable updates (python 3.11 or higher):
 
 .. code-block:: bash
 
     pip install --upgrade git+https://github.com/Egsagon/PHUB.git
 
-- Installing for lower python versions (>=3.9):
+- There also is a python 3.9 branch. Beware it might not be updated as often.
 
 .. code-block:: bash
 

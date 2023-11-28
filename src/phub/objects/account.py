@@ -146,18 +146,22 @@ class Account:
 
         return Feed(self.client)
     
-    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+    def dictify(self,
+                keys: Literal['all'] | list[str] = 'all',
+                recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionnary.
         
         Args:
             keys (str): The data keys to include.
+            recursive (bool): Whether to allow other PHUB objects dictify. 
         
         Returns:
             dict: Dict version of the object.
         '''
         
-        return utils.dictify(self, keys, ['name', 'avatar', 'is_premium', 'user'])
+        return utils.dictify(self, keys, ['name', 'avatar',
+                                          'is_premium', 'user'], recursive)
     
     @cached_property
     def subscriptions(self) -> SubQuery:

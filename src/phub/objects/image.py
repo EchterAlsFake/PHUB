@@ -90,17 +90,20 @@ class Image:
                 self.url = server['src']
                 self.download(path)
 
-    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+    def dictify(self,
+                keys: Literal['all'] | list[str] = 'all',
+                recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionnary.
         
         Args:
             keys (str): The data keys to include.
+            recursive (bool): Whether to allow other PHUB objects dictify. 
             
         Returns:
             dict: Dict version of the object.
         '''
         
-        return utils.dictify(self, keys, ['url', 'name', '_servers'])
+        return utils.dictify(self, keys, ['url', 'name', '_servers'], recursive)
     
 # EOF

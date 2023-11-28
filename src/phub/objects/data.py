@@ -27,18 +27,21 @@ class Tag:
         assert isinstance(__value, Tag)
         return self.name == __value.name
     
-    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+    def dictify(self,
+                keys: Literal['all'] | list[str] = 'all',
+                recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionnary.
         
         Args:
             keys (str): The data keys to include.
+            recursive (bool): Whether to allow other PHUB objects dictify. 
         
         Returns:
             dict: Dict version of the object.
         '''
         
-        return utils.dictify(self, keys, ['name', 'count'])
+        return utils.dictify(self, keys, ['name', 'count'], recursive)
 
 @dataclass
 class Like:
@@ -50,18 +53,21 @@ class Like:
     down: int
     ratings: float = field(repr = False)
     
-    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+    def dictify(self,
+                keys: Literal['all'] | list[str] = 'all',
+                recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionnary.
         
         Args:
             keys (str): The data keys to include.
+            recursive (bool): Whether to allow other PHUB objects dictify. 
         
         Returns:
             dict: Dict version of the object.
         '''
         
-        return utils.dictify(self, keys, ['up', 'down', 'ratings'])
+        return utils.dictify(self, keys, ['up', 'down', 'ratings'], recursive)
 
 @dataclass
 class FeedItem:
@@ -73,18 +79,21 @@ class FeedItem:
     raw: str = field(default = None, repr = False)
     type: str = field(default = None, repr = False)
     
-    def dictify(self, keys: Literal['all'] | list[str] = 'all') -> dict:
+    def dictify(self,
+                keys: Literal['all'] | list[str] = 'all',
+                recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionnary.
         
         Args:
             keys (str): The data keys to include.
+            recursive (bool): Whether to allow other PHUB objects dictify. 
         
         Returns:
             dict: Dict version of the object.
         '''
         
-        obj = utils.dictify(self, keys, ['user', 'header', 'item_type'])
+        obj = utils.dictify(self, keys, ['user', 'header', 'item_type'], recursive)
         if 'html' in keys: obj['html'] = self.html.decode()
         
         return obj

@@ -49,8 +49,6 @@ Available features
 
     Will search for videos and display their title, viewkey and duration.
 
-    Example:
-
     .. code-block:: bash
 
         $ python -m phub search cum
@@ -60,6 +58,9 @@ Available features
         * my tiny pussy make him cum 3 times and once creampie ♡ (0:10:11) - ph630157542f70f
         * Кончил в сводную сестрёнку пока дома гости (0:10:02) - 649dc5ca2e7d0
         [...]
+    
+    You can then copy the video viewkey at the end of each line and use it to download
+    the videos.
 
 - Download watched videos
 

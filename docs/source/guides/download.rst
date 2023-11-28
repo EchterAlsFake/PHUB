@@ -38,12 +38,7 @@ the :meth:`.Video.download` method.
 Video quality
 ^^^^^^^^^^^^^
 
-The quality of the video can be designed as:
-
-* A constant from `.Quality`, e.g. `.Quality.BEST`.
-* An absolute value (`int`): 1080, 720, etc.
-* A string representing `.Quality` constants, like `best`, `half`, `worst`.
-
+There are multiple ways you can create a quality object.
 
 .. code-block:: python
 
@@ -53,43 +48,36 @@ The quality of the video can be designed as:
     quality = Quality('best')          # Using a string
     quality = Quality(1080)            # Using an int
     quality = Quality(Quality('best')) # Using an object
+    
+    # Alternatively, you can also enter a raw quality inside most PHUB methods:
+    video.download(quality = Quality.BEST)
+    # is the same as
+    video.download(qulity = 'best')
 
 ^^^^^^^^^^^^^^^^^^^^^^^
 Simple progress display
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The progress of the video can be displayed using built-in functions, from the
-`.display` submodule.
+The progress of the download can be displayed using built-in functions, from the
+`.display` submodule. There are several presets available:
 
-* Simple progress (default)
-    Displays a colored output progress.
+.. code-block:: python
 
-    .. code-block:: python
+    >>> import phub
+    >>> import phub.display as display
+    >>> video = phub.Client().get('xxx')
 
-        >>> from phub.display import progress
+    # Simple colored progress (default)
+    >>> video.download(..., display = display.progress(color = True))
+    Downloading 50% [150/300]
 
-        >>> video.download(..., display = progress(color = True))
-        Downloading 50% [150/300]
+    # Bar progress
+    >>> video.download(..., display = bar())
+    Downloading |========        | [150/300]
 
-* Bar progress
-    Displays a tqdm-like progress bar.
-
-    .. code-block:: python
-
-        >>> from phub.display import bar
-        
-        >>> video.download(..., display = bar())
-        Downloading |========        | [150/300]
-
-* STD progress
-    Really Simple display to be grepped or something.
-
-    .. code-block:: python
-
-        >>> import sys
-        >>> from phub.display import std
-        
-        >>> video.download(..., display = std(file = sys.stdout))
+    # STD file progress
+    >>> video.download(..., display = std(file = sys.stdout))
+    50
 
 You can also define your own progress callback.
 Your callback shall take 2 arguments: the currently processing segment,
@@ -113,53 +101,27 @@ Downloaders
 You can specify custom downloaders to download your video.
 There are a few presets available in the `.download` submodule.
 
-* Dummy download (default)
-    A slow, dummy downloader that fetch each segment after the other,
-    concatenate them on the fly and write them to the file at the end.
+.. code-block:: python
 
-    .. code-block:: python
+    import phub
+    import phub.download as download
 
-        from phub.download import default
-        video.download(..., downloader = default)
+    client = phub.Client()
+    video = client.get('xxx')
 
-* FFMPEG download
-    This preset will use FFMPEG to download the file.
-    FFMPEG atomatically set the apropriate download speeds
-    between segments download and codecs stuff, which makes it
-    much faster and reliable than some presets.
-    
-    .. note:: You need to have FFMPEG installed to your system
-        to use this feature.
-    
-    .. note:: As FFMPEG is a CLI tool, download progress tracking is
-        not available. If you pass in a display callback, it will
-        only be called at the start and at the end of the download.
+    # Dummy download - Slow, but stable
+    video.download(..., downloader = download.default)
 
-    .. code-block:: python
+    # FFMPEG download - Everything is handled by FFMPEG
+    # Note - you need to have FFMPEG installed to your system.
+    video.download(..., downloader = download.FFMPEG)
 
-        from phub.download import FFMPEG
-        video.download(..., downloader = FFMPEG)
-
-* Threaded download
-
-    .. warning:: Threaded download is experimental.
-        It might produce bad results.
-    
-    This preset will use threads to download segments as fast as
-    it can, and writing them after.
-    You can set the maximum threads working in parrallel and the
-    maximum requests timeout.
-    
-    You might have to adjust these values
-    depending on your configuration, e.g. reduce the workers count
-    if you have a weak CPU and add more timeout if you have a low
-    quality connection.
-
-    .. code-block:: python
-
-        from phub.download import threaded
-        video.download(..., downloader = threaded(max_workers = 50,
-                                                  timeout = 10))
+    # Threaded download - Uses python futures to download
+    # the video as fast as possible. Multiple settings are available
+    # for you to set an appropriate download speed depending on your
+    # computer and internet connection. 
+    video.download(..., downloader = download.threaded(max_workers = 50,
+                                                       timeout = 10))
 
 You can also specify custom downloaders.
 
@@ -187,39 +149,29 @@ You can also specify custom downloaders.
     
     video.download(..., downloader = my_downloader)
 
-Even more advanced downloading
-------------------------------
+For even more advanced downloading, you can use :meth:`.Video.get_segments`,
+which outputs a generator containing a list segment URLs.
 
-If :meth:`.Video.download` is not advanced enough for you,
-here are a few other more bare-bone methods. 
+Alternatively, :meth:`.Video.get_M3U_url` outputs the URL of the master
+M3U file for a desired quality.
 
-You can use :meth:`.Video.get_segments`, which outputs a
-generator containing a list segment URLs. See the
-``my_downloader`` exemple above.
-
-If you want something even more bare-bone, use
-:meth:`.Video.get_M3U_url`. This outputs the URL of the master
-M3U file for a desired quality. This can be used, for exemple,
-with FFMPEG (if you want to have more control over it than with
-``phub.download.FFMPEG``).
+For instance, the following downloader will download the M3U8 file of a video:
 
 .. code-block:: python
 
     import os
     import phub
-    from phub.locals import Quality
 
-    video = ...
+    client = phub.Client()
+    video = client.get('...')
 
-    # Get the M3U url
-    M3U = video.get_M3U_url(quality = Quality.BEST)
+    def m3u_downloader(video, quality, callback, path):
 
-    # Use PHUB default FFMPEG command:
-    # ffmpeg -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output}
-    cmd = phub.consts.FFMPEG_COMMAND.format(
-        input = M3U,
-        output = 'my-video.mp4'
-    )
+        url = video.get_M3U_url(quality = quality)
 
-    # Execute the command
-    os.system(cmd)
+        with open(path, 'wb') as file:
+
+            raw = video.client.call(url)
+            file.write(raw.content)
+        
+    video.download('master.m3u8', quality = 'best', downloader = m3u_downloader)

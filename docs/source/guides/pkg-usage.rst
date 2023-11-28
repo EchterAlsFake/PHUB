@@ -37,7 +37,7 @@ like so:
 .. code-annotations::
     #.
         Note that you can also load the video 
-        using the `viewkey` paramater in the URL.
+        using the `viewkey` paramater in its URL.
 
         .. code-block:: python
 
@@ -50,44 +50,44 @@ A :py:class:`.Video` object has several properties you can use to fetch
 data on a video. By default, no data is actually fetched until you call
 a property for optimization purposes. Once fetched, data is cached for
 each property. If you want to refresh the data, you will have to clear
-the cache by calling :meth:``.Video.refresh``.
+the cache by calling :meth:`.Video.refresh`.
 
 .. note::
   
   You can find out all the available properties
-  in :doc:`downloading </features/video>`.
+  in the :doc:`video docs </features/video>` or in the :py:class:`.Video` class.
 
 .. code-block:: python
 
-    print(f'The "{video.title}" has {video.like.up} likes!')
+    video = client.get(key = 'xxx')
 
-You can check out all video properties in the :py:class:`.Video` API docs.
+    print(f'The "{video.title}" has {video.like.up} likes!')
 
 Downloading a video
 -------------------
 
-A video can be downloaded via :meth:`.Video.download`.
+A video can be downloaded by using :meth:`.Video.download`.
 
 .. code-block:: python
 
     import phub
     from phub.locals import Quality
 
-    video = ...
+    client = phub.Client()
+    video = client.get('xxx')
 
     video.download(path = 'my-video.mp4',
                    quality = Quality.BEST)
 
-You can set the quality to be ``BEST``, ``HALF`` or ``WORST``, or an :py:class:`int`
-for an absolute value.
+.. note::
+  
+  Tip: You can set the ``path`` paramater to be a directory for the video
+  to be downloaded in. The file name will automatically be the video id. 
 
-.. note:: Tip: you can set the ``path`` paramater to be a directory for the video
-    to be downloaded in. The file name will automatically be the video id. 
+For more information on how to download, see :doc:`downloading </guides/download>`.
 
-For advanced downloading, see :doc:`downloading </guides/download>`.
-
-Debugging
----------
+Logging
+-------
 
 You can use Python `logging`_ library to debug your code and see what's wrong with
 it or the API.
@@ -99,7 +99,8 @@ it or the API.
     import phub
     import logging
 
-    logging.BasicConfig(level = ...)
+    # Use whatever configuration you want
+    logging.BasicConfig(level = logging.INFO)
 
     client = phub.Client()
     ...
@@ -110,15 +111,20 @@ Compatibility
 Most of the PHUB objects have a ``dictify`` method that allows
 them to be converted to serialized objects.
 
-.. warning::
+.. code-block:: python
 
-  PHUB objects are often linked between each others (especially videos, images and users).
-  Calling a ``dictify`` method on a object can make several other objects fetched, parsed
-  and ``dictify``ed at the same time. You can manage this feature by specifying which keys
-  are made into the response dictionnary using the ``keys`` parameter.  
+  import phub
 
-This can be used with other languages as a shell command, and
-as a server.
+  client = phub.Client()
+  video = client.get('xxx')
+
+  data = video.dictify()
+
+Result: ``{"name": "A cool video", ...}``
+
+This is done for compatibility and ease of use with other
+languages and applications, since you can easily run a small python
+script or local server:
 
 .. code-block:: python
 
@@ -133,10 +139,10 @@ as a server.
         try:
             url = flask.request.args.get('video')
             video = client.get(url)
-            res = video.dictify()
+            res = { 'response': video.dictify() }
         
         except Exception as err:
-            res = {'error': repr(err)}
+            res = { 'error': repr(err) }
         
         return flask.jsonify(res)
 
@@ -157,18 +163,15 @@ that can fetch video data:
 Each ``dictify`` method can take as argument a :py:class`list[str]` of keys,
 if you want to avoid fetching specific things.
 
-For exemple, by default a serialized :py:class:`.User` object will also serialize
-its avatar (:py:class:`.Image` object).
-
-Below is a list of all serializeable PHUB objects, along with their keys and Special
-keys (objects that require further fetching and seriadszddsfkation)
+Below is a list of all serializeable PHUB objects, along with their keys and recusrive
+keys (PHUB objects that require further parsing and serialization).
 
 .. list-table:: Serializeable objects
     :header-rows: 1
 
     * - Object
       - Default keys
-      - Special keys
+      - Recursive keys
 
     * - :py:class:`.Video`
       - ``url``, ``key``, ``is_vertical``, ``duration``, ``views``, ``date``, ``orientation``
@@ -197,3 +200,11 @@ keys (objects that require further fetching and seriadszddsfkation)
     * - :py:class:`.FeedItem`
       - ``user``, ``header``, ``item_type``
       - /
+
+By default, recusrive keys will appear as ``repr`` strings, unless
+you allow recursiveness with ``object.dictify(recursive = True)``.
+
+.. warning::
+
+  Turning on recursiveness can make PHUB open more requests that you might
+  actually need. Make sure you specify only the keys you need when using it.

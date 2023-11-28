@@ -5,6 +5,13 @@ Locals
 
 Locals are constants that can be directly imported for better readability.
 
+.. code-block:: python
+
+    import phub
+    from phub.locals import *
+
+    ...
+
 .. autoclass:: phub.locals.Quality
     :members:
     :undoc-members:

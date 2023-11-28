@@ -3,9 +3,7 @@ Errors
 
 .. currentmodule:: phub
 
-The following exceptions can
-be raised by PHUB in case of
-errors.
+PHUB can raise the following expressions.
 
 .. autoexception:: phub.errors.ClientAlreadyLogged
 

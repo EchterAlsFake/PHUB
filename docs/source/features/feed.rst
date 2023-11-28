@@ -1,38 +1,36 @@
 Account feed
 ============
 
-If an :py:class:`.Account` objects initialises
-successfully, you can access your account feed.
-
 .. note::
-    Pornhub's feed is the place where you get the
-    notifications from your subscribtions, comments,
-    video uploads, etc.
+    
+    As of today, feed parsing is still experimental and requires bs4.
 
-The :py:class:`.Feed` object is a utility object that
-initialises custom :py:class:`.Query` objects. These
-queries contain :py:class:`.FeedItem` objects.
-
-You can get the raw feed this way:
+If a :py:class:`.Account` object initialises
+successfully, you can access your account :py:class:`.Feed`.
 
 .. code-block:: python
 
-    my_feed = client.account.feed.feed
+    import phub
 
-    for item in my_feed:
+    client = phub.Client('my-username', 'my-password')
+
+    feed = client.account.feed.feed
+
+    # Print the first 10 feed news
+    for item in feed[:10]:
         print(item)
 
-You can also specify custom filters to generate other
-feeds queries.
+You can also specify custom feed filters:
 
 .. code-block:: python
 
     from phub.locals import Section
 
-    my_feed = client.account.feed.filter(
+    comments_feed = client.account.feed.filter(
         user = 'my-user', # Filter notifications from a specific user name or object
         section = Section.COMMENTS # Or any other section type
     )
 
-    for item in my_feed:
+    # Print the first 10 feed news
+    for item in comments_feed[:10]:
         print(item)
