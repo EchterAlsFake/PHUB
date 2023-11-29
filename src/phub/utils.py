@@ -3,10 +3,14 @@ PHUB utilities.
 '''
 
 import json
+import logging
 import requests
 from typing import Generator, Iterable
 
 from . import consts, locals, errors
+
+logger = logging.getLogger(__name__)
+
 
 def concat(*args: list[str]) -> str:
     '''
@@ -185,6 +189,7 @@ def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoErr
         Generator: The result generator. 
     '''
     
+    logger.info('Initialising suppressed generator')
     iterator = iter(gen)
     
     while 1:
@@ -197,6 +202,7 @@ def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoErr
         
         except Exception as err:
             if isinstance(err, errs):
+                logger.warn('Suppressing error %s: %s', err, repr(err))
                 continue
             
             raise err

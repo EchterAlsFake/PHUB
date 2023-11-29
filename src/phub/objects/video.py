@@ -106,6 +106,7 @@ class Video:
             data = self.client.call(url).json()
             
             if 'message' in data:
+                logger.warning('Video %s is not available. Error code: %s', self, data.get('code'))
                 raise errors.VideoError(f'Video is not available. Reason: {data["message"]}')
             
             self.data |= {f'data@{k}': v for k, v in data['video'].items()}
