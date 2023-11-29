@@ -46,7 +46,7 @@ def bar(desc: str = 'Downloading', format_: str = ' |{bar}| [{cur}/{total}]') ->
     
     def wrapper(cur: int, total: int) -> None:
 
-        raw = tem.format(cur = cur, total = total, bar = '{bar}')
+        raw = tem.format(cur = int(cur), total = int(total), bar = '{bar}')
         bar_length = term_size - len(tem) + 10
         percent = round((cur / total) * bar_length)
         
