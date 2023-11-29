@@ -356,11 +356,15 @@ class PSQuery(MemberQuery):
 
 class SubQuery(MemberQuery):
     
-    PAGE_LENGTH = int(1e100) # Unsure
+    PAGE_LENGTH = 47
     
     def _parse_page(self, raw: str) -> list:
         
         container = raw.split('<div id="profileContent">')[1]
         return consts.re.get_users(container)
+
+class WatchedQuery(HTMLQuery):
+    
+    PAGE_LENGTH = 46
 
 # EOF

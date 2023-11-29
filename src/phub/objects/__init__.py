@@ -10,7 +10,7 @@ __all__ = [
     
     'Query', 'JSONQuery', 'HTMLQuery', 'FeedQuery',
     'SubQuery', 'UserQuery', 'MemberQuery', 'PSQuery',
-    'UPSQuery'
+    'UPSQuery', 'WatchedQuery'
 ]
 
 # Dataclasses
@@ -26,7 +26,7 @@ from .account import Account
 from .query import (
     Query, JSONQuery, HTMLQuery,
     FeedQuery, UserQuery, MemberQuery,
-    PSQuery, SubQuery, UPSQuery
+    PSQuery, SubQuery, UPSQuery, WatchedQuery
 )
 
 # EOF

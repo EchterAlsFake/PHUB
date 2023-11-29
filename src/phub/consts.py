@@ -29,7 +29,7 @@ LOGIN_PAYLOAD = {
 
 RSS = 'https://www.pornhub.com/video/webmasterss'
 
-MAX_CALL_RETRIES = 5 # Maximum times a HTTPError can be reproduced
+MAX_CALL_RETRIES = 4 # Maximum times a HTTPError can be reproduced
 MAX_CALL_TIMEOUT = .4 # Time to wait before retrying basic calls 
 
 SEGMENT_LENGTH = 4 # Length of a PH video segment (in seconds)

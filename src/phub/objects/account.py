@@ -122,9 +122,9 @@ class Account:
         Account video history.
         '''
         
-        from . import HTMLQuery
+        from . import WatchedQuery
         
-        return HTMLQuery(self.client, f'users/{self.name}/videos/recent')
+        return WatchedQuery(self.client, f'users/{self.name}/videos/recent')
     
     @cached_property
     def liked(self) -> HTMLQuery:
@@ -135,6 +135,16 @@ class Account:
         from . import HTMLQuery
         
         return HTMLQuery(self.client, f'users/{self.name}/videos/favorites')
+    
+    @cached_property
+    def subscriptions(self) -> SubQuery:
+        '''
+        Get the account subscriptions.
+        '''
+        
+        from . import SubQuery
+        
+        return SubQuery(self.client, f'users/{self.name}/subscriptions')
     
     @cached_property
     def feed(self) -> Feed:
@@ -162,15 +172,5 @@ class Account:
         
         return utils.dictify(self, keys, ['name', 'avatar',
                                           'is_premium', 'user'], recursive)
-    
-    @cached_property
-    def subscriptions(self) -> SubQuery:
-        '''
-        Get the account subscriptions.
-        '''
-        
-        from . import SubQuery
-        
-        return SubQuery(self.client, f'users/{self.name}/subscriptions')
 
 # EOF
