@@ -12,6 +12,8 @@ from . import consts
 from . import errors
 from . import locals
 
+from .modules import parser
+
 from .objects import (
     Param, NO_PARAM,
     Video, User, Pornstar, Account,
@@ -116,16 +118,39 @@ class Client:
 
         url = func if 'http' in func else utils.concat(consts.HOST, func)
         
-        # Send request
-        response = self.session.request(
-            method = method,
-            url = url,
-            headers = consts.HEADERS | headers | self.language,
-            data = data,
-            timeout = timeout,
-            proxies = self.proxies
-        )
+        for i in range(consts.MAX_CALL_RETRIES):
+            
+            try:
+                # Send request
+                response = self.session.request(
+                    method = method,
+                    url = url,
+                    headers = consts.HEADERS | headers | self.language,
+                    data = data,
+                    timeout = timeout,
+                    proxies = self.proxies
+                )
+                
+                # Silent 429 errors
+                if b'429</title>' in response.content:
+                    raise ConnectionError('Pornhub raised error 429: too many requests')
+                
+                # Attempt to resolve challenge if needed
+                if challenge := consts.re.get_challenge(response.text, False):
+                    logger.info('\n\nChallenge found, attempting to resolve\n\n')
+                    parser.challenge(self, *challenge)
+                    continue # Reload page
+                
+                break
+            
+            except Exception as err:
+                logger.warning(f'Call failed: {repr(err)}. Retrying ({i})')
+                time.sleep(consts.MAX_CALL_TIMEOUT)
+                continue
         
+        else:
+            raise ConnectionError(f'Call failed after {i + 1} retries. Aborting.')
+
         if throw: response.raise_for_status()
         return response
     

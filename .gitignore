@@ -8,3 +8,5 @@ temp/
 src/temp/
 src/temp/*
 build.bat
+creds
+*.csv

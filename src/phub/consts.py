@@ -29,6 +29,9 @@ LOGIN_PAYLOAD = {
 
 RSS = 'https://www.pornhub.com/video/webmasterss'
 
+MAX_CALL_RETRIES = 5 # Maximum times a HTTPError can be reproduced
+MAX_CALL_TIMEOUT = .4 # Time to wait before retrying basic calls 
+
 SEGMENT_LENGTH = 4 # Length of a PH video segment (in seconds)
 MAX_VIDEO_RENEW_ATTEMPTS = 3
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
@@ -155,12 +158,17 @@ class re:
     get_videos = comp( engine.DOTALL, p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"' ) # Get all videos in a container (id, action type and title)
     get_ps     = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s'                              ) # Get all pornstars in a container (avatar, url, name, video count)
     
-    # Subscration regexes
+    # Substraction regexes
     remove_host = subc( _raw_root, '' ) # Remove the HOST root from a URL
     
     # Verification regexes
     is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                    ) # Check if a string is a URL
     is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}' ) # Check if a string is a video URL
+    
+    # Challenge regexes
+    get_challenge = find( engine.DOTALL, r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):' )
+    parse_challenge = subc( engine.DOTALL, r'(?:var )|(?:/\*.*?\*/)|\s|\n|\t|(?:n;)', '' )
+    ponct_challenge = subc( engine.DOTALL, r'(if.*?&1\)|else)', r'\1:' )
     
     # feed item user = .*?userLink.*?href=\"(.*?)\"
 

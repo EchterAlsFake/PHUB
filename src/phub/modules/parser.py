@@ -4,10 +4,12 @@ import json
 import logging
 from typing import TYPE_CHECKING
 
+from .. import utils
 from .. import errors
 from .. import consts
 
 if TYPE_CHECKING:
+    from .. import Client
     from ..objects import Video
 
 logger = logging.getLogger(__name__)
@@ -37,5 +39,29 @@ def resolve(video: Video) -> dict:
     except:
         logger.error('Failed to parse flash %s for video %s', flash, video)
         raise errors.ParsingError('Failed to resolve page for', video)
+
+def challenge(client: Client, challenge: str, token: str) -> None:
+    '''
+    Resolves a PH challenge.
+    '''
+    
+    # Format code
+    code = consts.re.parse_challenge(challenge)
+    code = consts.re.ponct_challenge(code)
+    code = '\n'.join(code.split(';'))
+    
+    # Execute code
+    context = dict(p = 0, s = 0)
+    exec(code, context)
+    
+    p = context['p']
+    s = context['s']
+    n = utils.least_factors(p)
+    
+    # Build and inject cookie
+    cookie = f'{n}*{p / n}:{s}:{token}:1'
+    client.session.cookies.set('RNKEY', cookie)
+    logger.info('Injected cookie %s', cookie)
+    
 
 # EOF
