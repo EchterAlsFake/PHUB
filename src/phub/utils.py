@@ -4,9 +4,9 @@ PHUB utilities.
 
 import json
 import requests
-from typing import Generator
+from typing import Generator, Iterable
 
-from . import consts, locals
+from . import consts, locals, errors
 
 def concat(*args: list[str]) -> str:
     '''
@@ -173,4 +173,31 @@ def dictify(object_: object,
     return {key: serialize(getattr(object_, key), recursive)
             for key in keys}
 
+def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoError) -> Generator:
+    '''
+    Setup a generator to bypass items that throw errors.
+    
+    Args:
+        gen: The iterable to suppress.
+        errs: The errors that fall under the suppress rule.
+    
+    Returns
+        Generator: The result generator. 
+    '''
+    
+    iterator = iter(gen)
+    
+    while 1:
+        try:
+            item = next(iterator)
+            yield item
+        
+        except StopIteration:
+            break
+        
+        except Exception as err:
+            if isinstance(err, errs):
+                continue
+            
+            raise err
 # EOF

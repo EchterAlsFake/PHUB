@@ -91,4 +91,11 @@ class InvalidSortParam(Exception):
     allowed to have a sort period.
     '''
 
+class VideoError(Exception):
+    '''
+    Pornhub refused to serve video data because
+    of some internal error (mostly because the video
+    is not available anymore).
+    '''
+
 # EOF

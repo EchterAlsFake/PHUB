@@ -104,6 +104,10 @@ class Video:
             
             url = utils.concat(consts.API_ROOT, 'video_by_id?id=' + self.key)
             data = self.client.call(url).json()
+            
+            if 'message' in data:
+                raise errors.VideoError(f'Video is not available. Reason: {data["message"]}')
+            
             self.data |= {f'data@{k}': v for k, v in data['video'].items()}
         
         # Fetch raw page
