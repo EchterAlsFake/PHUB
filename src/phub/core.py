@@ -110,8 +110,7 @@ class Client:
             requests.Response: The fetched response.
         '''
         
-        logger.log(logging.DEBUG if silent else logging.INFO,
-                   'Making call %s', func)
+        logger.log(logging.DEBUG if silent else logging.INFO, 'Making call %s', func)
         
         # Delay
         if self.start_delay:
@@ -147,7 +146,8 @@ class Client:
                 break
             
             except Exception as err:
-                logger.warning(f'Call failed: {repr(err)}. Retrying ({i})')
+                logger.log(logging.DEBUG if silent else logging.WARNING,
+                           f'Call failed: {repr(err)}. Retrying (attempt {i + 1}/{consts.MAX_CALL_RETRIES})')
                 time.sleep(consts.MAX_CALL_TIMEOUT)
                 continue
         
