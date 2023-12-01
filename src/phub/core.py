@@ -92,7 +92,8 @@ class Client:
              data: dict = None,
              headers: dict = {},
              timeout: float = 30,
-             throw: bool = True) -> requests.Response:
+             throw: bool = True,
+             silent: bool = False) -> requests.Response:
         '''
         Send a request.
         
@@ -103,12 +104,14 @@ class Client:
             headers  (dict): Request optional headers.
             timeout (float): Request maximum response time.
             throw    (bool): Wether to raise an error when a request explicitely fails.
+            silent   (bool): Make the call logging one level deeper.
         
         Returns:
             requests.Response: The fetched response.
         '''
         
-        logger.info('Making call %s', func)
+        logger.log(logging.DEBUG if silent else logging.INFO,
+                   'Making call %s', func)
         
         # Delay
         if self.start_delay:

@@ -49,7 +49,7 @@ def default(video: Video,
         for _ in range(consts.DOWNLOAD_SEGMENT_MAX_ATTEMPS):
         
             try:
-                segment = video.client.call(url, throw = False, timeout = 4)
+                segment = video.client.call(url, throw = False, timeout = 4, silent = True)
                 
                 if segment.ok:
                     buffer += segment.content
@@ -121,7 +121,7 @@ def _thread(client: Client, url: str, timeout: int) -> bytes:
     Download a single segment.
     '''
     
-    return client.call(url, timeout = timeout).content
+    return client.call(url, timeout = timeout, silent = True).content
 
 
 def _base_threaded(client: Client,
