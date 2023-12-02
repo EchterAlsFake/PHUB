@@ -126,7 +126,7 @@ class Query:
 
         page = self._get_page(index // self.PAGE_LENGTH)
         
-        if len(page) > (ii := index % self.PAGE_LENGTH):
+        if len(page) > (ii := index % len(page)):
             return self._parse_item(page[ii])
         
         raise errors.NoResult('Item does not exist')
