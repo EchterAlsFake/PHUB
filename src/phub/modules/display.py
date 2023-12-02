@@ -1,30 +1,46 @@
 import os
 import sys
+import time
 from typing import Callable
 
-def progress(color: bool = True) -> Callable:
+def progress(color: dict  | None = dict(c1=30, c2=33, c3=34, c4=36), desc: str = 'Downloading') -> Callable:
     '''
-    Simple progress display.
+    Simple progress display, with segment, percentage and speed display.
     
     Args:
-        color (bool): Wether to color the output using ANSI color codes.
+        color (dict): ASCII progress colors.
+        desc (str): Description to display.
     
     Returns:
         Callable: A wrapper to pass to a downloader.
     '''
     
-    tem = '\rDownloading: {percent}% [{cur}/{total}]'
+    if not color: color = dict(c1='', c2='', c3='', c4='')
     
-    if color:
-        tem = '\rDownloading: \033[92m{percent}%\033[0m [\033[93m{cur}\033[0m/\033[93m{total}\033[0m]'
+    color['c0'] = 0
+    color = {k: '' if v == '' else f'\033[{v}m' for k, v in color.items()}
+    
+    tem = '\r{c1}' + desc + ' {c2}{percent}%{c0} - {c3}{cur}{c0}/{c3}{total}i{c0}' # ({c4}{speed}ips{c0})
+    done = False
+    start = time.time()
     
     def wrapper(cur: int, total: int) -> None:
         
+        nonlocal done
+        if done: return
+        
         percent = round((cur / total) * 100)
         
-        print(tem.format(percent = percent, cur = cur, total = total), end = '')
+        print(tem.format(percent = percent,
+                         cur = cur,
+                         total = total,
+                         speed = round(cur // (time.time() - start), 1),
+                         **color),
+              end = '')
         
-        if cur == total: print()
+        if cur == total:
+            done = True
+            print()
     
     return wrapper
 
