@@ -61,5 +61,9 @@ class Feed:
         '''
 
         return self.filter()
+    
+    def __iter__(self) -> FeedQuery:
+        
+        return iter(self.feed)
 
 # EOF

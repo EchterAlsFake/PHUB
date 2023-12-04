@@ -1,5 +1,7 @@
 test.py
+test*.py
 src/test.py
+src/test*.py
 build/
 build/*
 docs/build/

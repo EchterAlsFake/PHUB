@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 import logging
-from functools import cache
-from typing import TYPE_CHECKING, Generator, Any
+from functools import cache, cached_property
+from typing import TYPE_CHECKING, Generator, Any, Self
 
 from . import Video, User, FeedItem, Param, NO_PARAM
 
@@ -21,12 +21,10 @@ QueryItem = Video | FeedItem | User
 
 class Query:
     '''
-    A Base query for type hints that handles
-    getting items. 
+    A Base query for type hints. 
     '''
     
     BASE: str = None
-    PAGE_LENGTH: int = None
     
     def __init__(self, client: Client, func: str, param: Param = NO_PARAM) -> None:
         '''
@@ -39,8 +37,7 @@ class Query:
         '''
 
         self.client = client
-        self.iter_index = -1
-
+        
         # Parse param
         param |= Param('page', '{page}')
         self.url = utils.concat(self.BASE, func)
@@ -58,27 +55,6 @@ class Query:
         
         return f'phub.Query(url={self.url})'
     
-    def __getitem__(self, index: int | slice) -> QueryItem | Generator[QueryItem, None, None]:
-        '''
-        Get one or multiple items from the query.
-        '''
-        
-        assert isinstance(index, (int, slice))
-        
-        if isinstance(index, int):
-            return self.get(index)
-
-        def wrap() -> Generator[Video, None, None]:
-            # Support slices
-            
-            for i in range(index.start or 0,
-                           index.stop  or 0,
-                           index.step  or 1):
-                
-                yield self.get(i)
-        
-        return wrap()
-
     def __len__(self) -> int:
         '''
         Attempts to fetch the query length.
@@ -92,44 +68,32 @@ class Query:
 
         return int(counter)
 
-    def __iter__(self):
+    @cached_property
+    def pages(self) -> Generator[Generator[QueryItem, None, None], None, None]:
+        '''
+        Iterate through the query pages.
+        '''
         
-        self.iter_index = -1
-        return self
+        i = 0
+        while 1:
+            
+            try:
+                page = self._get_page(i)
+            
+            except errors.NoResult:
+                return
+            
+            i += 1
+            yield (self._parse_item(item) for item in page)
     
-    def __next__(self):
-        
-        try:
-            self.iter_index += 1
-            return self.get(self.iter_index)
-        
-        except errors.NoResult:
-            raise StopIteration
-
-    @cache
-    def get(self, index: int) -> QueryItem:
+    def __iter__(self) -> Self:
         '''
-        Get a single item.
-        
-        Args:
-            index (int): The item index.
-        
-        Returns:
-            QueryItem: The item as an object representation.
+        Iterate through the query videos.
         '''
         
-        assert isinstance(index, int)
-        
-        # Support negative values
-        if index < 0:
-            index = len(self) - index
-
-        page = self._get_page(index // self.PAGE_LENGTH)
-        
-        if len(page) > (ii := index % self.PAGE_LENGTH):
-            return self._parse_item(page[ii])
-        
-        raise errors.NoResult('Item does not exist')
+        for page in self.pages:
+            for video in page:
+                yield video
     
     @cache
     def _get_raw_page(self, index: int) -> str:
@@ -219,7 +183,6 @@ class JSONQuery(Query):
     '''
     
     BASE = consts.API_ROOT
-    PAGE_LENGTH = 30
     
     def _parse_item(self, data: dict) -> Video:
         
@@ -245,7 +208,6 @@ class HTMLQuery(Query):
     '''
     
     BASE = consts.HOST
-    PAGE_LENGTH = 32
     
     def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
         
@@ -275,45 +237,16 @@ class UserQuery(HTMLQuery):
     '''
     Represents a Query able to parse User video data.
     '''
-    
-    PAGE_LENGTH = 40
-    
-    def _parse_page(self, raw: str) -> list[tuple]:
         
-        container = raw.split('class="videoSection')[1]
-        return consts.re.get_videos(container)
-
-class UPSQuery(UserQuery):
-    '''
-    Represents a Query abloe to parse Pornstar videos. 
-    '''
-    
     def _parse_page(self, raw: str) -> list[tuple]:
         
         container = raw.split('class="videoSection')[-1]
         return consts.re.get_videos(container)
 
-class FeedQuery(Query):
-    '''
-    Represents a query able to parse user feeds.
-    '''
-    
-    BASE = consts.HOST
-    PAGE_LENGTH = 13 # Unsure
-    
-    def _parse_item(self, raw: tuple) -> FeedItem:
-        
-        return FeedItem(self.client, raw)
-    
-    def _parse_page(self, raw: str) -> list[tuple]:
-        return consts.re.feed_items(raw)
-
 class MemberQuery(HTMLQuery):
     '''
     Represents an advanced member search query.
     '''
-    
-    PAGE_LENGTH = 42
     
     def _parse_item(self, raw: tuple) -> User:
         
@@ -332,8 +265,6 @@ class PSQuery(MemberQuery):
     '''
     Represents a pornstar search query.
     '''
-    
-    PAGE_LENGTH = 16
     
     def _parse_item(self, raw: tuple) -> User:
         
@@ -356,15 +287,23 @@ class PSQuery(MemberQuery):
 
 class SubQuery(MemberQuery):
     
-    PAGE_LENGTH = 47
-    
     def _parse_page(self, raw: str) -> list:
         
         container = raw.split('<div id="profileContent">')[1]
         return consts.re.get_users(container)
 
-class WatchedQuery(HTMLQuery):
+class FeedQuery(Query):
+    '''
+    Represents a query able to parse user feeds.
+    '''
     
-    PAGE_LENGTH = 46
+    BASE = consts.HOST
+    
+    def _parse_item(self, raw: tuple) -> FeedItem:
+        
+        return FeedItem(self.client, raw)
+    
+    def _parse_page(self, raw: str) -> list[tuple]:
+        return consts.re.feed_items(raw)
 
 # EOF

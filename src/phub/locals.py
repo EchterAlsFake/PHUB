@@ -302,6 +302,15 @@ FEED_CLASS_TO_CONST = {
     # etc.
 }
 
+class DeletedVideo:
+    '''
+    Represent a video that was available at some point,
+    but isn't anymore. 
+    '''
+    
+    def __repr__(self) -> str:
+        return f'phub.Video( DELETED VIDEO )'
+
 __all__ = [
     'NO_PARAM',
     'Quality',

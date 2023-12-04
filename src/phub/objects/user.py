@@ -11,7 +11,7 @@ from .. import errors
 if TYPE_CHECKING:
     from ..core import Client
     from . import Video, Image
-    from . import UserQuery, UPSQuery
+    from . import UserQuery
 
 logger = logging.getLogger(__name__)
 
@@ -240,13 +240,13 @@ class Pornstar(User):
         return UserQuery(self.client, utils.concat(self.url, 'videos/upload'))
     
     @cached_property
-    def videos(self) -> UPSQuery:
+    def videos(self) -> UserQuery:
         '''
         The pornstar's videos.
         '''
         
-        from .query import UPSQuery
+        from .query import UserQuery
         
-        return UPSQuery(self.client, utils.concat(self.url, 'videos'))
+        return UserQuery(self.client, utils.concat(self.url, 'videos'))
 
 # EOF

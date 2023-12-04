@@ -10,7 +10,6 @@ __all__ = [
     
     'Query', 'JSONQuery', 'HTMLQuery', 'FeedQuery',
     'SubQuery', 'UserQuery', 'MemberQuery', 'PSQuery',
-    'UPSQuery', 'WatchedQuery'
 ]
 
 # Dataclasses
@@ -24,9 +23,8 @@ from .feed import Feed
 from .video import Video
 from .account import Account
 from .query import (
-    Query, JSONQuery, HTMLQuery,
-    FeedQuery, UserQuery, MemberQuery,
-    PSQuery, SubQuery, UPSQuery, WatchedQuery
+    Query, JSONQuery, HTMLQuery, FeedQuery,
+    UserQuery, MemberQuery, PSQuery, SubQuery
 )
 
 # EOF
