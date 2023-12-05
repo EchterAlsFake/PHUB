@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import TYPE_CHECKING, Self, Literal
+from typing import TYPE_CHECKING, Self, Literal, Generator
 
 from .. import utils
 from .. import consts
@@ -10,7 +10,7 @@ from . import User, Image
 
 if TYPE_CHECKING:
     from ..core import Client
-    from . import Feed, HTMLQuery, SubQuery
+    from . import Feed, HTMLQuery, User
 
 logger = logging.getLogger(__name__)
 
@@ -137,14 +137,19 @@ class Account:
         return HTMLQuery(self.client, f'users/{self.name}/videos/favorites')
     
     @cached_property
-    def subscriptions(self) -> SubQuery:
+    def subscriptions(self) -> Generator[User, None, None]:
         '''
         Get the account subscriptions.
         '''
         
-        from . import SubQuery
+        page = self.client.call(f'users/{self.name}/subscriptions')
         
-        return SubQuery(self.client, f'users/{self.name}/subscriptions')
+        for url, avatar in consts.re.get_users(page.text):
+            
+            obj = User.get(self.client, utils.concat(consts.HOST, url))
+            obj._cached_avatar_url = avatar # Inject image url
+            
+            yield obj
     
     @cached_property
     def feed(self) -> Feed:

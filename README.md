@@ -1,6 +1,3 @@
-> [!CAUTION]
-> Iterating through subscriptions or recommended videos is currently broken. 
-
 <p align="center">
   <img width="300" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
 </p>
