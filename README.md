@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> I am currently going through hard times as of this december, i won't be able to really update this project.
+> This does not mean i'm giving up on it. I know it's in a pretty bad state (a lot of query features are broken),
+> but i can't do anything right now.
+
 <p align="center">
   <img width="300" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
 </p>
