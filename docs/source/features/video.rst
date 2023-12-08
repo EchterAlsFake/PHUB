@@ -20,7 +20,7 @@ You can use the following properties on a video:
       - Description
     
     * - :literal:`video.title`
-      - Video title. Might epend on client language.
+      - Video title. Might depend on client language.
     
     * - :literal:`video.image`
       - Video thumbnail, as a :py:class:`.Image` object.
@@ -44,7 +44,7 @@ You can use the following properties on a video:
       - The video views (:py:class:`int`).
 
     * - :literal:`video.hotspots`
-      - Video hotspots. Used by Pornhub player to dislplay hot moments. Represented as an :py:class:`int` generator.
+      - Video hotspots. Used by Pornhub player to display hot moments. Represented as an :py:class:`int` generator.
 
     * - :literal:`video.date`
       - The video release date, as a :py:class:`datetime.datetime` object.

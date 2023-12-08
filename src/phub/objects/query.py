@@ -120,7 +120,7 @@ class Query:
     @cache
     def _get_page(self, index: int) -> list:
         '''
-        Get splited unparsed page items.
+        Get split unparsed page items.
         
         Args:
             index (int): The page index:
@@ -197,7 +197,7 @@ class JSONQuery(Query):
         data = json.loads(raw).get('videos')
 
         if data is None:
-            logger.error('Invalif API response from `%s`', self.url)
+            logger.error('Invalid API response from `%s`', self.url)
             raise errors.ParsingError('Invalid API response')
 
         return data

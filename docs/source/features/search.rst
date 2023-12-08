@@ -27,7 +27,7 @@ You can see :doc:`here </api/locals>` a list of possible filters.
 
 For instance, this query will be restrained to search in the French category.
 
-You can use multiple Parameters objects by adding or substracting them, e.g.:
+You can use multiple Parameters objects by adding or subtracting them, e.g.:
 
 .. warning::
   
@@ -78,7 +78,7 @@ To exploit video data, see :doc:`here </features/video>`.
 Using different Query types while searching
 -------------------------------------------
 
-With searching only, you can choose to use 2 diffent queries subclasses.
+With searching only, you can choose to use 2 different queries subclasses.
 You should choose which one to use depending on what you want to do.
 
 .. code-block:: python

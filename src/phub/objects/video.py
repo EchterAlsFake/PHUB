@@ -63,8 +63,8 @@ class Video:
         Refresh video data.
         
         Args:
-            page (bool): Wether to refresh the video page.
-            data (bool): Wether to refresh the video data.
+            page (bool): Whether to refresh the video page.
+            data (bool): Whether to refresh the video data.
         '''
         
         logger.info('Refreshing %s cache', self)
@@ -124,14 +124,14 @@ class Video:
                 keys: Literal['all'] | list[str] = 'all',
                 recursive: bool = False) -> dict:
         '''
-        Convert the object to a dictionnary.
+        Convert the object to a dictionary.
         
         Args:
             keys (str): The data keys to include.
-            recursive (bool): Whether to allow other PHUB objects dictify. 
+            recursive (bool): Whether to allow other PHUB objects to dictify.
         
         Returns:
-            dict: Dict version of the object.
+            dict: A dict version of the object.
         '''
         
         return utils.dictify(self, keys, [
@@ -260,7 +260,7 @@ class Video:
     @cached_property
     def is_vertical(self) -> bool:
         '''
-        Wether the video is in vertical mode.
+        Whether the video is in vertical mode.
         '''
         
         return bool(self.fetch('page@isVertical'))

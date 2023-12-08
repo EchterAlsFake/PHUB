@@ -40,7 +40,7 @@ def concat(*args: list[str]) -> str:
 
 def urlify(dict_: dict) -> str:
     '''
-    Convert a dictionnary to string arguments.
+    Convert a dictionary to string arguments.
     
     Args:
         dict_ (dict): Parameters values.
@@ -143,23 +143,23 @@ def serialize(object_: object, recursive: bool = False) -> object:
     Simple serializer for PHUB objects.
     '''
     
-    # if object is a built-in
+    # if an object is a built-in
     if isinstance(object_, str | int | float | bool):
         ser = object_
     
-    # If object is a PHUB object
+    # If an object is a PHUB object
     elif hasattr(object_, 'dictify') and recursive:
         ser = object_.dictify(recursive = recursive)
     
-    # If object is a soup
+    # If an object is a soup
     elif object_.__class__.__name__ == 'BeautifulSoup':
         ser = object_.decode()
     
-    # If object is a dict
+    # If an object is a dict
     elif isinstance(object_, dict):
         ser = {k: (serialize(v, True)) for k, v in object_.items()}
     
-    # If object is a list or a generator
+    # If an object is a list or a generator
     elif isinstance(object_, list | tuple | Generator | map):
         ser = [serialize(value, True) for value in object_]
     
@@ -184,11 +184,11 @@ def dictify(object_: object,
 
 def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoError) -> Generator:
     '''
-    Setup a generator to bypass items that throw errors.
+    Set up a generator to bypass items that throw errors.
     
     Args:
         gen: The iterable to suppress.
-        errs: The errors that fall under the suppress rule.
+        errs: The errors that fall under the suppression rule.
     
     Returns
         Generator: The result generator. 

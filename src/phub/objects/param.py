@@ -18,8 +18,8 @@ class Param:
         Args:
             key      (str): The parameter key.
             value    (str): The parameter value.
-            single  (bool): Wether the parameter should be single.
-            reverse (bool): Wether the parameter is reversable.
+            single  (bool): Whether the parameter should be single.
+            reverse (bool): Whether the parameter is reversible.
         '''
         
         self.value: dict[str, set[str]] = {}
@@ -48,7 +48,7 @@ class Param:
         Assert that a given item is of the same type as this object.
         
         Args:
-            item (Any): A suposed Param object.
+            item (Any): A supposed Param object.
         '''
         
         if not isinstance(item, Param):
@@ -60,7 +60,7 @@ class Param:
         
         Args:
             other: Another Param instance.
-            brute: Wether to take care of wether params should be single.
+            brute: Whether to take care of whether params should be single.
         
         Returns
             Param: A new Param object.
@@ -87,7 +87,7 @@ class Param:
         
         Args:
             args: One or multiple params to concat.
-            brute: Wether to take care of wether params should be single.
+            brute: Whether to take care of whether params should be single.
         
         Returns
             Param: A new Param object.

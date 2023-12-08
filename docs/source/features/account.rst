@@ -21,7 +21,7 @@ to some Pornhub account:
 
     client = phub.Client('my-username', 'my-password')
 
-By default, PHUB will immediatly attempt a login to Pornhub.
+By default, PHUB will immediately attempt a login to Pornhub.
 If you want to disable this behavior, set ``login`` to False.
 
 .. code-block:: python
@@ -50,7 +50,7 @@ Once a client is logged in, the following data is available:
 
     client.account.name # The account name
     client.avatar # The account user avatar as an phub.Image object.
-    client.is_premium # Wether the account has premium enabled.
+    client.is_premium # Whether the account has premium enabled.
 
     client.user # Public representation of the account. This is useful
                 # if you want to access your own account's data/videos.
@@ -70,7 +70,7 @@ Theses queries emit :py:class:`.Video` objects and are refreshable with :meth:`.
 
 * Video history (:literal:`client.account.watched`)
 
-Here is an exemple on how to view your account history.
+Here is an example on how to view your account history.
 
 .. code-block:: python
 

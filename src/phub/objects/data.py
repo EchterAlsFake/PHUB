@@ -31,14 +31,14 @@ class Tag:
                 keys: Literal['all'] | list[str] = 'all',
                 recursive: bool = False) -> dict:
         '''
-        Convert the object to a dictionnary.
+        Convert the object to a dictionary.
         
         Args:
             keys (str): The data keys to include.
-            recursive (bool): Whether to allow other PHUB objects dictify. 
+            recursive (bool): Whether to allow other PHUB objects to dictify.
         
         Returns:
-            dict: Dict version of the object.
+            dict: A dict version of the object.
         '''
         
         return utils.dictify(self, keys, ['name', 'count'], recursive)
@@ -57,14 +57,14 @@ class Like:
                 keys: Literal['all'] | list[str] = 'all',
                 recursive: bool = False) -> dict:
         '''
-        Convert the object to a dictionnary.
+        Convert the object to a dictionary.
         
         Args:
             keys (str): The data keys to include.
-            recursive (bool): Whether to allow other PHUB objects dictify. 
+            recursive (bool): Whether to allow other PHUB objects to dictify.
         
         Returns:
-            dict: Dict version of the object.
+            dict: A dict version of the object.
         '''
         
         return utils.dictify(self, keys, ['up', 'down', 'ratings'], recursive)
@@ -83,14 +83,14 @@ class FeedItem:
                 keys: Literal['all'] | list[str] = 'all',
                 recursive: bool = False) -> dict:
         '''
-        Convert the object to a dictionnary.
+        Convert the object to a dictionary.
         
         Args:
             keys (str): The data keys to include.
-            recursive (bool): Whether to allow other PHUB objects dictify. 
+            recursive (bool): Whether to allow other PHUB objects to dictify.
         
         Returns:
-            dict: Dict version of the object.
+            dict: A dict version of the object.
         '''
         
         obj = utils.dictify(self, keys, ['user', 'header', 'item_type'], recursive)
@@ -161,10 +161,10 @@ class _BaseQuality:
     
     def __init__(self, value: Literal['best', 'half', 'worst'] | int | Self) -> None:
         '''
-        Initialise a new quality object.
+        Initialize a new quality object.
         
         Args:
-            value (Literal['best', 'half', 'worst'] | int | Self): String, number or quality object to initialise from.
+            value (Literal['best', 'half', 'worst'] | int | Self): String, number or quality object to initialize from.
         '''
         
         self.value = value

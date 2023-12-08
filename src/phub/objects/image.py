@@ -94,14 +94,14 @@ class Image:
                 keys: Literal['all'] | list[str] = 'all',
                 recursive: bool = False) -> dict:
         '''
-        Convert the object to a dictionnary.
+        Convert the object to a dictionary.
         
         Args:
             keys (str): The data keys to include.
-            recursive (bool): Whether to allow other PHUB objects dictify. 
+            recursive (bool): Whether to allow other PHUB objects to dictify.
             
         Returns:
-            dict: Dict version of the object.
+            dict: A dict version of the object.
         '''
         
         return utils.dictify(self, keys, ['url', 'name', '_servers'], recursive)
