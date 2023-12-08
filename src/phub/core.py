@@ -45,8 +45,8 @@ class Client:
             password (str): Optional account password to connect to.
             language (str): Language locale (fr, en, ru, etc.)
             delay  (float): Minimum delay between requests.
-            proxies (dict): Dictionnary of proxies for the requests.
-            login   (bool): Wether to automatically login after initialisation.
+            proxies (dict): Dictionary of proxies for the requests.
+            login   (bool): Whether to automatically log in after initialization.
         '''
         
         logger.debug('Initialised new Client %s', self)
@@ -103,7 +103,7 @@ class Client:
             data     (dict): Optional data to send to the server.
             headers  (dict): Request optional headers.
             timeout (float): Request maximum response time.
-            throw    (bool): Wether to raise an error when a request explicitely fails.
+            throw    (bool): Whether to raise an error when a request explicitly fails.
             silent   (bool): Make the call logging one level deeper.
         
         Returns:
@@ -137,7 +137,7 @@ class Client:
                 if b'429</title>' in response.content:
                     raise ConnectionError('Pornhub raised error 429: too many requests')
                 
-                # Attempt to resolve challenge if needed
+                # Attempt to resolve the challenge if needed
                 if challenge := consts.re.get_challenge(response.text, False):
                     logger.info('\n\nChallenge found, attempting to resolve\n\n')
                     parser.challenge(self, *challenge)
@@ -164,11 +164,11 @@ class Client:
         Attempt to log in.
         
         Args:
-            force (bool): Wether to force the login (used to reconnect).
-            throw (bool): Wether to raise an error if this fails.
+            force (bool): Whether to force the login (used to reconnect).
+            throw (bool): Whether to raise an error if this fails.
         
         Returns:
-            bool: Wether the login was successfull.
+            bool: Whether the login was successful.
         '''
         
         logger.debug('Attempting login')
@@ -242,7 +242,7 @@ class Client:
             user (str): user URL or name.
         
         Returns:
-            User: The corresponging user object.
+            User: The corresponding user object.
         '''
         
         logger.debug('Fetching user %s', user)
@@ -264,7 +264,7 @@ class Client:
             Query: Initialised query.
         '''
         
-        # Assert param type
+        # Assert a param type
         assert isinstance(param, Param)
         logger.info('Opening search query for `%s`', query)
         

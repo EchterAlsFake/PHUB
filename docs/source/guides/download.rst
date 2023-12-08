@@ -52,7 +52,7 @@ There are multiple ways you can create a quality object.
     # Alternatively, you can also enter a raw quality inside most PHUB methods:
     video.download(quality = Quality.BEST)
     # is the same as
-    video.download(qulity = 'best')
+    video.download(quality = 'best')
 
 ^^^^^^^^^^^^^^^^^^^^^^^
 Simple progress display

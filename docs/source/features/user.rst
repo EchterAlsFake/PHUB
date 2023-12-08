@@ -98,7 +98,7 @@ Searching for pornstars
 -----------------------
 
 The :meth:`.Client.search_user` method only search for community members.
-If you want to search specifically for pornstars, you can uesr the
+If you want to search specifically for pornstars, you can use the
 :meth:`.Client.search_pornstar` method.
 
 .. code-block:: python

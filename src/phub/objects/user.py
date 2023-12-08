@@ -23,7 +23,7 @@ class User:
 
     def __new__(cls, client: Client, name: str, url: str, type: str = None) -> Self | Pornstar:
         '''
-        Check user type.
+        Check a user type.
         '''
         
         user_type = type or consts.re.get_user_type(url)
@@ -37,11 +37,11 @@ class User:
     
     def __init__(self, client: Client, name: str, url: str, type: str = None) -> None:
         '''
-        Initialise a new user object.
+        Initialize a new user object.
         
         Args:
             client (Client): The client parent.
-            name      (str): The user name.
+            name      (str): The username.
             url       (str): The user page URL.
         '''
         
@@ -54,7 +54,7 @@ class User:
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
         
-        logger.debug('Initialised new user object %s', self)
+        logger.debug('Initialized new user object %s', self)
         
         # This attribute will be deleted if a refresh is triggered
         self._cached_avatar_url: str = None
@@ -80,14 +80,14 @@ class User:
                 keys: Literal['all'] | list[str] = 'all',
                 recursive: bool = False) -> dict:
             '''
-            Convert the object to a dictionnary.
+            Convert the object to a dictionary.
             
             Args:
                 keys (str): The data keys to include.
-                recursive (bool): Whether to allow other PHUB objects dictify. 
+                recursive (bool): Whether to allow other PHUB objects to dictify.
                 
             Returns:
-                dict: Dict version of the object.
+                dict: A dict version of the object.
             '''
             
             return utils.dictify(self, keys, ['name', 'url', 'type',
@@ -125,7 +125,7 @@ class User:
         
         Args:
             client (Client): The parent client.
-            user      (str): User name or URL.
+            user      (str): Username or URL.
         '''
         
         if consts.re.is_url(user):
@@ -143,9 +143,9 @@ class User:
                 response = client.call(guess, 'HEAD', throw = False)
 
                 # We need to verify that the guess is correct.
-                # Pornhub redirects are weird, they depend on the
+                # Pornhub's redirects are weird, they depend on the
                 # type of the user, so we need to make sure that
-                # we are not redirected to avoid discret 404 pages
+                # we are not redirected to avoid discrete 404 pages
                 if response.ok and type_ in response.url:
                     logger.info('Guessing type of %s is %s', user, type_)
                     url = response.url
@@ -195,7 +195,7 @@ class User:
         
         [Experimental]
         
-        Warning: keys depends on the lanugage.
+        Warning: keys depend on the language.
         '''
         
         li = consts.re.user_infos(self._page)

@@ -117,7 +117,7 @@ def user_videos(user: str, n: str, output: str, quality: str) -> None:
 @cli.command()
 def update_locals() -> None:
     '''
-    Update PHUB locals that depends on PH.
+    Update PHUB locals that depend on PH.
     '''
     
     phub.utils.update_locals()
