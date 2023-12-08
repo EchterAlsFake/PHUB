@@ -206,5 +206,5 @@ you allow repulsiveness with ``object.dictify(recursive = True)``.
 
 .. warning::
 
-  Turning on repulsiveness can make PHUB open more requests that you might
+  Turning on recursion can make PHUB open more requests that you might
   actually need. Make sure you specify only the keys you need when using it.
