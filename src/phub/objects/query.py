@@ -5,7 +5,7 @@ import logging
 from functools import cache, cached_property
 from typing import TYPE_CHECKING, Iterator, Any, Self, Callable
 
-from . import Video, User, FeedItem, Param, NO_PARAM
+from . import Video, User, FeedItem, Param, NO_PARAM, Pornstar
 
 from .. import utils
 from .. import consts
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-QueryItem = Video | FeedItem | User
+QueryItem = Video | FeedItem | User | Pornstar
 
 
 class Query:
@@ -132,9 +132,6 @@ class Query:
         if req.status_code == 404:
             raise errors.NoResult()
         
-        with open('temp.html', 'wb') as file:
-            file.write(req.content)
-
         return req.text
     
     @cache
@@ -225,6 +222,9 @@ class queries:
                 raise errors.ParsingError('Invalid API response')
 
             return data
+        
+        def sample(self, max: int = 0, filter: Callable[[QueryItem], bool] = None) -> Iterator[QueryItem]:
+            return super().sample(max, filter)
 
     class VideoQuery(Query):
         '''
@@ -285,61 +285,15 @@ class queries:
         def _parse_page(self, raw: str) -> list[tuple]:
             return consts.re.feed_items(raw)
 
-
 '''
-Global section delimiters
-
-- Pornstar
-    - .container
-    - #profileContent
-    - .profileVideos
-    - .videosTab
-    - sectionWrapper
-    - videoSection
-    - videoUList
-    - #mostRecentVideoSection (ul)
-
-- Model
-    - .container
-    - .mainSection
-    - .mainContainer
-    - .amateurMainProfileSection
-    - .sectionWrapper
-    - #modelMostRecentVideosSection (ul)
-
-- Recommended
-    - .container
-    - #recommendations
-    - .sectionWrapper
-    - #recommendedVideosContainer
-
-- Pornstar
-    - .container (holup)
-    - .nf-videos
-    - .sectionWrapper.pornstarsLang
-    - #pornstarSearchResult (ul)
-'''
-
-'''
-- VideoQuery -> Yields videos from a page
-    - Video search (PHUB3)
+TODO:
     - User/Model/Pornstar videos enum
     - Pornstars personnal videos
     - Account recommendations
     - Account history
     - Account likes
-
-- UserQuery -> Yields users/members/models/pornstars from a page
-    - Community member search
-    - Pornstar search
     - Account subscriptions
-
-- FeedQuery -> Yields Feed items from a page
     - Feed
-
-- JSONQuery -> Yields videos from the HubTraffic API
-    - Video search (HTAPI)
-
 '''
 
 # EOF

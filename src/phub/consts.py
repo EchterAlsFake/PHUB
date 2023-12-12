@@ -150,8 +150,7 @@ class re:
     user_avatar   = find( engine.DOTALL, r'previewAvatarPicture\">.*?src=\"(.*?)\"'                     ) # get the user avatar
     query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'                 ) # Get a query's video amount
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'            ) # Get the user bio
-    # container     = find( engine.DOTALL, r'class=\"container.*?<ul(.*?)<\/ul'                           ) # Get the page container
-    container     = find( engine.DOTALL, r'class=\"container(.*)'                           ) # Get the page container
+    container     = find( engine.DOTALL, r'class=\"container(.*)'                                       ) # Get the page container
     
     # Findall regexess
     get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
