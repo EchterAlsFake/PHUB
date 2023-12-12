@@ -308,27 +308,5 @@ class Client:
             params |= Param('age2', age[1])
         
         return queries.UserQuery(self, 'user/search', params)
-    
-    def search_pornstar(self,
-                        name: str = None,
-                        sort_param: Param = NO_PARAM) -> queries.UserQuery:
-        '''
-        Search for pornstars.
-        
-        Args:
-            name (str): The pornstar name.
-            sort_param (Param): Query sort parameter.
-        
-        Returns:
-            PQuery: Initialised query.
-        '''
-        
-        # TODO
-        if sort_param.value: # Should be o => mp/mv/nv
-            raise NotImplementedError('PS search parameters are not implemented')
-                
-        sort_param |= Param('search', '+'.join(name.split())) # Format name
-        
-        return queries.UserQuery(self, 'pornstars/search', sort_param)
 
 # EOF

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from functools import cache, cached_property
-from typing import TYPE_CHECKING, Generator, Any, Self
+from typing import TYPE_CHECKING, Iterator, Any, Self, Callable
 
 from . import Video, User, FeedItem, Param, NO_PARAM
 
@@ -69,7 +69,7 @@ class Query:
         return int(counter)
 
     @cached_property
-    def pages(self) -> Generator[Generator[QueryItem, None, None], None, None]:
+    def pages(self) -> Iterator[Iterator[QueryItem]]:
         '''
         Iterate through the query pages.
         '''
@@ -88,12 +88,29 @@ class Query:
     
     def __iter__(self) -> Self:
         '''
-        Iterate through the query videos.
+        Iterate through the query items.
         '''
         
         for page in self.pages:
-            for video in page:
-                yield video
+            for item in page:
+                yield item
+    
+    def sample(self, max: int = 0, filter: Callable[[QueryItem], bool] = None) -> Iterator[QueryItem]:
+        '''
+        Get a sample of items.
+        '''
+        
+        i = 0
+        for item in self:
+            
+            if max and i >= max:
+                return
+            
+            if filter and not filter(item):
+                continue
+            
+            i += 1
+            yield item
     
     @cache
     def _get_raw_page(self, index: int) -> str:
@@ -272,15 +289,6 @@ class queries:
 '''
 Global section delimiters
 
-- Search
-    - sectionWrapper
-    - videoSearch
-    - tjWrap
-    - searchPageTitle
-    - showingCounter
-    - videoSearchResult
-    - sniperModeEngaged (??)
-
 - Pornstar
     - .container
     - #profileContent
@@ -304,11 +312,6 @@ Global section delimiters
     - #recommendations
     - .sectionWrapper
     - #recommendedVideosContainer
-
-- Community members
-    - .container
-    - #advanceSearchResultsWrapper
-    - .search-results (ul)
 
 - Pornstar
     - .container (holup)

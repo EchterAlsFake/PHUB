@@ -6,7 +6,7 @@ import math
 import json
 import logging
 import requests
-from typing import Generator, Iterable
+from typing import Generator, Iterable, Iterator
 
 from . import consts, locals, errors
 
@@ -159,8 +159,8 @@ def serialize(object_: object, recursive: bool = False) -> object:
     elif isinstance(object_, dict):
         ser = {k: (serialize(v, True)) for k, v in object_.items()}
     
-    # If object is a list or a generator
-    elif isinstance(object_, list | tuple | Generator | map):
+    # If object is a list or an itrator
+    elif isinstance(object_, list | tuple | Generator | Iterator | map):
         ser = [serialize(value, True) for value in object_]
     
     else:
@@ -182,7 +182,7 @@ def dictify(object_: object,
     return {key: serialize(getattr(object_, key), recursive)
             for key in keys}
 
-def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoError) -> Generator:
+def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoError) -> Iterator:
     '''
     Setup a generator to bypass items that throw errors.
     
@@ -191,7 +191,7 @@ def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoErr
         errs: The errors that fall under the suppress rule.
     
     Returns
-        Generator: The result generator. 
+        Iterator: The result iterator. 
     '''
     
     logger.info('Initialising suppressed generator')

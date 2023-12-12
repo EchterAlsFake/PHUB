@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import TYPE_CHECKING, Self, Literal, Generator
+from typing import TYPE_CHECKING, Self, Literal, Iterator
 
 from .. import utils
 from .. import consts
@@ -137,7 +137,7 @@ class Account:
         return queries.VideoQuery(self.client, f'users/{self.name}/videos/favorites')
     
     @cached_property
-    def subscriptions(self) -> Generator[User, None, None]:
+    def subscriptions(self) -> Iterator[User]:
         '''
         Get the account subscriptions.
         '''

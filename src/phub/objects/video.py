@@ -4,7 +4,7 @@ import os
 import logging
 from functools import cached_property
 from datetime import datetime, timedelta
-from typing import (TYPE_CHECKING, Generator, Literal,
+from typing import (TYPE_CHECKING, Iterator, Literal,
                     LiteralString, Callable, Any)
 
 from . import (Tag, Like, User,
@@ -164,7 +164,7 @@ class Video:
         
         return Quality(quality).select(qualities)
 
-    def get_segments(self, quality: Quality) -> Generator[str, None, None]:
+    def get_segments(self, quality: Quality) -> Iterator[str]:
         '''
         Get the video segment URLs.
         
@@ -172,7 +172,7 @@ class Video:
             quality (Quality): The video quality.
         
         Returns:
-            Generator: A segment URL generator.
+            Iterator: A segment URL iterator.
         '''
         
         # Fetch the master file
@@ -311,7 +311,7 @@ class Video:
         return self.fetch('data@views')
     
     @cached_property
-    def hotspots(self) -> Generator[int, None, None]:
+    def hotspots(self) -> Iterator[int]:
         '''
         List of hotspots (in seconds) of the video.
         '''
@@ -337,7 +337,7 @@ class Video:
                 for ps in self.fetch('data@pornstars')]
     
     @cached_property
-    def categories(self) -> Generator[Category, None, None]:
+    def categories(self) -> Iterator[Category]:
         '''
         The categories of the video.
         '''
