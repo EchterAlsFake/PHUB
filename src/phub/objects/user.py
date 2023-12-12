@@ -11,7 +11,7 @@ from .. import errors
 if TYPE_CHECKING:
     from ..core import Client
     from . import Video, Image
-    from . import UserQuery
+    from . import queries
 
 logger = logging.getLogger(__name__)
 
@@ -159,18 +159,18 @@ class User:
         return cls(client = client, name = name, type = user_type, url = url)
     
     @cached_property
-    def videos(self) -> UserQuery:
+    def videos(self) -> queries.VideoQuery:
         '''
         Get the list of videos published by this user.
         '''
         
-        from .query import UserQuery
+        from .query import queries
         
         url = self.url
         # if 'model/' in url: url += '/videos'
         url = utils.concat(self.url, 'videos')
         
-        return UserQuery(client = self.client, func = url)
+        return queries.VideoQuery(client = self.client, func = url)
 
     @cached_property
     def _page(self) -> str:
@@ -230,23 +230,23 @@ class Pornstar(User):
         return f'phub.Pornstar(name={self.name})'
     
     @cached_property
-    def uploads(self) -> UserQuery:
+    def uploads(self) -> queries.VideoQuery:
         '''
         The pornstar's custom uploads.
         '''
         
-        from .query import UserQuery
+        from .query import queries
         
-        return UserQuery(self.client, utils.concat(self.url, 'videos/upload'))
+        return queries.VideoQuery(self.client, utils.concat(self.url, 'videos/upload'))
     
     @cached_property
-    def videos(self) -> UserQuery:
+    def videos(self) -> queries.VideoQuery:
         '''
         The pornstar's videos.
         '''
         
-        from .query import UserQuery
+        from .query import queries
         
-        return UserQuery(self.client, utils.concat(self.url, 'videos'))
+        return queries.VideoQuery(self.client, utils.concat(self.url, 'videos'))
 
 # EOF

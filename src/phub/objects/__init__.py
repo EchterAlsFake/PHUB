@@ -6,10 +6,7 @@ __all__ = [
     'Image', 'Param', 'NO_PARAM',
     'Tag', 'Like', 'FeedItem', 'Pornstar',
     'User', 'Feed', 'Video', 'Account',
-    '_BaseQuality',
-    
-    'Query', 'JSONQuery', 'HTMLQuery', 'FeedQuery',
-    'SubQuery', 'UserQuery', 'MemberQuery', 'PSQuery',
+    '_BaseQuality', 'Query', 'queries'
 ]
 
 # Dataclasses
@@ -22,9 +19,6 @@ from .user import User, Pornstar
 from .feed import Feed
 from .video import Video
 from .account import Account
-from .query import (
-    Query, JSONQuery, HTMLQuery, FeedQuery,
-    UserQuery, MemberQuery, PSQuery, SubQuery
-)
+from .query import Query, queries
 
 # EOF

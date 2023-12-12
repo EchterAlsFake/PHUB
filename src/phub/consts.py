@@ -75,7 +75,7 @@ def find(*args) -> Callable[[str, bool], str]:
         
         matches = regex.findall(string)
         if throw and not matches:
-            logger.error('Pattern %s failed', pattern)
+            logger.error('Pattern \033[91m%s\033[0m failed', pattern)
             raise errors.RegexError('Find regex failed.')
         
         if len(matches): return matches[0]
@@ -102,7 +102,7 @@ def comp(*args) -> Callable[[str], str]:
             return matches
         
         except AttributeError:
-            logger.error('Invalid regex method: %s', method)
+            logger.error('Invalid regex method: \033[91m%s\033[0m', method)
             raise AttributeError('Invalid compiled regex method:', method)
     
     return wrapper
@@ -126,7 +126,7 @@ def subc(*args) -> Callable[[str], str]:
             return regex.sub(repl, *args)
         
         except Exception as err:
-            logger.error('Pattern %s replacing %s failed', pattern, repl)
+            logger.error('Pattern \033[91m%s\033[0m replacing \033[91m%s\033[0m failed', pattern, repl)
             raise errors.RegexError('Substraction failed:', err)
     
     return wrapper
@@ -150,6 +150,8 @@ class re:
     user_avatar   = find( engine.DOTALL, r'previewAvatarPicture\">.*?src=\"(.*?)\"'                     ) # get the user avatar
     query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'                 ) # Get a query's video amount
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'            ) # Get the user bio
+    # container     = find( engine.DOTALL, r'class=\"container.*?<ul(.*?)<\/ul'                           ) # Get the page container
+    container     = find( engine.DOTALL, r'class=\"container(.*)'                           ) # Get the page container
     
     # Findall regexess
     get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search

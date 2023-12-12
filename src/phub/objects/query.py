@@ -21,7 +21,7 @@ QueryItem = Video | FeedItem | User
 
 class Query:
     '''
-    A Base query for type hints. 
+    A Base query.
     '''
     
     BASE: str = None
@@ -114,6 +114,9 @@ class Query:
         
         if req.status_code == 404:
             raise errors.NoResult()
+        
+        with open('temp.html', 'wb') as file:
+            file.write(req.content)
 
         return req.text
     
@@ -168,7 +171,7 @@ class Query:
         Get a query page.
         
         Args:
-            raw (str): The unparsed page.
+            raw (str): The raw page container.
         
         Returns:
             list: A semi-parsed list representation.
@@ -176,134 +179,164 @@ class Query:
         
         return NotImplemented
 
+class queries:
+    '''
+    A collection of all PHUB queries.
+    '''
+    
+    class JSONQuery(Query):
+        '''
+        Represents a query able to parse JSON data from the HubTraffic API.
+        '''
+        
+        BASE = consts.API_ROOT
+        
+        def _parse_item(self, data: dict) -> Video:
+            
+            # Create the object and inject data
+            video = Video(self.client, url = data['url'])
+            video.data = {f'data@{k}': v for k, v in data.items()}
+            
+            return video
+        
+        def _parse_page(self, raw: str) -> list[dict]:
+            
+            data = json.loads(raw).get('videos')
 
-class JSONQuery(Query):
-    '''
-    Represents a query able to parse JSON data.
-    '''
-    
-    BASE = consts.API_ROOT
-    
-    def _parse_item(self, data: dict) -> Video:
-        
-        # Create the object and inject data
-        video = Video(self.client, url = data['url'])
-        video.data = {f'data@{k}': v for k, v in data.items()}
-        
-        return video
-    
-    def _parse_page(self, raw: str) -> list[dict]:
-        
-        data = json.loads(raw).get('videos')
+            if data is None:
+                logger.error('Invalif API response from `%s`', self.url)
+                raise errors.ParsingError('Invalid API response')
 
-        if data is None:
-            logger.error('Invalif API response from `%s`', self.url)
-            raise errors.ParsingError('Invalid API response')
+            return data
 
-        return data
+    class VideoQuery(Query):
+        '''
+        Represents a Query able to parse HTML data.
+        '''
+        
+        BASE = consts.HOST
+        
+        def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
+            
+            if key == 'category':
+                key = 'filter-category'
+            
+            set_ = [v.split('@')[0] if '@' in v else v for v in set_]
+            
+            raw = '|'.join(set_)
+            return key, raw
+        
+        def _parse_item(self, raw: tuple) -> Video:
+                    
+            url = f'{consts.HOST}view_video.php?viewkey={raw[0]}'
+            obj = Video(self.client, url)
+            obj.data = {f'page@title': raw[2]}
+            
+            return obj
+        
+        def _parse_page(self, raw: str) -> list:
+            container = consts.re.container(raw)
+            return consts.re.get_videos(container)
 
-class HTMLQuery(Query):
-    '''
-    Represents a Query able to parse HTML data.
-    '''
-    
-    BASE = consts.HOST
-    
-    def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
+    class UserQuery(VideoQuery):
+        '''
+        Represents an advanced member search query.
+        '''
         
-        if key == 'category':
-            key = 'filter-category'
-        
-        set_ = [v.split('@')[0] if '@' in v else v for v in set_]
-        
-        raw = '|'.join(set_)
-        return key, raw
-    
-    def _parse_item(self, raw: tuple) -> Video:
-                
-        url = f'{consts.HOST}view_video.php?viewkey={raw[0]}'
-        
-        obj = Video(self.client, url)
-        obj.data = {f'page@title': raw[2]}
-        
-        return obj
-    
-    def _parse_page(self, raw: str) -> list[tuple]:
-                
-        container = raw.split('class="container')[1]
-        return consts.re.get_videos(container)
+        def _parse_item(self, raw: tuple) -> User:
+            
+            url, image_url = raw
+            
+            obj = User.get(self.client, utils.concat(consts.HOST, url))
+            obj._cached_avatar_url = image_url # Inject image url
+            return obj
 
-class UserQuery(HTMLQuery):
-    '''
-    Represents a Query able to parse User video data.
-    '''
-        
-    def _parse_page(self, raw: str) -> list[tuple]:
-        
-        container = raw.split('class="videoSection')[-1]
-        return consts.re.get_videos(container)
+        def _parse_page(self, raw: str) -> list[tuple]:
+            container = consts.re.container(raw)
+            return consts.re.get_users(container)
 
-class MemberQuery(HTMLQuery):
-    '''
-    Represents an advanced member search query.
-    '''
-    
-    def _parse_item(self, raw: tuple) -> User:
+    class FeedQuery(Query):
+        '''
+        Represents a query able to parse user feeds.
+        '''
         
-        url, image_url = raw
+        BASE = consts.HOST
         
-        obj = User.get(self.client, utils.concat(consts.HOST, url))
-        obj._cached_avatar_url = image_url # Inject image url
-        return obj
+        def _parse_item(self, raw: tuple) -> FeedItem:
+            return FeedItem(self.client, raw)
+        
+        def _parse_page(self, raw: str) -> list[tuple]:
+            return consts.re.feed_items(raw)
 
-    def _parse_page(self, raw: str) -> list[tuple]:
-        
-        container = raw.split('id="advanceSearchResultsWrapper')[1]
-        return consts.re.get_users(container)
 
-class PSQuery(MemberQuery):
-    '''
-    Represents a pornstar search query.
-    '''
-    
-    def _parse_item(self, raw: tuple) -> User:
-        
-        avatar, url, name, videos = raw
-        
-        # Create new user
-        obj = User(self.client,
-                   name = name,
-                   type = 'pornstar',
-                   url = url)
-        
-        obj._cached_avatar_url = avatar # Inject avatar
-        
-        return obj
-    
-    def _parse_page(self, raw: str) -> list[tuple]:
-        
-        container = raw.split('id="pornstarsSearchResult')[1].split('</ul')[0]
-        return consts.re.get_ps(container)
+'''
+Global section delimiters
 
-class SubQuery(MemberQuery):
-    
-    def _parse_page(self, raw: str) -> list:
-        
-        container = raw.split('<div id="profileContent">')[1]
-        return consts.re.get_users(container)
+- Search
+    - sectionWrapper
+    - videoSearch
+    - tjWrap
+    - searchPageTitle
+    - showingCounter
+    - videoSearchResult
+    - sniperModeEngaged (??)
 
-class FeedQuery(Query):
-    '''
-    Represents a query able to parse user feeds.
-    '''
-    
-    BASE = consts.HOST
-    
-    def _parse_item(self, raw: tuple) -> FeedItem:
-        
-        return FeedItem(self.client, raw)
-    
-    def _parse_page(self, raw: str) -> list[tuple]:
-        return consts.re.feed_items(raw)
+- Pornstar
+    - .container
+    - #profileContent
+    - .profileVideos
+    - .videosTab
+    - sectionWrapper
+    - videoSection
+    - videoUList
+    - #mostRecentVideoSection (ul)
+
+- Model
+    - .container
+    - .mainSection
+    - .mainContainer
+    - .amateurMainProfileSection
+    - .sectionWrapper
+    - #modelMostRecentVideosSection (ul)
+
+- Recommended
+    - .container
+    - #recommendations
+    - .sectionWrapper
+    - #recommendedVideosContainer
+
+- Community members
+    - .container
+    - #advanceSearchResultsWrapper
+    - .search-results (ul)
+
+- Pornstar
+    - .container (holup)
+    - .nf-videos
+    - .sectionWrapper.pornstarsLang
+    - #pornstarSearchResult (ul)
+'''
+
+'''
+- VideoQuery -> Yields videos from a page
+    - Video search (PHUB3)
+    - User/Model/Pornstar videos enum
+    - Pornstars personnal videos
+    - Account recommendations
+    - Account history
+    - Account likes
+
+- UserQuery -> Yields users/members/models/pornstars from a page
+    - Community member search
+    - Pornstar search
+    - Account subscriptions
+
+- FeedQuery -> Yields Feed items from a page
+    - Feed
+
+- JSONQuery -> Yields videos from the HubTraffic API
+    - Video search (HTAPI)
+
+'''
 
 # EOF

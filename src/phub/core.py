@@ -14,12 +14,9 @@ from . import locals
 
 from .modules import parser
 
-from .objects import (
-    Param, NO_PARAM,
-    Video, User, Pornstar, Account,
-    Query, JSONQuery, HTMLQuery,
-    MemberQuery, PSQuery
-)
+from .objects import (Param, NO_PARAM, Video,
+                      User, Pornstar, Account,
+                      Query, queries)
 
 logger = logging.getLogger(__name__)
 
@@ -251,14 +248,14 @@ class Client:
     def search(self,
                query: str,
                param: locals.constant = NO_PARAM,
-               feature = JSONQuery) -> Query:
+               use_hubtraffic = True) -> Query:
         '''
         Performs searching on Pornhub.
         
         Args:
             query (str): The query to search.
             param (Param): Filters parameter.
-            feature (Query): Query to use for parsing.
+            use_hubtraffic (bool): Whether to use the HubTraffic Pornhub API (faster but less precision).
         
         Returns:
             Query: Initialised query.
@@ -274,16 +271,20 @@ class Client:
             
             raise errors.InvalidSortParam('Sort parameter not allowed')
         
-        func = 'video/search' if feature is HTMLQuery else 'search'
-        return feature(self, func, Param('search', query) | param)
-
+        param_ = Param('search', query) | param
+        
+        if use_hubtraffic:
+            return queries.JSONQuery(self, 'search', param_)
+        
+        return queries.VideoQuery(self, 'video/search', param_)
+    
     def search_user(self,
                     username: str = None,
                     country: str = None,
                     city: str = None,
                     age: tuple[int] = None,
                     param: Param = NO_PARAM
-                    ) -> MemberQuery:
+                    ) -> queries.UserQuery:
         '''
         Search for users in the community.
         
@@ -306,11 +307,11 @@ class Client:
             params |= Param('age1', age[0])
             params |= Param('age2', age[1])
         
-        return MemberQuery(self, 'user/search', params)
+        return queries.UserQuery(self, 'user/search', params)
     
     def search_pornstar(self,
                         name: str = None,
-                        sort_param: Param = NO_PARAM) -> PSQuery:
+                        sort_param: Param = NO_PARAM) -> queries.UserQuery:
         '''
         Search for pornstars.
         
@@ -328,6 +329,6 @@ class Client:
                 
         sort_param |= Param('search', '+'.join(name.split())) # Format name
         
-        return PSQuery(self, 'pornstars/search', sort_param)
+        return queries.UserQuery(self, 'pornstars/search', sort_param)
 
 # EOF

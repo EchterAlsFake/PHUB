@@ -7,7 +7,7 @@ from functools import cached_property
 from . import User, Param, NO_PARAM
 
 if TYPE_CHECKING:
-    from . import FeedQuery
+    from . import queries
     from ..core import Client
     from ..locals import Section
 
@@ -37,7 +37,7 @@ class Feed:
     
     def filter(self,
                section: Section | Param | str = NO_PARAM,
-               user: User | str = None) -> FeedQuery:
+               user: User | str = None) -> queries.FeedQuery:
         '''
         Creates a Feed Query with specific filters.
         
@@ -46,23 +46,23 @@ class Feed:
             user (User | str): User to filter feed with.
         '''
         
-        from . import FeedQuery
+        from . import queries
         
         # Generate args
         username = user.name if isinstance(user, User) else user
         
         logger.info('Generating new filter feed using args', )
-        return FeedQuery(self.client, 'feeds', Param('username', username) | section)
+        return queries.FeedQuery(self.client, 'feeds', Param('username', username) | section)
     
     @cached_property
-    def feed(self) -> FeedQuery:
+    def feed(self) -> queries.FeedQuery:
         '''
         A feed query with no filters.
         '''
 
         return self.filter()
     
-    def __iter__(self) -> FeedQuery:
+    def __iter__(self) -> queries.FeedQuery:
         
         return iter(self.feed)
 

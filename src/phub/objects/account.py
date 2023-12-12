@@ -10,7 +10,7 @@ from . import User, Image
 
 if TYPE_CHECKING:
     from ..core import Client
-    from . import Feed, HTMLQuery, User
+    from . import Feed, queries, User
 
 logger = logging.getLogger(__name__)
 
@@ -107,17 +107,17 @@ class Account:
                 delattr(self, key)
     
     @cached_property
-    def recommended(self) -> HTMLQuery:
+    def recommended(self) -> queries.VideoQuery:
         '''
         Videos recommended to the account.
         '''
         
-        from . import HTMLQuery
+        from . import queries
         
-        return HTMLQuery(self.client, 'recommended')
+        return queries.VideoQuery(self.client, 'recommended')
     
     @cached_property
-    def watched(self) -> HTMLQuery:
+    def watched(self) -> queries.VideoQuery:
         '''
         Account video history.
         '''
@@ -127,14 +127,14 @@ class Account:
         return HTMLQuery(self.client, f'users/{self.name}/videos/recent')
     
     @cached_property
-    def liked(self) -> HTMLQuery:
+    def liked(self) -> queries.VideoQuery:
         '''
         Videos liked by the account.
         '''
         
-        from . import HTMLQuery
+        from . import queries
         
-        return HTMLQuery(self.client, f'users/{self.name}/videos/favorites')
+        return queries.VideoQuery(self.client, f'users/{self.name}/videos/favorites')
     
     @cached_property
     def subscriptions(self) -> Generator[User, None, None]:
