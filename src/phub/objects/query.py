@@ -290,9 +290,6 @@ TODO:
     - User/Model/Pornstar videos enum
     - Pornstars personnal videos
     - Account recommendations
-    - Account history
-    - Account likes
-    - Account subscriptions
     - Feed
 '''
 

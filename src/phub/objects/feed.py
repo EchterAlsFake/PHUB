@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
 from functools import cached_property
+from typing import TYPE_CHECKING, Callable, Iterator
 
-from . import User, Param, NO_PARAM
+from . import User, Param, NO_PARAM, FeedItem
 
 if TYPE_CHECKING:
     from . import queries
@@ -62,8 +62,11 @@ class Feed:
 
         return self.filter()
     
+    # Mimic feed.feed to avoid repetition
     def __iter__(self) -> queries.FeedQuery:
-        
         return iter(self.feed)
+    
+    def sample(self, max: int = 0, filter: Callable[[FeedItem], bool] = None) -> Iterator[FeedItem]:
+        return self.feed.sample(max, filter)
 
 # EOF
