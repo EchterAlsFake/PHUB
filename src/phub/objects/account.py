@@ -122,9 +122,9 @@ class Account:
         Account video history.
         '''
         
-        from . import HTMLQuery
+        from . import queries
         
-        return HTMLQuery(self.client, f'users/{self.name}/videos/recent')
+        return queries.VideoQuery(self.client, f'users/{self.name}/videos/recent')
     
     @cached_property
     def liked(self) -> queries.VideoQuery:
