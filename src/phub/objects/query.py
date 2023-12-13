@@ -285,12 +285,4 @@ class queries:
         def _parse_page(self, raw: str) -> list[tuple]:
             return consts.re.feed_items(raw)
 
-'''
-TODO:
-    - User/Model/Pornstar videos enum
-    - Pornstars personnal videos
-    - Account recommendations
-    - Feed
-'''
-
 # EOF
