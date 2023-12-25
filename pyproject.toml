@@ -5,7 +5,7 @@ description = "An API for Pornhub"
 authors = [{name = "Egsagon", email = "egsagon.git@gmail.com"}]
 license = {file = "LICENSE"}
 readme = {file = "pypi.md", content-type = "text/markdown"}
-keywords = ["pornhub", "phub", "porn", "hub", "api", "web scrapper", "api wrapper"]
+keywords = ["pornhub", "phub", "porn", "api", "web scrapper", "api wrapper"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"

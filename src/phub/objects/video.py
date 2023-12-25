@@ -375,4 +375,44 @@ class Video:
         
         return User.from_video(self)
 
+    @cached_property
+    def liked(self) -> NotImplemented:
+        '''
+        Whether the video was liked by the account.
+        '''
+        
+        return NotImplemented
+    
+    def _set_like(self, value = 1) -> None:
+        '''
+        Set the video like value.
+        '''
+        
+        raise NotImplementedError()
+        
+        assert self.client.logged, 'Account is not logged in'
+        
+        params = (Param('id', '420092661')
+                  | Param('token', '')
+                  | Param('current', '374')
+                  | Param('value', str(value)))
+        
+        self.client.call('video/rate', 'POST')
+    
+    
+    def like(self) -> NotImplemented:
+        '''
+        Likes the video.
+        '''
+        
+        self._set_like(1)
+        
+        
+    def unlike(self) -> NotImplemented:
+        '''
+        Unlikes the video.
+        '''
+        
+        self._set_like(0)
+
 # EOF

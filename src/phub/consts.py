@@ -172,5 +172,4 @@ class re:
     ponct_challenge = subc( engine.DOTALL, r'(if.*?&1\)|else)', r'\1:' )
     
     # feed item user = .*?userLink.*?href=\"(.*?)\"
-
 # EOF
