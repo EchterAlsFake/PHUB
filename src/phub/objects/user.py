@@ -166,11 +166,8 @@ class User:
         
         from .query import queries
         
-        url = self.url
-        # if 'model/' in url: url += '/videos'
-        url = utils.concat(self.url, 'videos')
-        
-        return queries.VideoQuery(client = self.client, func = url)
+        return queries.VideoQuery(client = self.client,
+                                  func = utils.concat(self.url, 'videos'))
 
     @cached_property
     def _page(self) -> str:
