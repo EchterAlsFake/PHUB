@@ -14,9 +14,8 @@ from . import locals
 
 from .modules import parser
 
-from .objects import (Param, NO_PARAM, Video,
-                      User, Pornstar, Account,
-                      Query, queries)
+from .objects import (Param, NO_PARAM, Video, User,
+                      Account, Query, queries)
 
 logger = logging.getLogger(__name__)
 
@@ -231,7 +230,7 @@ class Client:
         
         return Video(self, url)
 
-    def get_user(self, user: str) -> User | Pornstar:
+    def get_user(self, user: str) -> User:
         '''
         Get a specific user.
         

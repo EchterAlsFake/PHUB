@@ -248,4 +248,14 @@ def least_factors(n: int) -> int:
 
     return n
 
+def head(client: object, url: str) -> bool:
+    '''
+    Performs a HEAD request to check if a page is available.
+    '''
+    
+    res = client.call(url, 'HEAD', throw = False, silent = True)
+    
+    # Make sure we were not redirected
+    return res.ok and url == res.url
+
 # EOF

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Self, Literal
 
 from .. import utils
@@ -16,25 +17,20 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class _QuerySupportIndex:
+    '''
+    Represents indexes about supported queries for a user and their built urls.
+    '''
+    
+    videos: str = None
+    upload: str = None
+
 class User:
     '''
     Represents a Pornhub user.
     '''
 
-    def __new__(cls, client: Client, name: str, url: str, type: str = None) -> Self | Pornstar:
-        '''
-        Check user type.
-        '''
-        
-        user_type = type or consts.re.get_user_type(url)
-        
-        if user_type == 'pornstar':
-            return Pornstar(client, name, url, user_type)
-        
-        # ...
-        
-        return object.__new__(cls)
-    
     def __init__(self, client: Client, name: str, url: str, type: str = None) -> None:
         '''
         Initialise a new user object.
@@ -140,7 +136,7 @@ class User:
             for type_ in ('model', 'pornstar', 'channels'):            
                 
                 guess = utils.concat(type_, name)
-                response = client.call(guess, 'HEAD', throw = False)
+                response = client.call(guess, 'HEAD', throw = False, silent = True)
 
                 # We need to verify that the guess is correct.
                 # Pornhub redirects are weird, they depend on the
@@ -159,6 +155,24 @@ class User:
         return cls(client = client, name = name, type = user_type, url = url)
     
     @cached_property
+    def _supports_queries(self) -> _QuerySupportIndex:
+        '''
+        Checks query support.
+        '''
+        
+        index = _QuerySupportIndex()
+        videos_url = utils.concat(self.url, 'videos')
+
+        if utils.head(self.client, videos_url):
+            index.videos = videos_url
+        
+        if self.type == 'pornstar' and \
+           utils.head(self.client, upload_url := utils.concat(videos_url, 'upload')):
+            index.upload = upload_url
+        
+        return index
+    
+    @cached_property
     def videos(self) -> queries.VideoQuery:
         '''
         Get the list of videos published by this user.
@@ -166,9 +180,29 @@ class User:
         
         from .query import queries
         
-        return queries.VideoQuery(client = self.client,
-                                  func = utils.concat(self.url, 'videos'))
+        # If the video page does not exists, we use the home page
+        url = self._supports_queries.videos or self.url
 
+        return queries.VideoQuery(client = self.client, func = url)
+
+    @cached_property
+    def uploads(self) -> queries.VideoQuery:
+        '''
+        Attempt to get the list of videos uploaded by this user.
+        '''
+        
+        from .query import queries
+        
+        url = self._supports_queries.upload
+        
+        # If the user does not supports uploads, we just return an empty query.
+        query = queries.VideoQuery
+        if not url:
+            logger.info('User %s does not support uploads', self)
+            query = queries.EmptyQuery
+        
+        return query(self.client, func = url)
+    
     @cached_property
     def _page(self) -> str:
         '''
@@ -213,37 +247,5 @@ class User:
         return Image(client = self.client,
                      url = url,
                      name = f'{self.name}-avatar')
-
-class Pornstar(User):
-    '''
-    Represents a Pornstar.
-    '''
-    
-    def __new__(cls, *args, **kwargs) -> Self:
-        return object.__new__(cls)
-    
-    def __repr__(self) -> str:
-        
-        return f'phub.Pornstar(name={self.name})'
-    
-    @cached_property
-    def uploads(self) -> queries.VideoQuery:
-        '''
-        The pornstar's custom uploads.
-        '''
-        
-        from .query import queries
-        
-        return queries.VideoQuery(self.client, utils.concat(self.url, 'videos/upload'))
-    
-    @cached_property
-    def videos(self) -> queries.VideoQuery:
-        '''
-        The pornstar's videos.
-        '''
-        
-        from .query import queries
-        
-        return queries.VideoQuery(self.client, utils.concat(self.url, 'videos'))
 
 # EOF

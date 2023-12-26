@@ -5,7 +5,9 @@ import logging
 from functools import cache, cached_property
 from typing import TYPE_CHECKING, Iterator, Any, Self, Callable
 
-from . import Video, User, FeedItem, Param, NO_PARAM, Pornstar
+from phub.objects import NO_PARAM, Param
+
+from . import Video, User, FeedItem, Param, NO_PARAM
 
 from .. import utils
 from .. import consts
@@ -16,7 +18,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-QueryItem = Video | FeedItem | User | Pornstar
+QueryItem = Video | FeedItem | User
 
 
 class Query:
@@ -285,4 +287,19 @@ class queries:
         def _parse_page(self, raw: str) -> list[tuple]:
             return consts.re.feed_items(raw)
 
+    class EmptyQuery(Query):
+        '''
+        Represents an empty query.
+        '''
+        
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+        
+        def __len__(self) -> int:
+            return 0
+        
+        @cached_property
+        def pages(self):
+            return []
+        
 # EOF
