@@ -238,6 +238,18 @@ class Video:
     # === Data properties === #
 
     @cached_property
+    def id(self) -> str:
+        '''
+        The internal video id.
+        '''
+
+        if id_ := self.data.get('page@id'):
+            return id_
+        
+        # Use thumbnail URL 
+        return consts.re.get_thumb_id(self.image.url)
+
+    @cached_property
     def title(self) -> str:
         '''
         The video title.
@@ -290,7 +302,7 @@ class Video:
                 for tag in self.fetch('data@tags')]
     
     @cached_property
-    def like(self) -> Like:
+    def likes(self) -> Like:
         '''
         Positive and negative reviews of the video.
         '''
@@ -383,22 +395,52 @@ class Video:
         
         return NotImplemented
     
-    def _set_like(self, value = 1) -> None:
+    def _assert_internal_success(self, res: dict) -> None:
+        '''
+        Assert an internal response has succeeded.
+        '''
+        
+        if not res['success']:
+            raise Exception(f'Failed to add to playlist: `{res["message"]}`')
+    
+    def _set_like(self, value: int) -> None:
         '''
         Set the video like value.
         '''
         
-        raise NotImplementedError()
-        
         assert self.client.logged, 'Account is not logged in'
         
-        params = (Param('id', '420092661')
-                  | Param('token', '')
-                  | Param('current', '374')
-                  | Param('value', str(value)))
+        res = self.client.call(f'video/rate?id={self.id}&token={self.client.token}&current={self.likes.up}&value={value}', 'POST')
         
-        self.client.call('video/rate', 'POST')
-    
+        # self._assert_internal_success(res)
+        
+        print(res.status_code, res.content)
+
+    def _set_favorite(self, value: int) -> None:
+        '''
+        Set video as favorite or not.
+        '''
+        
+        # BUG - 400 Invalid for some reason 
+        res = self.client.call(func = 'video/favourite',
+                               method = 'POST',
+                               data = f'toggle={value}&id={self.id}&token={self.client.token}',
+                               headers = {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                          'Referer': consts.HOST + '/view_video.php?viewkey=' + self.key})
+        
+        self._assert_internal_success(res.json())
+
+    def watch_later(self) -> None:
+        '''
+        Add the video to the watch later playlist.
+        '''
+        
+        res = self.client.call('playlist/video_add_watchlater', 'POST', dict(
+            vid = None,
+            token = self.client.token
+        ))
+        
+        self._assert_internal_success(res.json())
     
     def like(self) -> NotImplemented:
         '''
@@ -406,13 +448,38 @@ class Video:
         '''
         
         self._set_like(1)
-        
-        
+    
     def unlike(self) -> NotImplemented:
         '''
         Unlikes the video.
         '''
         
         self._set_like(0)
+
+    @cached_property
+    def watched(self) -> bool | NotImplemented:
+        '''
+        Whether the video was viewed previously by the account.
+        
+        Warning: In the event you don't get this video from a *page* query,
+        calling this could become really unoptimized.
+        '''
+        
+        if not self.client.logged:
+            raise Exception('Client must be logged in to use this property.') # temp class
+        
+        # If we fetched the video page, PH consider we have watched it
+        if self.page:
+            return True
+        
+        # If the video was initialised by a query, Pornhub
+        # gives us this information so there is no problem
+        if markers := self.data.get('query@markers'):
+            return 'watchedVideo' in markers
+        
+        # If the video comes from nowhere, well idk
+        # Hack: create a temp PH playlist to simulate a
+        # query and get info from there
+        return NotImplemented
 
 # EOF

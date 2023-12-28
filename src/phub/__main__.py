@@ -15,7 +15,7 @@ def cli(): pass
 @click.argument('entry')
 @click.option('--quality', '-q', help = 'Video quality', default = 'best')
 @click.option('--output',  '-o', help = 'Output video file', default = '.')
-@click.option('--pause',  '-p', help = 'Pause between downloads', default = 10)
+@click.option('--pause',  '-p', help = 'Pause between downloads', default = 5)
 @click.option('--threads',  '-t', help = 'Number of threads to use', default = 100)
 def download(entry: str, quality: str, output: str, pause: str, threads) -> None:
     '''

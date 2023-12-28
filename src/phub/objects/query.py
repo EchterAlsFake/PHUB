@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Iterator, Any, Self, Callable
 
 from phub.objects import NO_PARAM, Param
 
-from . import Video, User, FeedItem, Param, NO_PARAM
+from . import Video, Image, User, FeedItem, Param, NO_PARAM
 
 from .. import utils
 from .. import consts
@@ -28,7 +28,11 @@ class Query:
     
     BASE: str = None
     
-    def __init__(self, client: Client, func: str, param: Param = NO_PARAM) -> None:
+    def __init__(self,
+                 client: Client,
+                 func: str,
+                 param: Param = NO_PARAM,
+                 container_hint: Callable = None) -> None:
         '''
         Initialise a new query.
         
@@ -39,6 +43,7 @@ class Query:
         '''
 
         self.client = client
+        self.hint = container_hint
         
         # Parse param
         param |= Param('page', '{page}')
@@ -245,16 +250,29 @@ class queries:
             raw = '|'.join(set_)
             return key, raw
         
-        def _parse_item(self, raw: tuple) -> Video:
-                    
-            url = f'{consts.HOST}view_video.php?viewkey={raw[0]}'
+        def _parse_item(self, data: tuple[str]) -> Video:
+            
+            # Unpack data
+            raw, id, key, title, image, preview, markers = data
+            
+            url = f'{consts.HOST}view_video.php?viewkey={key}'
             obj = Video(self.client, url)
-            obj.data = {f'page@title': raw[2]}
+            
+            obj.data = {
+                # Property overrides
+                'page@title': title,
+                'data@thumb': image,
+                'page@id': id,
+                
+                # Extra query specific data
+                'query@raw': raw,
+                'query@preview': preview
+            }
             
             return obj
         
         def _parse_page(self, raw: str) -> list:
-            container = consts.re.container(raw)
+            container = (self.hint or consts.re.container)(raw)
             return consts.re.get_videos(container)
 
     class UserQuery(VideoQuery):
@@ -271,7 +289,7 @@ class queries:
             return obj
 
         def _parse_page(self, raw: str) -> list[tuple]:
-            container = consts.re.container(raw)
+            container = (self.hint or consts.re.container)(raw)
             return consts.re.get_users(container)
 
     class FeedQuery(Query):

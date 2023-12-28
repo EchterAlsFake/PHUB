@@ -151,13 +151,14 @@ class re:
     query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'                 ) # Get a query's video amount
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'            ) # Get the user bio
     container     = find( engine.DOTALL, r'class=\"container(.*)'                                       ) # Get the page container
+    get_thumb_id  = find( r'\/([a-z0-9]+?)\/(?=original)'                                               ) # Get video id from its thumbnail 
     
     # Findall regexess
     get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
     user_infos = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
     feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                                                        ) # Get all items in the Feed
-    get_videos = comp( engine.DOTALL, p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"' ) # Get all videos in a container (id, action type and title)
     get_ps     = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s'                              ) # Get all pornstars in a container (avatar, url, name, video count)
+    get_videos = comp( engine.DOTALL, p.findall, r'<li.*?videoblock.*?>.*?(id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?).*?)</li' ) # Get all videos & data
     
     # Substraction regexes
     remove_host = subc( _raw_root, '' ) # Remove the HOST root from a URL
@@ -167,9 +168,10 @@ class re:
     is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}' ) # Check if a string is a video URL
     
     # Challenge regexes
-    get_challenge = find( engine.DOTALL, r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):' )
+    get_challenge   = find( engine.DOTALL, r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):' )
     parse_challenge = subc( engine.DOTALL, r'(?:var )|(?:/\*.*?\*/)|\s|\n|\t|(?:n;)', '' )
     ponct_challenge = subc( engine.DOTALL, r'(if.*?&1\)|else)', r'\1:' )
     
     # feed item user = .*?userLink.*?href=\"(.*?)\"
+
 # EOF

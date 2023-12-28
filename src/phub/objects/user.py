@@ -184,7 +184,7 @@ class User:
         url = self._supports_queries.videos or self.url
 
         return queries.VideoQuery(client = self.client, func = url)
-
+    
     @cached_property
     def uploads(self) -> queries.VideoQuery:
         '''

@@ -60,6 +60,7 @@ class Client:
         
         # Connect account
         self.logged = False
+        self.token: str = None
         self.account = Account(self)
         logger.debug('Connected account to client %s', self.account)
         
@@ -175,10 +176,10 @@ class Client:
     
         # Get token
         page = self.call('').text
-        token = consts.re.get_token(page)
+        self.token = consts.re.get_token(page)
         
         # Send credentials
-        payload = consts.LOGIN_PAYLOAD | self.credentials | {'token': token}
+        payload = consts.LOGIN_PAYLOAD | self.credentials | {'token': self.token}
         response = self.call('front/authenticate', method = 'POST', data = payload)
         
         # Parse response
