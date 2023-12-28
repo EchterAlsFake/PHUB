@@ -49,6 +49,8 @@ class Query:
         param |= Param('page', '{page}')
         self.url = utils.concat(self.BASE, func)
         
+        self.suppress_spicevids = True
+        
         add_qm = True
         for key, set_ in param.value.items():
             self.url += '&?'[add_qm]
@@ -91,7 +93,12 @@ class Query:
                 return
             
             i += 1
-            yield (self._parse_item(item) for item in page)
+            
+            # Yield each object of the page, but only if it does not have the spicevids
+            # markers and we explicitely suppress spicevids videos.
+            yield (wrapped := self._parse_item(item) for item in page
+                   if not (self.suppress_spicevids
+                           and 'PremiumIcon' in wrapped.data.get('query@markers')))
     
     def __iter__(self) -> Self:
         '''
@@ -155,7 +162,7 @@ class Query:
         
         raw = self._get_raw_page(index)
         return self._parse_page(raw)
-    
+
     # Methods defined by subclasses
     def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
         '''
@@ -250,13 +257,16 @@ class queries:
             raw = '|'.join(set_)
             return key, raw
         
-        def _parse_item(self, data: tuple[str]) -> Video:
+        def _parse_item(self, raw: str) -> Video:
             
-            # Unpack data
-            raw, id, key, title, image, preview, markers = data
+            # Parse data
+            id, key, title, image, preview, markers = consts.re.eval_video(raw)
             
             url = f'{consts.HOST}view_video.php?viewkey={key}'
             obj = Video(self.client, url)
+            
+            # Parse markers
+            markers = ' '.join(consts.re.get_markers(markers)).split()
             
             obj.data = {
                 # Property overrides
@@ -266,6 +276,7 @@ class queries:
                 
                 # Extra query specific data
                 'query@raw': raw,
+                'query@markers': markers,
                 'query@preview': preview
             }
             

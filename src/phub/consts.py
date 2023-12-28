@@ -158,7 +158,10 @@ class re:
     user_infos = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
     feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                                                        ) # Get all items in the Feed
     get_ps     = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s'                              ) # Get all pornstars in a container (avatar, url, name, video count)
-    get_videos = comp( engine.DOTALL, p.findall, r'<li.*?videoblock.*?>.*?(id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?).*?)</li' ) # Get all videos & data
+    
+    get_videos = comp( engine.DOTALL, p.findall, r'<li.*?videoblock(.*?)</li' ) # Get all videos
+    eval_video = find( engine.DOTALL, r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div' ) # Parse video data
+    get_markers = comp( engine.DOTALL, p.findall, r'class=\"(.*?)\"' ) # Get markers identifiers
     
     # Substraction regexes
     remove_host = subc( _raw_root, '' ) # Remove the HOST root from a URL

@@ -26,6 +26,7 @@ class _QuerySupportIndex:
     videos: str = None
     upload: str = None
 
+
 class User:
     '''
     Represents a Pornhub user.

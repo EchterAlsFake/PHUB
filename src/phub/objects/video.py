@@ -481,5 +481,16 @@ class Video:
         # Hack: create a temp PH playlist to simulate a
         # query and get info from there
         return NotImplemented
+    
+    @cached_property
+    def is_free_premium(self) -> bool | NotImplemented:
+        '''
+        Whether the video is part of free premium.
+        '''
+        
+        if markers := self.data.get('query@markers'):
+            return 'phpFreeBlock' in markers
+
+        return NotImplemented
 
 # EOF
