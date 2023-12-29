@@ -1,7 +1,3 @@
-> [!IMPORTANT]
-> Status update
-> User videos and uploads queries are still broken 
-
 <p align="center">
   <img width="300" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
 </p>
