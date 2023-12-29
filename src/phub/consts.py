@@ -42,6 +42,8 @@ FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c c
 
 # Regex wrappers
 
+WrappedRegex = Callable[[str, bool], str]
+
 def eval_flags(flags: list[int]) -> int:
     '''
     Evaluate flags.
@@ -58,7 +60,7 @@ def eval_flags(flags: list[int]) -> int:
     
     return 0
 
-def find(*args) -> Callable[[str, bool], str]:
+def find(*args) -> WrappedRegex:
     '''
     Compile a single find regex and wraps handling its errors.
     
@@ -82,7 +84,7 @@ def find(*args) -> Callable[[str, bool], str]:
     
     return wrapper
 
-def comp(*args) -> Callable[[str], str]:
+def comp(*args) -> WrappedRegex:
     '''
     Compile a regex using a custom method with error handling.
     
@@ -107,7 +109,7 @@ def comp(*args) -> Callable[[str], str]:
     
     return wrapper
 
-def subc(*args) -> Callable[[str], str]:
+def subc(*args) -> WrappedRegex:
     '''
     Compile a substraction regex and apply its replacement to each call.
     
@@ -152,15 +154,14 @@ class re:
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'            ) # Get the user bio
     container     = find( engine.DOTALL, r'class=\"container(.*)'                                       ) # Get the page container
     get_thumb_id  = find( r'\/([a-z0-9]+?)\/(?=original)'                                               ) # Get video id from its thumbnail 
+    eval_video    = find( engine.DOTALL, r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div' ) # Parse video data
     
     # Findall regexess
     get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
     user_infos = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
     feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                                                        ) # Get all items in the Feed
     get_ps     = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s'                              ) # Get all pornstars in a container (avatar, url, name, video count)
-    
     get_videos = comp( engine.DOTALL, p.findall, r'<li.*?videoblock(.*?)</li' ) # Get all videos
-    eval_video = find( engine.DOTALL, r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div' ) # Parse video data
     get_markers = comp( engine.DOTALL, p.findall, r'class=\"(.*?)\"' ) # Get markers identifiers
     
     # Substraction regexes

@@ -23,6 +23,12 @@ QueryItem = Video | FeedItem | User
 def Page(query: Query, page: list[Any]) -> Iterator[QueryItem]:
     '''
     Iterates over a page.
+    Args:
+        query (Query): Parent query.
+        page   (list): The parsed page to iterate over.
+    
+    Returns:
+        Iterator: An iterator containing wrapped query items.
     '''
     
     for item in page:
@@ -48,14 +54,15 @@ class Query:
                  client: Client,
                  func: str,
                  param: Param = NO_PARAM,
-                 container_hint: Callable = None) -> None:
+                 container_hint: consts.WrappedRegex | Callable = None) -> None:
         '''
         Initialise a new query.
         
         Args:
-            client (Client): The parent client.
-            func      (str): The URL function.
-            param   (Param): Filter parameter.
+            client           (Client): The parent client.
+            func                (str): The URL function.
+            param             (Param): Filter parameter.
+            container_hint (Callable): An hint function to help determine where should the target container be.
         '''
 
         self.client = client
@@ -209,7 +216,7 @@ class Query:
         
         return NotImplemented
     
-    def _parse_page(self, raw: str) -> list:
+    def _parse_page(self, raw: str) -> list[Any]:
         '''
         Get a query page.
         

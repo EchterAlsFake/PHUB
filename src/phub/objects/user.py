@@ -58,7 +58,7 @@ class User:
     
     def __repr__(self) -> str:
         
-        return f'phub.User(name={self.name})'
+        return f'phub.{self.type.capitalize()}({self.name})'
 
     def refresh(self) -> None:
         '''
@@ -183,8 +183,14 @@ class User:
         
         # If the video page does not exists, we use the home page
         url = self._supports_queries.videos or self.url
-
-        return queries.VideoQuery(client = self.client, func = url)
+        
+        # If there is a upload section, make sure we bypass it
+        hint = (lambda raw: raw.split('id="mostRecentVideosSection')[1]) \
+               if self._supports_queries.upload else None
+        
+        return queries.VideoQuery(client = self.client,
+                                  func = url,
+                                  container_hint = hint)
     
     @cached_property
     def uploads(self) -> queries.VideoQuery:

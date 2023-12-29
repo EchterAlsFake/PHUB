@@ -233,7 +233,70 @@ class Video:
         )
         
         return path
+    
+    # === Interaction methods === #
+    
+    def _assert_internal_success(self, res: dict) -> None:
+        '''
+        Assert an internal response has succeeded.
+        '''
         
+        if not res['success']:
+            raise Exception(f'Failed to add to playlist: `{res["message"]}`')
+    
+    def _set_like(self, value: int) -> None:
+        '''
+        Set the video like value.
+        '''
+        
+        assert self.client.logged, 'Account is not logged in'
+        
+        res = self.client.call(f'video/rate?id={self.id}&token={self.client.token}&current={self.likes.up}&value={value}', 'POST')
+        
+        # self._assert_internal_success(res)
+        
+        print(res.status_code, res.content)
+
+    def _set_favorite(self, value: int) -> None:
+        '''
+        Set video as favorite or not.
+        '''
+        
+        # BUG - 400 Invalid for some reason 
+        res = self.client.call(func = 'video/favourite',
+                               method = 'POST',
+                               data = f'toggle={value}&id={self.id}&token={self.client.token}',
+                               headers = {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                          'Referer': consts.HOST + '/view_video.php?viewkey=' + self.key})
+        
+        self._assert_internal_success(res.json())
+
+    def watch_later(self) -> None:
+        '''
+        Add the video to the watch later playlist.
+        '''
+        
+        res = self.client.call('playlist/video_add_watchlater', 'POST', dict(
+            vid = None,
+            token = self.client.token
+        ))
+        
+        self._assert_internal_success(res.json())
+    
+    def like(self) -> NotImplemented:
+        '''
+        Likes the video.
+        '''
+        
+        self._set_like(1)
+    
+    def unlike(self) -> NotImplemented:
+        '''
+        Unlikes the video.
+        '''
+        
+        self._set_like(0)
+
     # === Data properties === #
 
     @cached_property
@@ -394,67 +457,6 @@ class Video:
         
         return NotImplemented
     
-    def _assert_internal_success(self, res: dict) -> None:
-        '''
-        Assert an internal response has succeeded.
-        '''
-        
-        if not res['success']:
-            raise Exception(f'Failed to add to playlist: `{res["message"]}`')
-    
-    def _set_like(self, value: int) -> None:
-        '''
-        Set the video like value.
-        '''
-        
-        assert self.client.logged, 'Account is not logged in'
-        
-        res = self.client.call(f'video/rate?id={self.id}&token={self.client.token}&current={self.likes.up}&value={value}', 'POST')
-        
-        # self._assert_internal_success(res)
-        
-        print(res.status_code, res.content)
-
-    def _set_favorite(self, value: int) -> None:
-        '''
-        Set video as favorite or not.
-        '''
-        
-        # BUG - 400 Invalid for some reason 
-        res = self.client.call(func = 'video/favourite',
-                               method = 'POST',
-                               data = f'toggle={value}&id={self.id}&token={self.client.token}',
-                               headers = {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                                          'Referer': consts.HOST + '/view_video.php?viewkey=' + self.key})
-        
-        self._assert_internal_success(res.json())
-
-    def watch_later(self) -> None:
-        '''
-        Add the video to the watch later playlist.
-        '''
-        
-        res = self.client.call('playlist/video_add_watchlater', 'POST', dict(
-            vid = None,
-            token = self.client.token
-        ))
-        
-        self._assert_internal_success(res.json())
-    
-    def like(self) -> NotImplemented:
-        '''
-        Likes the video.
-        '''
-        
-        self._set_like(1)
-    
-    def unlike(self) -> NotImplemented:
-        '''
-        Unlikes the video.
-        '''
-        
-        self._set_like(0)
-
     @cached_property
     def watched(self) -> bool | NotImplemented:
         '''
