@@ -61,7 +61,7 @@ the cache by calling :meth:`.Video.refresh`.
 
     video = client.get(key = 'xxx')
 
-    print(f'The "{video.title}" has {video.like.up} likes!')
+    print(f'The "{video.title}" has {video.likes.up} likes!')
 
 Downloading a video
 -------------------

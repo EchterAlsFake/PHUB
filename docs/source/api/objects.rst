@@ -57,7 +57,7 @@ Here is a list of all API objects.
     :members:
     :undoc-members:
     :private-members:
-    :special-members: __init__
+    :special-members: __init__, __iter__
 
 .. autoclass:: phub.objects.User
     :members:

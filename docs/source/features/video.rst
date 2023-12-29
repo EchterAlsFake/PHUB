@@ -58,6 +58,38 @@ You can use the following properties on a video:
     * - :literal:`video.author`
       - The user account that posted the video, as a :py:class:`.User` object.
 
+    * - :literal:`video.id`
+      - The video internal id. Most likely to be used in Pornhub's databases.
+    
+    * - :literal:`video.watched`
+      - Whether the video has been watched by the client.
+    
+    * - :literal:`video.is_free_premium`
+      - Whether the video is part of Pornhub free premium plan.
+
+    * - :literal:`video.preview`
+      - The small preview you see when hovering a video, as a :py:class:`.Image` object.
+    
+    * - :literal:`video.is_favorite`
+      - Whether the video is set a favorite by the client.
+
+Interactions
+------------
+
+As of version 4.3, some interactions are available with the video:
+
+.. list-table:: PHUB Video Interactions
+    :header-rows: 1
+
+    * - :meth:`.Video.like`
+      - Set or unset the video as liked.
+
+    * - :meth:`.Video.favorite`
+      - Set or unset the video as favorite.
+    
+    * - :meth:`.Video.watch_later`
+      - Add or remove the video from the watch later playlist.
+
 Refreshing data
 ---------------
 

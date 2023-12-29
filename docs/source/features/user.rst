@@ -52,7 +52,8 @@ You can search for user accounts on the platform using :meth:`.Client.search_use
     )
 
 This method behaves like :meth:`.Client.search`: you can select custom filters for the
-query:
+query.
+You can learn more about PHUB queries :doc:`here </features/search>`.
 
 .. code-block:: python
 
@@ -93,23 +94,3 @@ query:
     # You can also use these sort filters    
     Sort.USER_POPULAR # Alongside with a sort period like SORT.week
     Sort.USER_NEWEST
-
-Searching for pornstars
------------------------
-
-The :meth:`.Client.search_user` method only search for community members.
-If you want to search specifically for pornstars, you can uesr the
-:meth:`.Client.search_pornstar` method.
-
-.. code-block:: python
-
-    users = core.search_pornstar(name = 'Target',
-                                 sort_param = ...)
-
-There is no custom pornstar search filters in Pornhub, so the only filters
-available are the sort params.
-
-Note that the results will be a query containing :py:class:`.User` objects.
-Their :attr:`.User.type` will be :literal:`'pornstar'`.
-
-You can learn more about PHUB queries :dov:`here </features/search>`.
