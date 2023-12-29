@@ -279,27 +279,34 @@ class queries:
             raw = '|'.join(set_)
             return key, raw
         
+        def _eval_video(self, raw: str) -> dict:
+            # Evaluate video data.
+            # Can be used externally from this query
+            
+            keys = ('id', 'key', 'title', 'image', 'preview', 'markers')
+            data = {k: v for k, v in zip(keys, consts.re.eval_video(raw))} | {'raw': raw}
+            
+            return data
+        
         def _parse_item(self, raw: str) -> Video:
             
             # Parse data
-            id, key, title, image, preview, markers = consts.re.eval_video(raw)
+            data = self._eval_video(raw)
             
-            url = f'{consts.HOST}view_video.php?viewkey={key}'
+            url = f'{consts.HOST}view_video.php?viewkey={data["key"]}'
             obj = Video(self.client, url)
+            
+            # Override the _as_query property since we already have a query 
+            obj._as_query = data
             
             # Parse markers
             markers = ' '.join(consts.re.get_markers(markers)).split()
             
             obj.data = {
                 # Property overrides
-                'page@title': title,
-                'data@thumb': image,
-                'page@id': id,
-                
-                # Extra query specific data
-                'query@raw': raw,
-                'query@markers': markers,
-                'query@preview': preview
+                'page@title': data["title"],
+                'data@thumb': data["image"],
+                'page@id': id
             }
             
             return obj

@@ -153,7 +153,7 @@ class re:
     query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'                 ) # Get a query's video amount
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'            ) # Get the user bio
     container     = find( engine.DOTALL, r'class=\"container(.*)'                                       ) # Get the page container
-    get_thumb_id  = find( r'\/([a-z0-9]+?)\/(?=original)'                                               ) # Get video id from its thumbnail 
+    get_thumb_id  = find( r'\/([a-z0-9]+?)\/(?=original|thumb)'                                         ) # Get video id from its thumbnail 
     eval_video    = find( engine.DOTALL, r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div' ) # Parse video data
     
     # Findall regexess

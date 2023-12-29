@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import random
 import logging
 from functools import cached_property
 from datetime import datetime, timedelta
@@ -244,6 +245,56 @@ class Video:
         if res['success'] and not res['success'] in ('true', True, 1):
             raise Exception(f'Failed to call : `{res.get("message")}`')
     
+    @cached_property
+    def _as_query(self) -> dict[str, str]:
+        '''
+        Simulate a query to gain access to more data.
+        
+        Warning - This will make a lot of requests and can false
+                   some properties (like watched).
+        '''
+        
+        # 1. Create playlist
+        name = f'temp-{random.randint(0, 100)}'
+        logger.info('Creating temporary playlist %s', name)
+        res = self.client.call('playlist/create', 'POST', dict(
+            title = name,
+            tags = '["porn"]',
+            description = '',
+            status = 'private',
+            token = self._token
+        )).json()
+        
+        self._assert_internal_success(res)
+        playlist_id = res.get('id')
+        
+        # 2. Add to playlist
+        res = self.client.call('playlist/video_add', 'POST', dict(
+            pid = playlist_id,
+            vid = self.id,
+            token = self._token
+        ))
+        
+        self._assert_internal_success(res.json())
+        
+        # 3. Start query
+        from .query import queries
+        query = queries.VideoQuery(self.client, f'playlist/{playlist_id}')
+        raw = query._get_page(0)[0]
+        
+        keys = ('id', 'key', 'title', 'image', 'preview', 'markers')
+        data = {k: v for k, v in zip(keys, consts.re.eval_video(raw))} | {'raw': raw}
+        
+        # 4. Delete playlist
+        logger.info('Deleting playlist %s', name)
+        res = self.client.call('playlist/delete', 'POST', dict(
+            pid = playlist_id,
+            token = self._token,
+            action = 'delete'
+        ))
+        
+        return data
+    
     def like(self, toggle: bool = True) -> None:
         '''
         Set the video like value.
@@ -461,30 +512,24 @@ class Video:
         return NotImplemented
     
     @cached_property
-    def watched(self) -> bool | NotImplemented:
+    def watched(self) -> bool:
         '''
         Whether the video was viewed previously by the account.
-        
-        Warning: In the event you don't get this video from a *page* query,
-        calling this could become really unoptimized.
         '''
         
         if not self.client.logged:
             raise Exception('Client must be logged in to use this property.') # temp class
         
-        # If we fetched the video page, PH consider we have watched it
+        # If we fetched the video page while logged in, PH consider we have watched it
         if self.page:
             return True
         
-        # If the video was initialised by a query, Pornhub
-        # gives us this information so there is no problem
-        if markers := self.data.get('query@markers'):
-            return 'watchedVideo' in markers
+        if 'watchedVideo' in self._as_query['markers']:
+            return True
         
-        # If the video comes from nowhere, well idk
-        # Hack: create a temp PH playlist to simulate a
-        # query and get info from there
-        return NotImplemented
+        # For some reason the watched text is different in playlists
+        if 'class="watchedVideoText' in self._as_query['raw']:
+            return True
     
     @cached_property
     def is_free_premium(self) -> bool | NotImplemented:
@@ -492,11 +537,8 @@ class Video:
         Whether the video is part of free premium.
         '''
         
-        if markers := self.data.get('query@markers'):
-            return 'phpFreeBlock' in markers
+        return 'phpFreeBlock' in self._as_query['markers']
 
-        return NotImplemented
-    
     @cached_property
     def preview(self) -> Image | NotImplemented:
         '''
@@ -504,11 +546,10 @@ class Video:
         This is the lazy video displayed when hovering the video.
         '''
         
-        if url := self.data.get('query@preview'):
-            return Image(self.client, url, name = f'preview-{self.key}')
+        return Image(client = self.client,
+                     url = self._as_query['preview'],
+                     name = f'preview-{self.key}')
         
-        return NotImplemented
-
     @property
     def is_favorite(self) -> bool:
         '''
