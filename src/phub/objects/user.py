@@ -137,15 +137,10 @@ class User:
             for type_ in ('model', 'pornstar', 'channels'):            
                 
                 guess = utils.concat(type_, name)
-                response = client.call(guess, 'HEAD', throw = False, silent = True)
-
-                # We need to verify that the guess is correct.
-                # Pornhub redirects are weird, they depend on the
-                # type of the user, so we need to make sure that
-                # we are not redirected to avoid discret 404 pages
-                if response.ok and type_ in response.url:
+                
+                if response := utils.head(client, guess):
                     logger.info('Guessing type of %s is %s', user, type_)
-                    url = response.url
+                    url = response
                     user_type = type_
                     break
             
