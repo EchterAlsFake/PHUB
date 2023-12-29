@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Self, Literal
 
 from .. import utils
@@ -11,9 +12,19 @@ from .. import errors
 if TYPE_CHECKING:
     from ..core import Client
     from . import Video, Image
-    from . import UserQuery
+    from . import queries
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class _QuerySupportIndex:
+    '''
+    Represents indexes about supported queries for a user and their built urls.
+    '''
+    
+    videos: str = None
+    upload: str = None
 
 
 class User:
@@ -21,20 +32,6 @@ class User:
     Represents a Pornhub user.
     '''
 
-    def __new__(cls, client: Client, name: str, url: str, type: str = None) -> Self | Pornstar:
-        '''
-        Check a user type.
-        '''
-        
-        user_type = type or consts.re.get_user_type(url)
-        
-        if user_type == 'pornstar':
-            return Pornstar(client, name, url, user_type)
-        
-        # ...
-        
-        return object.__new__(cls)
-    
     def __init__(self, client: Client, name: str, url: str, type: str = None) -> None:
         '''
         Initialize a new user object.
@@ -61,7 +58,7 @@ class User:
     
     def __repr__(self) -> str:
         
-        return f'phub.User(name={self.name})'
+        return f'phub.{self.type.capitalize()}({self.name})'
 
     def refresh(self) -> None:
         '''
@@ -140,15 +137,10 @@ class User:
             for type_ in ('model', 'pornstar', 'channels'):            
                 
                 guess = utils.concat(type_, name)
-                response = client.call(guess, 'HEAD', throw = False)
-
-                # We need to verify that the guess is correct.
-                # Pornhub's redirects are weird, they depend on the
-                # type of the user, so we need to make sure that
-                # we are not redirected to avoid discrete 404 pages
-                if response.ok and type_ in response.url:
+                
+                if response := utils.head(client, guess):
                     logger.info('Guessing type of %s is %s', user, type_)
-                    url = response.url
+                    url = response
                     user_type = type_
                     break
             
@@ -159,19 +151,60 @@ class User:
         return cls(client = client, name = name, type = user_type, url = url)
     
     @cached_property
-    def videos(self) -> UserQuery:
+    def _supports_queries(self) -> _QuerySupportIndex:
+        '''
+        Checks query support.
+        '''
+        
+        index = _QuerySupportIndex()
+        videos_url = utils.concat(self.url, 'videos')
+
+        if utils.head(self.client, videos_url):
+            index.videos = videos_url
+        
+        if self.type == 'pornstar' and \
+           utils.head(self.client, upload_url := utils.concat(videos_url, 'upload')):
+            index.upload = upload_url
+        
+        return index
+    
+    @cached_property
+    def videos(self) -> queries.VideoQuery:
         '''
         Get the list of videos published by this user.
         '''
         
-        from .query import UserQuery
+        from .query import queries
         
-        url = self.url
-        # if 'model/' in url: url += '/videos'
-        url = utils.concat(self.url, 'videos')
+        # If the video page does not exists, we use the home page
+        url = self._supports_queries.videos or self.url
         
-        return UserQuery(client = self.client, func = url)
-
+        # If there is a upload section, make sure we bypass it
+        hint = (lambda raw: raw.split('id="mostRecentVideosSection')[1]) \
+               if self._supports_queries.upload else None
+        
+        return queries.VideoQuery(client = self.client,
+                                  func = url,
+                                  container_hint = hint)
+    
+    @cached_property
+    def uploads(self) -> queries.VideoQuery:
+        '''
+        Attempt to get the list of videos uploaded by this user.
+        '''
+        
+        from .query import queries
+        
+        url = self._supports_queries.upload
+        
+        # If the user does not supports uploads, we just return an empty query.
+        query = queries.VideoQuery
+        if not url:
+            logger.info('User %s does not support uploads', self)
+            query = queries.EmptyQuery
+        
+        return query(self.client, func = url)
+    
     @cached_property
     def _page(self) -> str:
         '''
@@ -216,37 +249,5 @@ class User:
         return Image(client = self.client,
                      url = url,
                      name = f'{self.name}-avatar')
-
-class Pornstar(User):
-    '''
-    Represents a Pornstar.
-    '''
-    
-    def __new__(cls, *args, **kwargs) -> Self:
-        return object.__new__(cls)
-    
-    def __repr__(self) -> str:
-        
-        return f'phub.Pornstar(name={self.name})'
-    
-    @cached_property
-    def uploads(self) -> UserQuery:
-        '''
-        The pornstar's custom uploads.
-        '''
-        
-        from .query import UserQuery
-        
-        return UserQuery(self.client, utils.concat(self.url, 'videos/upload'))
-    
-    @cached_property
-    def videos(self) -> UserQuery:
-        '''
-        The pornstar's videos.
-        '''
-        
-        from .query import UserQuery
-        
-        return UserQuery(self.client, utils.concat(self.url, 'videos'))
 
 # EOF

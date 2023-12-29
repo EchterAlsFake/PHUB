@@ -19,3 +19,9 @@ Maybe they can be helpful to you too.
 .. autofunction:: phub.utils.serialize
 
 .. autofunction:: phub.utils.dictify
+
+.. autofunction:: phub.utils.suppress
+
+.. autofunction:: phub.utils.least_factors
+
+.. autofunction:: phub.utils.head

@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 import logging
 from functools import cache, cached_property
-from typing import TYPE_CHECKING, Generator, Any, Self
+from typing import TYPE_CHECKING, Iterator, Any, Self, Callable
+
+from phub.objects import NO_PARAM, Param
 
 from . import Video, User, FeedItem, Param, NO_PARAM
 
@@ -18,29 +20,59 @@ logger = logging.getLogger(__name__)
 
 QueryItem = Video | FeedItem | User
 
+def Page(query: Query, page: list[Any]) -> Iterator[QueryItem]:
+    '''
+    Iterates over a page.
+    Args:
+        query (Query): Parent query.
+        page   (list): The parsed page to iterate over.
+    
+    Returns:
+        Iterator: An iterator containing wrapped query items.
+    '''
+    
+    for item in page:
+        wrapped = query._parse_item(item)
+        
+        # Yield each object of the page, but only if it does not have the spicevids
+        # markers and we explicitely suppress spicevids videos.    
+        if not(query.suppress_spicevids
+               and 'premiumIcon' in wrapped.data.get('query@markers')):
+            yield wrapped
+        
+        else:
+            logger.info('Bypassed spicevid video: %s', wrapped)
 
 class Query:
     '''
-    A Base query for type hints. 
+    A Base query.
     '''
     
     BASE: str = None
     
-    def __init__(self, client: Client, func: str, param: Param = NO_PARAM) -> None:
+    def __init__(self,
+                 client: Client,
+                 func: str,
+                 param: Param = NO_PARAM,
+                 container_hint: consts.WrappedRegex | Callable = None) -> None:
         '''
         Initialise a new query.
         
         Args:
-            client (Client): The parent client.
-            func      (str): The URL function.
-            param   (Param): Filter parameter.
+            client           (Client): The parent client.
+            func                (str): The URL function.
+            param             (Param): Filter parameter.
+            container_hint (Callable): An hint function to help determine where should the target container be.
         '''
 
         self.client = client
+        self.hint = container_hint
         
         # Parse param
         param |= Param('page', '{page}')
         self.url = utils.concat(self.BASE, func)
+        
+        self.suppress_spicevids = True
         
         add_qm = True
         for key, set_ in param.value.items():
@@ -69,7 +101,7 @@ class Query:
         return int(counter)
 
     @cached_property
-    def pages(self) -> Generator[Generator[QueryItem, None, None], None, None]:
+    def pages(self) -> Iterator[Iterator[QueryItem]]:
         '''
         Iterate through the query pages.
         '''
@@ -79,21 +111,37 @@ class Query:
             
             try:
                 page = self._get_page(i)
+                i += 1
+                yield Page(self, page)
             
             except errors.NoResult:
                 return
-            
-            i += 1
-            yield (self._parse_item(item) for item in page)
     
     def __iter__(self) -> Self:
         '''
-        Iterate through the query videos.
+        Iterate through the query items.
         '''
         
         for page in self.pages:
-            for video in page:
-                yield video
+            for item in page:
+                yield item
+    
+    def sample(self, max: int = 0, filter: Callable[[QueryItem], bool] = None) -> Iterator[QueryItem]:
+        '''
+        Get a sample of items.
+        '''
+        
+        i = 0
+        for item in self:
+            
+            if max and i >= max:
+                return
+            
+            if filter and not filter(item):
+                continue
+            
+            i += 1
+            yield item
     
     @cache
     def _get_raw_page(self, index: int) -> str:
@@ -114,7 +162,7 @@ class Query:
         
         if req.status_code == 404:
             raise errors.NoResult()
-
+        
         return req.text
     
     @cache
@@ -130,8 +178,13 @@ class Query:
         '''
         
         raw = self._get_raw_page(index)
-        return self._parse_page(raw)
-    
+        els = self._parse_page(raw)
+        
+        if not len(els):
+            raise errors.NoResult()
+        
+        return els
+
     # Methods defined by subclasses
     def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
         '''
@@ -163,12 +216,12 @@ class Query:
         
         return NotImplemented
     
-    def _parse_page(self, raw: str) -> list:
+    def _parse_page(self, raw: str) -> list[Any]:
         '''
         Get a query page.
         
         Args:
-            raw (str): The unparsed page.
+            raw (str): The raw page container.
         
         Returns:
             list: A semi-parsed list representation.
@@ -176,134 +229,135 @@ class Query:
         
         return NotImplemented
 
+class queries:
+    '''
+    A collection of all PHUB queries.
+    '''
+    
+    class JSONQuery(Query):
+        '''
+        Represents a query able to parse JSON data from the HubTraffic API.
+        '''
+        
+        BASE = consts.API_ROOT
+        
+        def _parse_item(self, data: dict) -> Video:
+            
+            # Create the object and inject data
+            video = Video(self.client, url = data['url'])
+            video.data = {f'data@{k}': v for k, v in data.items()}
+            
+            return video
+        
+        def _parse_page(self, raw: str) -> list[dict]:
+            
+            data = json.loads(raw).get('videos')
 
-class JSONQuery(Query):
-    '''
-    Represents a query able to parse JSON data.
-    '''
-    
-    BASE = consts.API_ROOT
-    
-    def _parse_item(self, data: dict) -> Video:
-        
-        # Create the object and inject data
-        video = Video(self.client, url = data['url'])
-        video.data = {f'data@{k}': v for k, v in data.items()}
-        
-        return video
-    
-    def _parse_page(self, raw: str) -> list[dict]:
-        
-        data = json.loads(raw).get('videos')
+            if data is None:
+                logger.error('Invalid API response from `%s`', self.url)
+                raise errors.ParsingError('Invalid API response')
 
-        if data is None:
-            logger.error('Invalid API response from `%s`', self.url)
-            raise errors.ParsingError('Invalid API response')
+            return data
+        
+        def sample(self, max: int = 0, filter: Callable[[QueryItem], bool] = None) -> Iterator[QueryItem]:
+            return super().sample(max, filter)
 
-        return data
+    class VideoQuery(Query):
+        '''
+        Represents a Query able to parse HTML data.
+        '''
+        
+        BASE = consts.HOST
+        
+        def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
+            
+            if key == 'category':
+                key = 'filter-category'
+            
+            set_ = [v.split('@')[0] if '@' in v else v for v in set_]
+            
+            raw = '|'.join(set_)
+            return key, raw
+        
+        def _eval_video(self, raw: str) -> dict:
+            # Evaluate video data.
+            # Can be used externally from this query
+            
+            keys = ('id', 'key', 'title', 'image', 'preview', 'markers')
+            data = {k: v for k, v in zip(keys, consts.re.eval_video(raw))} | {'raw': raw}
+            
+            return data
+        
+        def _parse_item(self, raw: str) -> Video:
+            
+            # Parse data
+            data = self._eval_video(raw)
+            
+            url = f'{consts.HOST}view_video.php?viewkey={data["key"]}'
+            obj = Video(self.client, url)
+            
+            # Override the _as_query property since we already have a query 
+            obj._as_query = data
+            
+            # Parse markers
+            markers = ' '.join(consts.re.get_markers(markers)).split()
+            
+            obj.data = {
+                # Property overrides
+                'page@title': data["title"],
+                'data@thumb': data["image"],
+                'page@id': id
+            }
+            
+            return obj
+        
+        def _parse_page(self, raw: str) -> list:
+            container = (self.hint or consts.re.container)(raw)
+            return consts.re.get_videos(container)
 
-class HTMLQuery(Query):
-    '''
-    Represents a Query able to parse HTML data.
-    '''
-    
-    BASE = consts.HOST
-    
-    def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
+    class UserQuery(VideoQuery):
+        '''
+        Represents an advanced member search query.
+        '''
         
-        if key == 'category':
-            key = 'filter-category'
-        
-        set_ = [v.split('@')[0] if '@' in v else v for v in set_]
-        
-        raw = '|'.join(set_)
-        return key, raw
-    
-    def _parse_item(self, raw: tuple) -> Video:
-                
-        url = f'{consts.HOST}view_video.php?viewkey={raw[0]}'
-        
-        obj = Video(self.client, url)
-        obj.data = {f'page@title': raw[2]}
-        
-        return obj
-    
-    def _parse_page(self, raw: str) -> list[tuple]:
-                
-        container = raw.split('class="container')[1]
-        return consts.re.get_videos(container)
+        def _parse_item(self, raw: tuple) -> User:
+            
+            url, image_url = raw
+            
+            obj = User.get(self.client, utils.concat(consts.HOST, url))
+            obj._cached_avatar_url = image_url # Inject image url
+            return obj
 
-class UserQuery(HTMLQuery):
-    '''
-    Represents a Query able to parse User video data.
-    '''
-        
-    def _parse_page(self, raw: str) -> list[tuple]:
-        
-        container = raw.split('class="videoSection')[-1]
-        return consts.re.get_videos(container)
+        def _parse_page(self, raw: str) -> list[tuple]:
+            container = (self.hint or consts.re.container)(raw)
+            return consts.re.get_users(container)
 
-class MemberQuery(HTMLQuery):
-    '''
-    Represents an advanced member search query.
-    '''
-    
-    def _parse_item(self, raw: tuple) -> User:
+    class FeedQuery(Query):
+        '''
+        Represents a query able to parse user feeds.
+        '''
         
-        url, image_url = raw
+        BASE = consts.HOST
         
-        obj = User.get(self.client, utils.concat(consts.HOST, url))
-        obj._cached_avatar_url = image_url # Inject image url
-        return obj
+        def _parse_item(self, raw: tuple) -> FeedItem:
+            return FeedItem(self.client, raw)
+        
+        def _parse_page(self, raw: str) -> list[tuple]:
+            return consts.re.feed_items(raw)
 
-    def _parse_page(self, raw: str) -> list[tuple]:
+    class EmptyQuery(Query):
+        '''
+        Represents an empty query.
+        '''
         
-        container = raw.split('id="advanceSearchResultsWrapper')[1]
-        return consts.re.get_users(container)
-
-class PSQuery(MemberQuery):
-    '''
-    Represents a pornstar search query.
-    '''
-    
-    def _parse_item(self, raw: tuple) -> User:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
         
-        avatar, url, name, videos = raw
+        def __len__(self) -> int:
+            return 0
         
-        # Create new user
-        obj = User(self.client,
-                   name = name,
-                   type = 'pornstar',
-                   url = url)
+        @cached_property
+        def pages(self):
+            return []
         
-        obj._cached_avatar_url = avatar # Inject avatar
-        
-        return obj
-    
-    def _parse_page(self, raw: str) -> list[tuple]:
-        
-        container = raw.split('id="pornstarsSearchResult')[1].split('</ul')[0]
-        return consts.re.get_ps(container)
-
-class SubQuery(MemberQuery):
-    
-    def _parse_page(self, raw: str) -> list:
-        
-        container = raw.split('<div id="profileContent">')[1]
-        return consts.re.get_users(container)
-
-class FeedQuery(Query):
-    '''
-    Represents a query able to parse user feeds.
-    '''
-    
-    BASE = consts.HOST
-    
-    def _parse_item(self, raw: tuple) -> FeedItem:
-        
-        return FeedItem(self.client, raw)
-    
-    def _parse_page(self, raw: str) -> list[tuple]:
-        return consts.re.feed_items(raw)
-
 # EOF

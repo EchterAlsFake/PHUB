@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from xml.etree import ElementTree
-from typing import Generator, TYPE_CHECKING
+from typing import Iterator, TYPE_CHECKING
 
 from .. import consts
 
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 _RSS: object = None
 
-def get(client: Client = None) -> Generator[Video, None, None]:
+def get(client: Client = None) -> Iterator[Video]:
     '''
     Get and parse the RSS flux.
     

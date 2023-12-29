@@ -1,14 +1,4 @@
-test.py
-test*.py
-src/test.py
-src/test*.py
-build/
+**/test*
+**/creds*
 build/*
-docs/build/
 docs/build/*
-temp/
-src/temp/
-src/temp/*
-build.bat
-creds
-*.csv

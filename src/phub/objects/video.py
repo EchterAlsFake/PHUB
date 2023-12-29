@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import os
+import random
 import logging
 from functools import cached_property
 from datetime import datetime, timedelta
-from typing import (TYPE_CHECKING, Generator, Literal,
+from typing import (TYPE_CHECKING, Iterator, Literal,
                     LiteralString, Callable, Any)
 
-from . import (Tag, Like, User,
-               Image, Param)
+from . import Tag, Like, User, Image, Param
 from .. import utils
 from .. import errors
 from .. import consts
@@ -164,7 +164,7 @@ class Video:
         
         return Quality(quality).select(qualities)
 
-    def get_segments(self, quality: Quality) -> Generator[str, None, None]:
+    def get_segments(self, quality: Quality) -> Iterator[str]:
         '''
         Get the video segment URLs.
         
@@ -172,7 +172,7 @@ class Video:
             quality (Quality): The video quality.
         
         Returns:
-            Generator: A segment URL generator.
+            Iterator: A segment URL iterator.
         '''
         
         # Fetch the master file
@@ -234,8 +234,136 @@ class Video:
         )
         
         return path
+    
+    # === Interaction methods === #
+    
+    def _assert_internal_success(self, res: dict) -> None:
+        '''
+        Assert an internal response has succeeded.
+        '''
         
+        if res['success'] and not res['success'] in ('true', True, 1):
+            raise Exception(f'Failed to call : `{res.get("message")}`')
+    
+    @cached_property
+    def _as_query(self) -> dict[str, str]:
+        '''
+        Simulate a query to gain access to more data.
+        
+        Warning - This will make a lot of requests and can false
+                   some properties (like watched).
+        '''
+        
+        # 1. Create playlist
+        name = f'temp-{random.randint(0, 100)}'
+        logger.info('Creating temporary playlist %s', name)
+        res = self.client.call('playlist/create', 'POST', dict(
+            title = name,
+            tags = '["porn"]',
+            description = '',
+            status = 'private',
+            token = self._token
+        )).json()
+        
+        self._assert_internal_success(res)
+        playlist_id = res.get('id')
+        
+        # 2. Add to playlist
+        res = self.client.call('playlist/video_add', 'POST', dict(
+            pid = playlist_id,
+            vid = self.id,
+            token = self._token
+        ))
+        
+        self._assert_internal_success(res.json())
+        
+        # 3. Start query
+        from .query import queries
+        query = queries.VideoQuery(self.client, f'playlist/{playlist_id}')
+        raw = query._get_page(0)[0]
+        
+        keys = ('id', 'key', 'title', 'image', 'preview', 'markers')
+        data = {k: v for k, v in zip(keys, consts.re.eval_video(raw))} | {'raw': raw}
+        
+        # 4. Delete playlist
+        logger.info('Deleting playlist %s', name)
+        res = self.client.call('playlist/delete', 'POST', dict(
+            pid = playlist_id,
+            token = self._token,
+            action = 'delete'
+        ))
+        
+        return data
+    
+    def like(self, toggle: bool = True) -> None:
+        '''
+        Set the video like value.
+        Args:
+            toggle (bool): The toggle value.
+        '''
+        
+        self.client.call('video/rate', 'POST', dict(
+            id = self.id,
+            current = self.likes.up,
+            value = int(toggle),
+            token = self._token
+        ))
+    
+    def favorite(self, toggle: bool = True) -> None:
+        '''
+        Set video as favorite or not.
+        Args:
+            toggle (bool): The toggle value.
+        '''
+        
+        res = self.client.call('video/favourite', 'POST', dict(
+            toggle = int(toggle),
+            id = self.id,
+            token = self._token
+        ))
+        
+        self._assert_internal_success(res.json())
+
+    def watch_later(self, toggle: bool = True) -> None:
+        '''
+        Add or remove the video to the watch later playlist.
+        Args:
+            toggle (bool): The toggle value.
+        '''
+        
+        mod = 'add' if toggle else 'remove'
+        
+        res = self.client.call(f'playlist/video_{mod}_watchlater', 'POST',
+                               dict(vid = self.id, token = self._token))
+        
+        self._assert_internal_success(res.json())
+    
     # === Data properties === #
+
+    @cached_property
+    def _token(self) -> str:
+        '''
+        The page client token.
+        '''
+        
+        assert self.client.logged, 'Account is not logged in'
+        
+        # Force fetch page
+        self.fetch('page@title')
+        
+        return consts.re.get_token(self.page)
+
+    @cached_property
+    def id(self) -> str:
+        '''
+        The internal video id.
+        '''
+
+        if id_ := self.data.get('page@id'):
+            return id_
+        
+        # Use thumbnail URL 
+        return consts.re.get_thumb_id(self.image.url)
 
     @cached_property
     def title(self) -> str:
@@ -290,7 +418,7 @@ class Video:
                 for tag in self.fetch('data@tags')]
     
     @cached_property
-    def like(self) -> Like:
+    def likes(self) -> Like:
         '''
         Positive and negative reviews of the video.
         '''
@@ -311,7 +439,7 @@ class Video:
         return self.fetch('data@views')
     
     @cached_property
-    def hotspots(self) -> Generator[int, None, None]:
+    def hotspots(self) -> Iterator[int]:
         '''
         List of hotspots (in seconds) of the video.
         '''
@@ -337,7 +465,7 @@ class Video:
                 for ps in self.fetch('data@pornstars')]
     
     @cached_property
-    def categories(self) -> Generator[Category, None, None]:
+    def categories(self) -> Iterator[Category]:
         '''
         The categories of the video.
         '''
@@ -375,4 +503,61 @@ class Video:
         
         return User.from_video(self)
 
+    @cached_property
+    def liked(self) -> NotImplemented:
+        '''
+        Whether the video was liked by the account.
+        '''
+        
+        return NotImplemented
+    
+    @cached_property
+    def watched(self) -> bool:
+        '''
+        Whether the video was viewed previously by the account.
+        '''
+        
+        if not self.client.logged:
+            raise Exception('Client must be logged in to use this property.') # temp class
+        
+        # If we fetched the video page while logged in, PH consider we have watched it
+        if self.page:
+            return True
+        
+        if 'watchedVideo' in self._as_query['markers']:
+            return True
+        
+        # For some reason the watched text is different in playlists
+        if 'class="watchedVideoText' in self._as_query['raw']:
+            return True
+    
+    @cached_property
+    def is_free_premium(self) -> bool | NotImplemented:
+        '''
+        Whether the video is part of free premium.
+        '''
+        
+        return 'phpFreeBlock' in self._as_query['markers']
+
+    @cached_property
+    def preview(self) -> Image | NotImplemented:
+        '''
+        The preview 'mediabook' of the video.
+        This is the lazy video displayed when hovering the video.
+        '''
+        
+        return Image(client = self.client,
+                     url = self._as_query['preview'],
+                     name = f'preview-{self.key}')
+        
+    @property
+    def is_favorite(self) -> bool:
+        '''
+        Whether the video has been set as favorite by the client.
+        '''
+        
+        # Make sure page is loaded
+        self._token
+        
+        return bool(consts.re.is_favorite(self.page, False))
 # EOF

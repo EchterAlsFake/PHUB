@@ -1,14 +1,12 @@
 '''
-PHUB CLI.
-
-Contains a bunch of features
-that can be accessed quickly. 
+PHUB built-in CLI.
 '''
 
-import click
-import getpass
-
 import phub
+
+import os
+import time
+import click
 
 @click.group()
 def cli(): pass
@@ -17,102 +15,62 @@ def cli(): pass
 @click.argument('entry')
 @click.option('--quality', '-q', help = 'Video quality', default = 'best')
 @click.option('--output',  '-o', help = 'Output video file', default = '.')
-def download(entry: str, quality: str, output: str) -> None:
+@click.option('--pause',  '-p', help = 'Pause between downloads', default = 5)
+@click.option('--threads',  '-t', help = 'Number of threads to use', default = 100)
+def download(entry: str, quality: str, output: str, pause: str, threads) -> None:
     '''
-    Download a specific video.
+    Download videos given a URL or a text file containing urls or keys.
     '''
     
-    client = phub.Client()
+    pause = int(pause)
+    threads = int(threads)
     
-    urls = [entry]
-    if entry.endswith('.txt'):
+    if entry.startswith('https://'):
+            urls = [entry.strip()]
+    
+    else:
         with open(entry, 'r') as file:
             urls = file.read().split()
     
-    for url in urls:
-        video = client.get(url)
-        print(f'Downloading video \033[92m{video.key}\033[0m')
-        video.download(output, quality)
+    client = phub.Client( delay = .1)
+    length = len(urls)
+    max_length = len(str(length))
+    
+    if length > 1 and os.path.isfile(output):
+        print('\033[91mError\033[0m ~ Output is not a directory')
+        exit()
+    
+    for index, url in enumerate(urls):
+        try:
+            video = client.get(url)
+            
+            video.download(path = output,
+                           quality = quality,
+                           downloader = phub.download.threaded(threads, 20),
+                           display = phub.display.progress(
+                               desc = f'{index: >{max_length}}/{length} ~ {video}',
+                               color = dict(c1=37, c2=33, c3=36, c4=0)))
+            
+            time.sleep(pause)
+            client.reset()
+        
+        except Exception as err:
+            print(f'\033[91mError\033[0m ~ {repr(err)}')
+    
+    print('\n\033[33mProcess finished.\033[0m')
 
 @cli.command()
-@click.argument('query')
-@click.option('--pages', '-p', help = 'Pages to search', default = '1')
-def search(query: str, pages: str) -> None:
+@click.argument('entry')
+@click.option('--max', '-m', help = 'Maximum number of videos', default = '40')
+def search(entry: str, max: str) -> None:
     '''
     Search for videos.
     '''
     
     client = phub.Client()
     
-    q = client.search(query)
-    
-    for i in range(int(pages) * 32):
-        
-        video = q[i]
-        print(f'* \033[93m{video.title}\033[0m ({video.duration}) - {video.key}')
-
-def init_pass_client(user: str = None) -> phub.Client:
-    '''
-    Get credentials and load a client
-    '''
-    
-    if not user: user = input('Username: ')
-    password = getpass.getpass()
-    return phub.Client(user, password)
-
-@cli.command()
-@click.option('-n', help = 'Video count', default = '1')
-@click.option('-o', '--output', help = 'Output dir', default = '.')
-@click.option('-u', '--user', help = 'Account username')
-@click.option('-q', '--quality', help = 'Video quality', default = 'best')
-def watched(n: str, output: str, user: str, quality: str) -> None:
-    '''
-    Download the n-last watched videos.
-    '''
-    client = init_pass_client(user)
-    q = client.account.watched
-
-    for i in range(int(n)):
-        
-        video = q[i]
-        
-        video.download(output, quality, display = phub.display.bar(f'Downloading {video.key}'))
-
-@cli.command()
-@click.option('-n', help = 'Video count', default = '1')
-@click.option('-o', '--output', help = 'Output dir', default = '.')
-@click.option('-u', '--user', help = 'Account username')
-@click.option('-q', '--quality', help = 'Video quality', default = 'best')
-def liked(n: str, output: str, user: str, quality: str) -> None:
-    '''
-    Download the n-last watched videos.
-    '''
-    
-    client = init_pass_client(user)
-    q = client.account.liked
-
-    for i in range(int(n)):
-        
-        video = q[i]
-        
-        video.download(output, quality, display = phub.display.bar(f'Downloading {video.key}'))
-
-@cli.command()
-@click.argument('user')
-@click.option('-n', help = 'Video count')
-@click.option('-o', '--output', help = 'Output dir', default = '.')
-@click.option('-q', '--quality', help = 'Video quality', default = 'best')
-def user_videos(user: str, n: str, output: str, quality: str) -> None:
-    '''
-    Download the n last videos from a channel/model/etc. 
-    '''
-    
-    client = phub.Client()
-    user = client.get_user(user)
-    
-    for i, video in enumerate(user.videos[:n]):
-        
-        video.download(output, quality, display = phub.display.bar(f'#{i}'))
+    for video in client.search(entry).sample(int(max)):    
+        print(f'{video.key} - {video.title}')
 
 @cli.command()
 def update_locals() -> None:

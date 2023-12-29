@@ -75,9 +75,12 @@ class FeedItem:
     Represent an element of the user feed.
     '''
     
-    client: Client = field(default = None, repr = False)
-    raw: str = field(default = None, repr = False)
-    type: str = field(default = None, repr = False)
+    client: Client = None
+    raw: str = None
+    type: str = None
+    
+    def __repr__(self) -> str:
+        return f'FeedItem(type={self.item_type})'
     
     def dictify(self,
                 keys: Literal['all'] | list[str] = 'all',

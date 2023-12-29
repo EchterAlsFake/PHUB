@@ -42,6 +42,8 @@ FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c c
 
 # Regex wrappers
 
+WrappedRegex = Callable[[str, bool], str]
+
 def eval_flags(flags: list[int]) -> int:
     '''
     Evaluate flags.
@@ -58,7 +60,7 @@ def eval_flags(flags: list[int]) -> int:
     
     return 0
 
-def find(*args) -> Callable[[str, bool], str]:
+def find(*args) -> WrappedRegex:
     '''
     Compile a single find regex and wraps handling its errors.
     
@@ -75,14 +77,14 @@ def find(*args) -> Callable[[str, bool], str]:
         
         matches = regex.findall(string)
         if throw and not matches:
-            logger.error('Pattern %s failed', pattern)
+            logger.error('Pattern \033[91m%s\033[0m failed', pattern)
             raise errors.RegexError('Find regex failed.')
         
         if len(matches): return matches[0]
     
     return wrapper
 
-def comp(*args) -> Callable[[str], str]:
+def comp(*args) -> WrappedRegex:
     '''
     Compile a regex using a custom method with error handling.
     
@@ -102,12 +104,12 @@ def comp(*args) -> Callable[[str], str]:
             return matches
         
         except AttributeError:
-            logger.error('Invalid regex method: %s', method)
+            logger.error('Invalid regex method: \033[91m%s\033[0m', method)
             raise AttributeError('Invalid compiled regex method:', method)
     
     return wrapper
 
-def subc(*args) -> Callable[[str], str]:
+def subc(*args) -> WrappedRegex:
     '''
     Compile a substraction regex and apply its replacement to each call.
     
@@ -126,7 +128,7 @@ def subc(*args) -> Callable[[str], str]:
             return regex.sub(repl, *args)
         
         except Exception as err:
-            logger.error('Pattern %s replacing %s failed', pattern, repl)
+            logger.error('Pattern \033[91m%s\033[0m replacing \033[91m%s\033[0m failed', pattern, repl)
             raise errors.RegexError('Substraction failed:', err)
     
     return wrapper
@@ -150,13 +152,17 @@ class re:
     user_avatar   = find( engine.DOTALL, r'previewAvatarPicture\">.*?src=\"(.*?)\"'                     ) # get the user avatar
     query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'                 ) # Get a query's video amount
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'            ) # Get the user bio
+    container     = find( engine.DOTALL, r'class=\"container(.*)'                                       ) # Get the page container
+    get_thumb_id  = find( r'\/([a-z0-9]+?)\/(?=original|thumb)'                                         ) # Get video id from its thumbnail 
+    eval_video    = find( engine.DOTALL, r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div' ) # Parse video data
     
     # Findall regexess
-    get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
-    user_infos = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
-    feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                                                        ) # Get all items in the Feed
-    get_videos = comp( engine.DOTALL, p.findall, r'<li .*?videoblock.*?data-video-vkey=\"(.*?)\".*?data-action=\"(.*?)\".*?title=\"(.*?)\"' ) # Get all videos in a container (id, action type and title)
-    get_ps     = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s'                              ) # Get all pornstars in a container (avatar, url, name, video count)
+    get_users   = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
+    user_infos  = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
+    feed_items  = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                                                        ) # Get all items in the Feed
+    get_ps      = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s'                              ) # Get all pornstars in a container (avatar, url, name, video count)
+    get_videos  = comp( engine.DOTALL, p.findall, r'<li.*?videoblock(.*?)</li' ) # Get all videos
+    get_markers = comp( engine.DOTALL, p.findall, r'class=\"(.*?)\"' ) # Get markers identifiers
     
     # Substraction regexes
     remove_host = subc( _raw_root, '' ) # Remove the HOST root from a URL
@@ -164,9 +170,10 @@ class re:
     # Verification regexes
     is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                    ) # Check if a string is a URL
     is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}' ) # Check if a string is a video URL
+    is_favorite  = find( r'<div class=\".*?js-favoriteBtn.*?active\"'                     ) # Check if a video is favorite
     
     # Challenge regexes
-    get_challenge = find( engine.DOTALL, r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):' )
+    get_challenge   = find( engine.DOTALL, r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):' )
     parse_challenge = subc( engine.DOTALL, r'(?:var )|(?:/\*.*?\*/)|\s|\n|\t|(?:n;)', '' )
     ponct_challenge = subc( engine.DOTALL, r'(if.*?&1\)|else)', r'\1:' )
     

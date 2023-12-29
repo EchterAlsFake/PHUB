@@ -62,32 +62,6 @@ Available features
     You can then copy the video viewkey at the end of each line and use it to download
     the videos.
 
-- Download watched videos
-
-    .. code-block:: bash
-
-        $ python -m phub watched --user <name> -n <int> --output <dir> --quality <video quality>
-
-    Download the ``n`` last videos from the user history.
-    You will be prompted for a username and a password.
-
-- Download liked videos
-    
-    .. code-block:: bash
-
-        $ python -m phub liked --user <name> -n <int> --output <dir> --quality <video quality>
-
-    Download the ``n`` last liked videos.
-    You will be prompted for a username and a password.
-
-- Download videos from a user
-
-    .. code-block:: bash
-
-        $ python -m phub user_videos <username> -n <int> --output <dir> --quality <video quality>
-
-    Download the ``n`` last liked videos.
-
 - Update PHUB constants
 
     PHUB uses a constant system that can be updated locally.

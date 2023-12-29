@@ -25,3 +25,4 @@ PHUB can raise the following expressions.
 
 .. autoexception:: phub.errors.InvalidSortParam
 
+.. autoexception:: phub.errors.VideoError

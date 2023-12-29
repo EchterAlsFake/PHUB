@@ -53,25 +53,29 @@ fetched. Instead, a :py:class:`.Query` is created. This object is responsible fo
 automatically managing the requests and caches to make the query as efficient as it
 can be (hopefully).
 
-You can access its content directly using python list item syntax, or :meth:`.Query.get`.
+Then, all you have to do is iterate it.
 
 .. code-block:: python
 
-    item = query[0]
-    # Or
-    item = query.get(0)
-
-You can also use it as a generator to get multiple videos:
-
-.. code-block:: python
-
-    # Fetch first 10 videos
-    for video in query[0:10]:
-        print(video.title)
-    
-    # Fetch every videos
     for video in query:
         print(video.title)
+
+For more in-depth iteration, you can use the sample method.
+
+.. code-block:: python
+
+    # Fetch the 10 first videos
+    for video in query.sample(max = 10):
+        print(video.title)
+    
+    # Fetch only non watched
+    for video in query.sample(filter = lambda v: not v.watched):
+        print(video.title)
+
+.. warning::
+    Beware that if :meth:`Video.watched` is used without a query, 
+    it can provide wrong results by considering 'watched' certain
+    videos.
 
 To exploit video data, see :doc:`here </features/video>`.
 
@@ -83,15 +87,11 @@ You should choose which one to use depending on what you want to do.
 
 .. code-block:: python
 
-    import phub
+    # Uses a JSONQuery (recommended) - faster and 'pornhub approved', but less data
+    query = client.search(..., use_hubtraffic = True)
 
-    client = phub.Client()
-
-    # JSONQuery (recommended, uses HubTraffic) - faster, but less data
-    query = client.search(..., feature = phub.JSONQuery)
-
-    # HTMLQuery - slower, but fetches all of the video data
-    query = client.search(..., feature = phub.HTMLQuery)
+    # Uses a VideoQuery - slower, but fetches all of the video data
+    query = client.search(..., use_hubtraffic = False)
 
 Refreshing queries
 ------------------

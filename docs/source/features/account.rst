@@ -86,7 +86,7 @@ Here is an example on how to view your account history.
 .. warning::
 
     Pornhub videos are not excluded from being deleted by their creators.
-    These videos still exist and a key and a title, but accessing video data
+    These videos still exist and have a key and a title, but accessing video data
     will raise errors. If you are iterating videos (e.g. your history), you
     can ignore these videos by using ``phub.utils.suppress``. 
 
