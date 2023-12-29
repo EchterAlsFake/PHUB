@@ -65,7 +65,7 @@ def find(*args) -> WrappedRegex:
     Compile a single find regex and wraps handling its errors.
     
     Returns:
-        Callable: Wrapped regex callable. If second argument evaluates to False, won't raise an error.
+        Callable: Wrapped regex callable. If the second argument evaluates to False, it won't raise an error.
     '''
     
     *flags, pattern = args

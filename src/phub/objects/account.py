@@ -19,7 +19,7 @@ class Account:
     '''
     Represents a connected Ponhub account,
     capable of accessing account-only features.
-    If the login fails, will be None.
+    If the login fails, there will be None.
     '''
     
     def __new__(cls, client: Client) -> Self | None:
@@ -27,7 +27,7 @@ class Account:
         Check if the object creation is needed.
         
         Args:
-            client (Client): The client that initialised this.
+            client (Client): The client that initialized this.
         
         Returns:
             Self: The Account object or None, if login is not triggered.
@@ -54,7 +54,7 @@ class Account:
         self.is_premium: bool = None
         self.user: User = None
         
-        # Save data keys so far so we can make a difference with the
+        # Save data keys so far, so we can make a difference with the
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
         
@@ -90,7 +90,7 @@ class Account:
         Delete the object's cache to allow items refreshing.
         
         Args:
-            refresh_login (bool): Wether to also attempt to re-log in.
+            refresh_login (bool): Whether to also attempt to re-log in.
         '''
         
         logger.info('Refreshing account %s', self)
@@ -165,11 +165,11 @@ class Account:
                 keys: Literal['all'] | list[str] = 'all',
                 recursive: bool = False) -> dict:
         '''
-        Convert the object to a dictionnary.
+        Convert the object to a dictionary.
         
         Args:
             keys (str): The data keys to include.
-            recursive (bool): Whether to allow other PHUB objects dictify. 
+            recursive (bool): Whether to allow other PHUB objects to dictify.
         
         Returns:
             dict: Dict version of the object.

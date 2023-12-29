@@ -37,7 +37,7 @@ like so:
 .. code-annotations::
     #.
         Note that you can also load the video 
-        using the `viewkey` paramater in its URL.
+        using the `viewkey` parameter in its URL.
 
         .. code-block:: python
 
@@ -81,7 +81,7 @@ A video can be downloaded by using :meth:`.Video.download`.
 
 .. note::
   
-  Tip: You can set the ``path`` paramater to be a directory for the video
+  Tip: You can set the ``path`` parameter to be a directory for the video
   to be downloaded in. The file name will automatically be the video id. 
 
 For more information on how to download, see :doc:`downloading </guides/download>`.
@@ -163,10 +163,10 @@ that can fetch video data:
 Each ``dictify`` method can take as argument a :py:class`list[str]` of keys,
 if you want to avoid fetching specific things.
 
-Below is a list of all serializeable PHUB objects, along with their keys and recusrive
+Below is a list of all serializable PHUB objects, along with their keys and recursive
 keys (PHUB objects that require further parsing and serialization).
 
-.. list-table:: Serializeable objects
+.. list-table:: Serializable objects
     :header-rows: 1
 
     * - Object
@@ -201,10 +201,10 @@ keys (PHUB objects that require further parsing and serialization).
       - ``user``, ``header``, ``item_type``
       - /
 
-By default, recusrive keys will appear as ``repr`` strings, unless
-you allow recursiveness with ``object.dictify(recursive = True)``.
+By default, recursive keys will appear as ``repr`` strings, unless
+you allow repulsiveness with ``object.dictify(recursive = True)``.
 
 .. warning::
 
-  Turning on recursiveness can make PHUB open more requests that you might
+  Turning on recursion can make PHUB open more requests that you might
   actually need. Make sure you specify only the keys you need when using it.

@@ -153,7 +153,7 @@ def _base_threaded(client: Client,
             futures = {executor.submit(_thread, client, url, timeout): url
                        for url in segments}
             
-            logger.info('Submited %s futures, starting executor', len(futures))
+            logger.info('Submitted %s futures, starting executor', len(futures))
             
             for future in as_completed(futures):
                 
@@ -191,7 +191,7 @@ def threaded(max_workers: int = 100,
     Simple threaded downloader.
     
     Args:
-        max_workers (int): How many downloads can take place simoultaneously.
+        max_workers (int): How many downloads can take place simultaneously.
         timeout (int): Maximum time before considering a download failed.
     
     Returns:

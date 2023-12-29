@@ -5,7 +5,7 @@ PHUB errors types.
 class ClientAlreadyLogged(Exception):
     '''
     The Client already has initiated
-    a login call which was successfull.
+    a login call which was successful.
     '''
 
 class LoginFailed(Exception):
@@ -34,17 +34,17 @@ class MaxRetriesExceeded(Exception):
     '''
     A module failed its job after too
     many retries. You might want to
-    try again after a few time.
+    try again after a little time.
     
-    You can also use :attr:`Client.delay`
+    You can also use: attr:`Client.delay`
     to slow down requests.
     '''
 
 class UserNotFound(Exception):
     '''
     User wasn't found. This either happens
-    because the user does not exists, or
-    it's name or URL is wrong.
+    because the user does not exist, or
+    its name or URL is wrong.
     '''
 
 class NoResult(Exception):

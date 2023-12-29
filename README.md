@@ -1,10 +1,14 @@
+> [!IMPORTANT]
+> Status update
+> User videos and uploads queries are still broken 
+
 <p align="center">
   <img width="300" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
 </p>
 
 # PHUB - An API for Pornhub.
 
-PHUB is an hybrid API for Pornhub. It is able to communicate with Pornhub
+PHUB is a hybrid API for Pornhub. It is able to communicate with Pornhub
 using both web-scraping and Pornhub's HubTraffic API. It is
 able to access most used or useful PH features, such as video searching,
 accessing account features, video downloading, and a lot more.
@@ -19,7 +23,7 @@ accessing account features, video downloading, and a lot more.
 pip install --upgrade phub
 ```
 
-- Or from this repo to get latest fixes/features:
+- Or from this repo to get the latest fixes/features:
 ```shell
 pip install --upgrade git+https://github.com/Egsagon/PHUB.git
 ```
@@ -69,5 +73,5 @@ PHUB uses GPLv3. See the `LICENSE` file.
 
 ## Contributing
 
-Feel free to contribute to this project by submiting
+Feel free to contribute to this project by submitting
 feature requests, issues, bugs, or whatever.

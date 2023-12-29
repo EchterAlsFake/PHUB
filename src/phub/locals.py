@@ -218,7 +218,7 @@ class Sort:
     VIDEO_MOST_RECENT = Param('o', 'mr', single = True)
     VIDEO_MOST_VIEWS  = Param('o', 'mv', single = True)
     VIDEO_TOP_RATED   = Param('o', 'tr', single = True)
-    VIDEO_LONGUEST    = Param('o', 'lg', single = True)
+    VIDEO_LONGEST    = Param('o', 'lg', single = True)
     
     # User sorting
     USER_POPULAR = Param('o', 'popular', single = True)
@@ -226,7 +226,7 @@ class Sort:
     
     # Time sorting
     ALL_TIME = Param('t', None, single = True)
-    DAYLY    = Param('t', 't',  single = True)
+    DAILY    = Param('t', 't', single = True)
     WEEKLY   = Param('t', 'w',  single = True)
     MONTHLY  = Param('t', 'm',  single = True)
     YEARLY   = Param('t', 'y',  single = True)
@@ -287,7 +287,7 @@ _allowed_sort_types = NO_PARAM._concat(
 )
 
 _sort_period_types  = NO_PARAM._concat(
-    Sort.DAYLY,
+    Sort.DAILY,
     Sort.WEEKLY,
     Sort.MONTHLY,
     Sort.YEARLY,

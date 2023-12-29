@@ -7,7 +7,7 @@ Installation
 PHUB uses the following dependencies:
 
 - `requests`_
-- `click`_ (optionnal, used for the built-in CLI)
+- `click`_ (optional, used for the built-in CLI)
 - `ffmpeg-progress-yield`_ (v4.1.5+)
 
 .. _requests: https://pypi.org/project/requests/
