@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from functools import cached_property
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Self, Literal
+from typing import TYPE_CHECKING, Literal
 
 from .. import utils
 from .. import consts
@@ -91,7 +91,7 @@ class User:
                                               'bio', 'info', 'avatar'], recursive)
 
     @classmethod
-    def from_video(cls, video: Video) -> Self:
+    def from_video(cls, video: Video):
         '''
         Find the author of a video.
         
@@ -113,7 +113,7 @@ class User:
                    url = utils.concat(consts.HOST, guess[0]))
     
     @classmethod
-    def get(cls, client: Client, user: str) -> Self:
+    def get(cls, client: Client, user: str):
         '''
         Fetch a user knowing its name or URL.
         Note - Using only a username makes the fetch between

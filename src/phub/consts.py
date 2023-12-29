@@ -150,7 +150,7 @@ class re:
     get_feed_type = find( r'data-table="(.*?)"'                                                         ) # Get feed section type
     get_user_type = find( r'\/(model|pornstar|channels|user|users)\/.*?'                                ) # Get a user type
     user_avatar   = find( engine.DOTALL, r'previewAvatarPicture\">.*?src=\"(.*?)\"'                     ) # get the user avatar
-    query_counter = find( engine.DOTALL, r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'                 ) # Get a query's video amount
+    query_counter = find(engine.DOTALL, r'showing(?:Counter|Info).*?\">.*?(\d+)\s*<\/')  # Get a query's video amount
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'            ) # Get the user bio
     container     = find( engine.DOTALL, r'class=\"container(.*)'                                       ) # Get the page container
     get_thumb_id  = find( r'\/([a-z0-9]+?)\/(?=original|thumb)'                                         ) # Get video id from its thumbnail 

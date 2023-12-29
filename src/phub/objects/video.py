@@ -6,7 +6,7 @@ import logging
 from functools import cached_property
 from datetime import datetime, timedelta
 from typing import (TYPE_CHECKING, Iterator, Literal,
-                    LiteralString, Callable, Any)
+                   Callable, Any)
 
 from . import Tag, Like, User, Image, Param
 from .. import utils
@@ -488,7 +488,7 @@ class Video:
             yield cat
 
     @cached_property
-    def orientation(self) -> LiteralString:
+    def orientation(self):
         '''
         Video sexual orientation (e.g. straight).
         '''

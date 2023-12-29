@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Self, Any
+from typing import Any
 
 class Param:
     '''
@@ -54,7 +54,7 @@ class Param:
         if not isinstance(item, Param):
             raise TypeError(f'Item `{item}` must be a Param object ({type(item)} found)')
     
-    def _concat_single(self, other: Self, brute: bool = False) -> Self:
+    def _concat_single(self, other, brute: bool = False):
         '''
         Concatenate Params.
         
@@ -81,7 +81,7 @@ class Param:
         
         return param
     
-    def _concat(self, *args, brute: bool = False) -> Self:
+    def _concat(self, *args, brute: bool = False):
         '''
         Concatenate Params.
         
@@ -104,14 +104,14 @@ class Param:
         
         return param
     
-    def __or__(self, other: Self) -> Self:
+    def __or__(self, other):
         '''
         Add 2 Params together.
         '''
         
         return self._concat_single(other)
     
-    def __neg__(self) -> Self:
+    def __neg__(self):
         '''
         Reverses a Param.
         param.reverse must be True.
@@ -128,7 +128,7 @@ class Param:
         
         return param
 
-    def __sub__(self, other: Self) -> Self:
+    def __sub__(self, other):
         '''
         Shorthand for __neg__, without
         the pipe operator.
@@ -137,7 +137,7 @@ class Param:
         self._assert_self(other)
         return self |- other
 
-    def __contains__(self, query: Self) -> bool:
+    def __contains__(self, query) -> bool:
         '''
         Check if a Param object is inside this object.
         '''
