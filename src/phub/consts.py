@@ -157,11 +157,11 @@ class re:
     eval_video    = find( engine.DOTALL, r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div' ) # Parse video data
     
     # Findall regexess
-    get_users  = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
-    user_infos = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
-    feed_items = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                                                        ) # Get all items in the Feed
-    get_ps     = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s'                              ) # Get all pornstars in a container (avatar, url, name, video count)
-    get_videos = comp( engine.DOTALL, p.findall, r'<li.*?videoblock(.*?)</li' ) # Get all videos
+    get_users   = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
+    user_infos  = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
+    feed_items  = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                                                        ) # Get all items in the Feed
+    get_ps      = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s'                              ) # Get all pornstars in a container (avatar, url, name, video count)
+    get_videos  = comp( engine.DOTALL, p.findall, r'<li.*?videoblock(.*?)</li' ) # Get all videos
     get_markers = comp( engine.DOTALL, p.findall, r'class=\"(.*?)\"' ) # Get markers identifiers
     
     # Substraction regexes
@@ -170,6 +170,7 @@ class re:
     # Verification regexes
     is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                    ) # Check if a string is a URL
     is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}' ) # Check if a string is a video URL
+    is_favorite  = find( r'<div class=\".*?js-favoriteBtn.*?active\"'                     ) # Check if a video is favorite
     
     # Challenge regexes
     get_challenge   = find( engine.DOTALL, r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):' )
