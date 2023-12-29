@@ -7,8 +7,7 @@ from datetime import datetime, timedelta
 from typing import (TYPE_CHECKING, Iterator, Literal,
                     LiteralString, Callable, Any)
 
-from . import (Tag, Like, User,
-               Image, Param)
+from . import Tag, Like, User, Image, Param
 from .. import utils
 from .. import errors
 from .. import consts
@@ -491,6 +490,18 @@ class Video:
         if markers := self.data.get('query@markers'):
             return 'phpFreeBlock' in markers
 
+        return NotImplemented
+    
+    @cached_property
+    def preview(self) -> Image | NotImplemented:
+        '''
+        The preview 'mediabook' of the video.
+        This is the lazy video displayed when hovering the video.
+        '''
+        
+        if url := self.data.get('query@preview'):
+            return Image(self.client, url, name = f'preview-{self.key}')
+        
         return NotImplemented
 
 # EOF

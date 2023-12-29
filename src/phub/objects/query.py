@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Iterator, Any, Self, Callable
 
 from phub.objects import NO_PARAM, Param
 
-from . import Video, Image, User, FeedItem, Param, NO_PARAM
+from . import Video, User, FeedItem, Param, NO_PARAM
 
 from .. import utils
 from .. import consts
@@ -20,6 +20,22 @@ logger = logging.getLogger(__name__)
 
 QueryItem = Video | FeedItem | User
 
+def Page(query: Query, page: list[Any]) -> Iterator[QueryItem]:
+    '''
+    Iterates over a page.
+    '''
+    
+    for item in page:
+        wrapped = query._parse_item(item)
+        
+        # Yield each object of the page, but only if it does not have the spicevids
+        # markers and we explicitely suppress spicevids videos.    
+        if not(query.suppress_spicevids
+               and 'premiumIcon' in wrapped.data.get('query@markers')):
+            yield wrapped
+        
+        else:
+            logger.info('Bypassed spicevid video: %s', wrapped)
 
 class Query:
     '''
@@ -88,17 +104,11 @@ class Query:
             
             try:
                 page = self._get_page(i)
+                i += 1
+                yield Page(self, page)
             
             except errors.NoResult:
                 return
-            
-            i += 1
-            
-            # Yield each object of the page, but only if it does not have the spicevids
-            # markers and we explicitely suppress spicevids videos.
-            yield (wrapped := self._parse_item(item) for item in page
-                   if not (self.suppress_spicevids
-                           and 'PremiumIcon' in wrapped.data.get('query@markers')))
     
     def __iter__(self) -> Self:
         '''
@@ -161,7 +171,12 @@ class Query:
         '''
         
         raw = self._get_raw_page(index)
-        return self._parse_page(raw)
+        els = self._parse_page(raw)
+        
+        if not len(els):
+            raise errors.NoResult()
+        
+        return els
 
     # Methods defined by subclasses
     def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
