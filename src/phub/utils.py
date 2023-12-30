@@ -255,8 +255,6 @@ def head(client: object, url: str) -> str | bool:
     
     res = client.call(url, 'HEAD', throw = False, silent = True)
     
-    print(res.status_code, res.url)
-    
     # Make sure we were not redirected
     if res.ok and res.url.endswith(url):
         return res.url

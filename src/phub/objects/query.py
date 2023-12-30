@@ -32,12 +32,12 @@ def Page(query: Query, page: list[Any]) -> Iterator[QueryItem]:
     '''
     
     for item in page:
-        wrapped = query._parse_item(item)
+        wrapped: QueryItem = query._parse_item(item)
         
         # Yield each object of the page, but only if it does not have the spicevids
         # markers and we explicitely suppress spicevids videos.    
         if not(query.suppress_spicevids
-               and 'premiumIcon' in wrapped.data.get('query@markers')):
+               and 'premiumIcon' in wrapped._as_query['markers']):
             yield wrapped
         
         else:
@@ -300,7 +300,7 @@ class queries:
             obj._as_query = data
             
             # Parse markers
-            markers = ' '.join(consts.re.get_markers(markers)).split()
+            markers = ' '.join(consts.re.get_markers(data['markers'])).split()
             
             obj.data = {
                 # Property overrides
