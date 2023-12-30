@@ -20,28 +20,6 @@ logger = logging.getLogger(__name__)
 
 QueryItem = Video | FeedItem | User
 
-def Page(query: Query, page: list[Any]) -> Iterator[QueryItem]:
-    '''
-    Iterates over a page.
-    Args:
-        query (Query): Parent query.
-        page   (list): The parsed page to iterate over.
-    
-    Returns:
-        Iterator: An iterator containing wrapped query items.
-    '''
-    
-    for item in page:
-        wrapped: QueryItem = query._parse_item(item)
-        
-        # Yield each object of the page, but only if it does not have the spicevids
-        # markers and we explicitely suppress spicevids videos.    
-        if not(query.suppress_spicevids
-               and 'premiumIcon' in wrapped._as_query['markers']):
-            yield wrapped
-        
-        else:
-            logger.info('Bypassed spicevid video: %s', wrapped)
 
 class Query:
     '''
@@ -112,8 +90,9 @@ class Query:
             try:
                 page = self._get_page(i)
                 i += 1
-                yield Page(self, page)
-            
+                
+                yield self._iter_page(page)
+                
             except errors.NoResult:
                 return
     
@@ -184,6 +163,14 @@ class Query:
             raise errors.NoResult()
         
         return els
+
+    def _iter_page(self, page: list[str]) -> Iterator[QueryItem]:
+        '''
+        Wraps and iterate a page items.
+        '''
+        
+        for item in page:
+            yield self._parse_item(item)
 
     # Methods defined by subclasses
     def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
@@ -314,7 +301,21 @@ class queries:
         def _parse_page(self, raw: str) -> list:
             container = (self.hint or consts.re.container)(raw)
             return consts.re.get_videos(container)
-
+    
+        def _iter_page(self, page: list[str]) -> Iterator[QueryItem]:
+            
+            for item in page:
+                wrapped: QueryItem = self._parse_item(item)
+                
+                # Yield each object of the page, but only if it does not have the spicevids
+                # markers and we explicitely suppress spicevids videos.    
+                if not(self.suppress_spicevids
+                    and 'premiumIcon' in wrapped._as_query['markers']):
+                    yield wrapped
+                
+                else:
+                    logger.info('Bypassed spicevid video: %s', wrapped)
+    
     class UserQuery(VideoQuery):
         '''
         Represents an advanced member search query.
