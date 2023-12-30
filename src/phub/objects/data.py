@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Literal, Self
+from typing import TYPE_CHECKING, Literal
 
 from .. import utils
 from .. import consts
@@ -162,7 +162,7 @@ class _BaseQuality:
     itself among a list of qualities.
     '''
     
-    def __init__(self, value: Literal['best', 'half', 'worst'] | int | Self) -> None:
+    def __init__(self, value: Literal['best', 'half', 'worst']):
         '''
         Initialize a new quality object.
         

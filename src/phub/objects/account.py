@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import TYPE_CHECKING, Self, Literal, Iterator
+from typing import TYPE_CHECKING, Literal, Iterator
 
 from .. import utils
 from .. import consts
@@ -22,7 +22,7 @@ class Account:
     If the login fails, there will be None.
     '''
     
-    def __new__(cls, client: Client) -> Self | None:
+    def __new__(cls, client: Client):
         '''
         Check if the object creation is needed.
         
