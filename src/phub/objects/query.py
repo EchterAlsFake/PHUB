@@ -332,6 +332,11 @@ class queries:
         def _parse_page(self, raw: str) -> list[tuple]:
             container = (self.hint or consts.re.container)(raw)
             return consts.re.get_users(container)
+        
+        def _iter_page(self, page: list[str]) -> Iterator[QueryItem]:
+        
+            for item in page:
+                yield self._parse_item(item)
 
     class FeedQuery(Query):
         '''
