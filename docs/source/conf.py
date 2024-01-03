@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath("../../src"))
 # Project metadata
 
 project = 'PHUB'
-copyright = '2023, Egsagon'
+copyright = '2023-2024, EchterAlsFake'
 author = 'Egsagon'
 
 # Sphinx extensions & options
@@ -40,7 +40,7 @@ html_theme_options = {
         "logo": "material/download-box-outline" # fallback logo
     },
     "site_url": "https://phub.readthedocs.io",
-    "repo_url": "https://github.com/Egsagon/PHUB",
+    "repo_url": "https://github.com/EchterAlsFake/PHUB",
     "repo_name": "PHUB",
     "edit_uri": "blob/main/docs",
     "globaltoc_collapse": True,
@@ -87,7 +87,7 @@ html_theme_options = {
     "social": [
         {
             "icon": "fontawesome/brands/github",
-            "link": "https://github.com/Egsagon/PHUB",
+            "link": "https://github.com/EchterAlsFake/PHUB",
             "name": "Source on github.com",
         },
         {

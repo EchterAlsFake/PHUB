@@ -10,7 +10,7 @@ able to access most used or useful PH features, such as video searching,
 accessing account features, video downloading, and a lot more.
 
 Learn more on the project [documentation](https://phub.readthedocs.io) and
-[GitHub page](https://github.com/Egsagon/PHUB).
+[GitHub page](https://github.com/EchterAlsFake/PHUB).
 
 ## Installation
 
