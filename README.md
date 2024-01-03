@@ -64,9 +64,9 @@ client.account.recommended
 ```
 
 # Note
-[!NOTE] This repository was initiated and maintained by [Egsagon](https://github.com/Egsagon)
+<strong>This repository was initiated and maintained by [Egsagon](https://github.com/Egsagon)
 He doesn't have any time to maintain this and transferred me the ownership.
-I'll do my best to maintain this repository functional.
+I'll do my best to maintain this repository functional.</strong>
 
 
 ## License
