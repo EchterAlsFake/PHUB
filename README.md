@@ -21,12 +21,12 @@ pip install --upgrade phub
 
 - Or from this repo to get the latest fixes/features:
 ```shell
-pip install --upgrade git+https://github.com/Egsagon/PHUB.git
+pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git
 ```
 
-- Or, for python 3.9 and higher (:warning: not updated as often)
+- Or, for python 3.10 and higher. It Could also work for Python 3.6–9, but untested.
 ```shell
-pip install --upgrade git+https://github.com/Egsagon/PHUB.git@py-3.9
+pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git@py-3.10
 ```
 
 ## Quickstart
