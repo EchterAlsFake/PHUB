@@ -283,11 +283,9 @@ class queries:
             url = f'{consts.HOST}view_video.php?viewkey={data["key"]}'
             obj = Video(self.client, url)
             
-            # Override the _as_query property since we already have a query 
-            obj._as_query = data
-            
             # Parse markers
             markers = ' '.join(consts.re.get_markers(data['markers'])).split()
+            obj._as_query = {'markers': markers}
             
             obj.data = {
                 # Property overrides
