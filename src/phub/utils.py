@@ -141,6 +141,13 @@ def update_locals() -> None:
 def serialize(object_: object, recursive: bool = False) -> object:
     '''
     Simple serializer for PHUB objects.
+    
+    Args:
+        object_    (Any): The object to serialize.
+        recursive (bool): Whether to allow serializing PHUB objects inside the object.
+    
+    Returns:
+        Any: A JSON serializable object.
     '''
     
     # if an object is a built-in
@@ -174,6 +181,15 @@ def dictify(object_: object,
             recursive: bool) -> dict:
     '''
     Dictify an object.
+    
+    Args:
+        object_     (Any): The object to serialize.
+        keys  (list[str]): A list of keys to dictify.
+        all_  (list[str]): The total list of serializeable object keys.
+        recursive  (bool): Whether to allow serializing PHUB objects inside the object.
+    
+    Returns:
+        dict: The object dictified.
     '''
     
     if isinstance(keys, str): keys = [keys]
@@ -187,8 +203,8 @@ def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoErr
     Set up a generator to bypass items that throw errors.
     
     Args:
-        gen: The iterable to suppress.
-        errs: The errors that fall under the suppression rule.
+        gen   (Iterable): The iterable to suppress.
+        errs (Exception): The errors that fall under the suppression rule.
     
     Returns
         Iterator: The result iterator. 
@@ -250,7 +266,15 @@ def least_factors(n: int) -> int:
 
 def head(client: object, url: str) -> str | bool:
     '''
-    Performs a HEAD request to check if a page is available.
+    Performs a silent HEAD request to check if a page is available
+    without fetching its content.
+    
+    Args:
+        client (Client): A client containing an initialised session.
+        url       (str): The url of the request.
+    
+    Returns:
+        str | bool: The redirect URL if success, False otherwise.
     '''
     
     res = client.call(url, 'HEAD', throw = False, silent = True)

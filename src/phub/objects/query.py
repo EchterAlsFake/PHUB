@@ -96,7 +96,7 @@ class Query:
             except errors.NoResult:
                 return
     
-    def __iter__(self) -> Self:
+    def __iter__(self) -> Iterator[QueryItem]:
         '''
         Iterate through the query items.
         '''
@@ -107,7 +107,14 @@ class Query:
     
     def sample(self, max: int = 0, filter: Callable[[QueryItem], bool] = None) -> Iterator[QueryItem]:
         '''
-        Get a sample of items.
+        Get a sample of the query.
+        
+        Args:
+            max (int): Maximum amount of items to fetch.
+            filter (Callable): A filter function that decides whether to keep each QueryItems.
+        
+        Returns:
+            Iterator: Response iterator containing QueryItems.
         '''
         
         i = 0
