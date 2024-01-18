@@ -1,8 +1,18 @@
 '''
-PHUB v4.1
+PHUB v4.3.2
 
-See https://github.com/Egsagon/PHUB for docs.
+See https://phub.readthedocs.io/en/latest/ for docs.
+See https://github.com/EchterAlsFake/PHUB for code.
 '''
+
+# Package description
+__author__ = 'Egsagon, EchterAlsFake'
+__copyright__ = 'Copyright 2024, PHUB'
+__license__ = 'GPLv3'
+__version__  = '4.3.2'
+
+__all__ = ['Client', 'Quality', 'core', 'utils',
+           'consts', 'errors', 'objects', 'modules']
 
 # Shortcuts
 from .core import Client
@@ -21,10 +31,5 @@ from . import modules
 # Sub packages content
 from .objects import *
 from .modules import *
-
-# Avoid importing everything from subpackages
-# when using star imports
-__all__ = ['Client', 'Quality', 'core', 'utils',
-           'consts', 'errors', 'objects', 'modules']
 
 # EOF
