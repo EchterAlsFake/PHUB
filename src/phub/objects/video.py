@@ -52,6 +52,8 @@ class Video:
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
         
+        self.ALLOW_QUERY_SIMULATION = False
+        
         logger.debug('Initialised new video object %s', self)
     
     def __repr__(self) -> str:
@@ -263,10 +265,15 @@ class Video:
     def _as_query(self) -> dict[str, str]:
         '''
         Simulate a query to gain access to more data.
+        If the video object is yielded by a query, this property
+        will be overriden by the query data.
         
-        Warning - This will make a lot of requests and can false
+        Warning - This will make a lot of requests and can fake
                    some properties (like watched).
         '''
+        
+        assert not self.ALLOW_QUERY_SIMULATION, 'Query simulation is disabled for this object'
+        logger.warning('Attempting query simulation')
         
         # 1. Create playlist
         name = f'temp-{random.randint(0, 100)}'
@@ -276,7 +283,7 @@ class Video:
             tags = '["porn"]',
             description = '',
             status = 'private',
-            token = self._token
+            token = self.client._granted_token
         )).json()
         
         self._assert_internal_success(res)
@@ -286,7 +293,7 @@ class Video:
         res = self.client.call('playlist/video_add', 'POST', dict(
             pid = playlist_id,
             vid = self.id,
-            token = self._token
+            token = self.client._granted_token
         ))
         
         self._assert_internal_success(res.json())
@@ -365,9 +372,11 @@ class Video:
         The internal video id.
         '''
 
-        if id_ := (self.data.get('page@id') # Query injection
-                   or self.data.get('page@playbackTracking').get('video_id')):
+        if id_ := self.data.get('page@id'):
             return id_
+        
+        if pt := self.data.get('page@playbackTracking'):
+            return pt.get('video_id')
         
         # Use thumbnail URL 
         return consts.re.get_thumb_id(self.image.url)
@@ -524,34 +533,6 @@ class Video:
         return User.from_video(self)
 
     @cached_property
-    def liked(self) -> NotImplemented:
-        '''
-        Whether the video was liked by the account.
-        '''
-        
-        return NotImplemented
-    
-    @cached_property
-    def watched(self) -> bool:
-        '''
-        Whether the video was viewed previously by the account.
-        '''
-        
-        if not self.client.logged:
-            raise Exception('Client must be logged in to use this property.') # temp class
-        
-        # If we fetched the video page while logged in, PH consider we have watched it
-        if self.page:
-            return True
-        
-        if 'watchedVideo' in self._as_query['markers']:
-            return True
-        
-        # For some reason the watched text is different in playlists
-        if 'class="watchedVideoText' in self._as_query['raw']:
-            return True
-    
-    @cached_property
     def is_free_premium(self) -> bool | NotImplemented:
         '''
         Whether the video is part of free premium.
@@ -594,14 +575,43 @@ class Video:
         
         return self.data.get('page@embedCode') or f'{consts.HOST}/embed/{self.id}'
     
+    # === Dynamic data properties === #
+    
+    @property
+    def liked(self) -> NotImplemented:
+        '''
+        Whether the video was liked by the account.
+        '''
+        
+        return NotImplemented
+    
+    @property
+    def watched(self) -> bool:
+        '''
+        Whether the video was viewed previously by the account.
+        '''
+        
+        assert self.client.logged, 'Client must be logged in to use this property'
+        
+        # If we fetched the video page while logged in, PH consider we have watched it
+        if self.page:
+            return True
+        
+        if 'watchedVideo' in self._as_query['markers']:
+            return True
+        
+        # For some reason the watched text is different in playlists
+        if 'class="watchedVideoText' in self._as_query['raw']:
+            return True
+        
+        return False
+    
     @property
     def is_favorite(self) -> bool:
         '''
         Whether the video has been set as favorite by the client.
         '''
         
-        # Make sure page is loaded
-        self._token
-        
         return bool(consts.re.is_favorite(self.page, False))
+
 # EOF
