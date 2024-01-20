@@ -36,8 +36,6 @@ class Account:
         if all(client.credentials.values()):
             logger.info('Creating new account object')
             return object.__new__(cls)
-        
-        logger.info('Bypassing account creation, no credentials')
     
     def __init__(self, client: Client) -> None:
         '''

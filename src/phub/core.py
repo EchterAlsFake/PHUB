@@ -6,6 +6,7 @@ import time
 import logging
 
 import requests
+from functools import cached_property
 
 from . import utils
 from . import consts
@@ -60,7 +61,6 @@ class Client:
         
         # Connect account
         self.logged = False
-        self.token: str = None
         self.account = Account(self)
         logger.debug('Connected account to client %s', self.account)
         
@@ -76,6 +76,7 @@ class Client:
         
         # Initialise session
         self.session = requests.Session()
+        self._clear_granted_token()
         
         # Bypass age disclaimer
         self.session.cookies.set('accessAgeDisclaimerPH', '1')
@@ -107,7 +108,7 @@ class Client:
             requests.Response: The fetched response.
         '''
         
-        logger.log(logging.DEBUG if silent else logging.INFO, 'Making call %s', func)
+        logger.log(logging.DEBUG if silent else logging.INFO, 'Making call %s', func or '/')
         
         # Delay
         if self.start_delay:
@@ -176,10 +177,10 @@ class Client:
     
         # Get token
         page = self.call('').text
-        self.token = consts.re.get_token(page)
+        base_token = consts.re.get_token(page)
         
         # Send credentials
-        payload = consts.LOGIN_PAYLOAD | self.credentials | {'token': self.token}
+        payload = consts.LOGIN_PAYLOAD | self.credentials | {'token': base_token}
         response = self.call('front/authenticate', method = 'POST', data = payload)
         
         # Parse response
@@ -190,6 +191,9 @@ class Client:
         if throw and not success:
             logger.error('Login failed: Received error: %s', message)
             raise errors.LoginFailed(message)
+        
+        # Reset token
+        self._clear_granted_token()
         
         # Update account data
         self.account.connect(data)
@@ -308,5 +312,26 @@ class Client:
             params |= Param('age2', age[1])
         
         return queries.UserQuery(self, 'user/search', params)
+
+    def _clear_granted_token(self) -> None:
+        '''
+        Clear the granted token cache.
+        '''
+        
+        if '_granted_token' in self.__dict__:
+            del self._granted_token
+
+    @cached_property
+    def _granted_token(self) -> str:
+        '''
+        Get a granted token after having
+        authentified the account.
+        '''
+        
+        assert self.logged, 'Client must be logged in'
+        self._token_controller = True
+
+        page = self.call('').text
+        return consts.re.get_token(page)
 
 # EOF

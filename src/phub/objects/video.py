@@ -83,8 +83,10 @@ class Video:
         '''
         Lazily fetch some data.
         
-        data@key => Use webmasters
-        page@key => Use web scrapers
+        key format:
+            data@<dkey>   => Get key from API 
+            page@<pkey>   => Scrape key from page
+            <dkey>|<pkey> => Choose considering cache
         
         Args:
             key (str): The key to fetch.
@@ -94,6 +96,15 @@ class Video:
         
         '''
         
+        # Multiple keys handle
+        if '|' in key:
+            datakey, pagekey = key.split('|')
+            
+            if self.page:
+                key = 'page@' + pagekey
+            key = 'data@' + datakey
+        
+        # If key is already cached 
         if key in self.data:
             return self.data.get(key)
         
@@ -240,10 +251,13 @@ class Video:
     def _assert_internal_success(self, res: dict) -> None:
         '''
         Assert an internal response has succeeded.
+
+        Args:
+            res (dict): The rerquest json response. 
         '''
         
-        if res['success'] and not res['success'] in ('true', True, 1):
-            raise Exception(f'Failed to call : `{res.get("message")}`')
+        if 'success' in res and not res['success']:
+            raise Exception(f'Call failed: `{res.get("message")}`')
     
     @cached_property
     def _as_query(self) -> dict[str, str]:
@@ -298,6 +312,7 @@ class Video:
     def like(self, toggle: bool = True) -> None:
         '''
         Set the video like value.
+        
         Args:
             toggle (bool): The toggle value.
         '''
@@ -306,12 +321,13 @@ class Video:
             id = self.id,
             current = self.likes.up,
             value = int(toggle),
-            token = self._token
+            token = self.client._granted_token
         ))
     
     def favorite(self, toggle: bool = True) -> None:
         '''
         Set video as favorite or not.
+        
         Args:
             toggle (bool): The toggle value.
         '''
@@ -319,7 +335,7 @@ class Video:
         res = self.client.call('video/favourite', 'POST', dict(
             toggle = int(toggle),
             id = self.id,
-            token = self._token
+            token = self.client._granted_token
         ))
         
         self._assert_internal_success(res.json())
@@ -327,31 +343,21 @@ class Video:
     def watch_later(self, toggle: bool = True) -> None:
         '''
         Add or remove the video to the watch later playlist.
+        
         Args:
             toggle (bool): The toggle value.
         '''
         
         mod = 'add' if toggle else 'remove'
         
-        res = self.client.call(f'playlist/video_{mod}_watchlater', 'POST',
-                               dict(vid = self.id, token = self._token))
+        res = self.client.call(f'playlist/video_{mod}_watchlater', 'POST', dict(
+            vid = self.id,
+            token = self.client._granted_token
+        ))
         
         self._assert_internal_success(res.json())
     
     # === Data properties === #
-
-    @cached_property
-    def _token(self) -> str:
-        '''
-        The page client token.
-        '''
-        
-        assert self.client.logged, 'Account is not logged in'
-        
-        # Force fetch page
-        self.fetch('page@title')
-        
-        return consts.re.get_token(self.page)
 
     @cached_property
     def id(self) -> str:
@@ -359,7 +365,8 @@ class Video:
         The internal video id.
         '''
 
-        if id_ := self.data.get('page@id'):
+        if id_ := (self.data.get('page@id') # Query injection
+                   or self.data.get('page@playbackTracking').get('video_id')):
             return id_
         
         # Use thumbnail URL 
@@ -380,9 +387,16 @@ class Video:
         The video thumbnail.
         '''
         
+        if url := self.data.get('page@image_url'):
+            servers = None
+        
+        else:
+            url = self.fetch('data@thumb')
+            servers = self.fetch('data@thumbs')
+        
         return Image(client = self.client,
-                     url = self.fetch('data@thumb'),
-                     servers = self.fetch('data@thumbs'),
+                     url = url,
+                     servers = servers,
                      name = f'thumb-{self.key}')
     
     @cached_property
@@ -399,12 +413,14 @@ class Video:
         The video length.
         '''
         
-        params = ('seconds', 'minutes', 'hours', 'days')
+        if seconds := self.data.get('page@video_duration'):
+            delta = {'seconds': seconds}
         
-        # Parse date
-        raw = self.fetch('data@duration')
-        digits = list(map(int, raw.split(':')))[::-1]
-        delta = {k: v for k, v in zip(params, digits)}
+        else:
+            params = ('seconds', 'minutes', 'hours', 'days')
+            raw = self.fetch('data@duration')
+            digits = list(map(int, raw.split(':')))[::-1]
+            delta = {k: v for k, v in zip(params, digits)}
         
         return timedelta(**delta)
     
@@ -414,6 +430,7 @@ class Video:
         The video tags.
         '''
         
+        # TODO - Can be harvested on page
         return [Tag(tag['tag_name'])
                 for tag in self.fetch('data@tags')]
     
@@ -423,6 +440,7 @@ class Video:
         Positive and negative reviews of the video.
         '''
         
+        # TODO - Can be harvested on page
         rating = self.fetch('data@rating') / 100
         counter = self.fetch('data@ratings')
         
@@ -436,6 +454,7 @@ class Video:
         How many people watched the video.
         '''
         
+        # TODO - Can be harvested on page
         return self.fetch('data@views')
     
     @cached_property
@@ -454,13 +473,14 @@ class Video:
         
         raw = self.fetch('data@publish_date')
         return datetime.strptime(raw, '%Y-%m-%d %H:%M:%S')
-        
+
     @cached_property
     def pornstars(self) -> list[User]:
         '''
         The pornstars present in the video.
         '''
         
+        # TODO - Can be harvested on page and cache more data
         return [User.get(self.client, ps['pornstar_name'])
                 for ps in self.fetch('data@pornstars')]
     
@@ -549,7 +569,31 @@ class Video:
         return Image(client = self.client,
                      url = self._as_query['preview'],
                      name = f'preview-{self.key}')
+    
+    @cached_property
+    def HD(self) -> bool:
+        '''
+        Whether the video is in High Definition.
+        '''
         
+        return self.fetch('page@isHD') == 'true'
+    
+    @cached_property
+    def VR(self) -> bool:
+        '''
+        Whether the video is in Virtual Reality.
+        '''
+        
+        return self.fetch('page@isVR') == 'true'
+    
+    @cached_property
+    def embed(self) -> str:
+        '''
+        The video iframe embed.
+        '''
+        
+        return self.data.get('page@embedCode') or f'{consts.HOST}/embed/{self.id}'
+    
     @property
     def is_favorite(self) -> bool:
         '''
