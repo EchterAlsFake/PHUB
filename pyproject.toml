@@ -1,8 +1,11 @@
 [project]
 name = "phub"
-version = "4.3.2"
+version = "4.4"
 description = "An API for Pornhub"
-authors = [{name = "EchterAlsFake", email = "EchterAlsFake@proton.me"}]
+authors = [
+  {name = 'Egsagon', email = "egsagon12@gmail.com"},
+  {name = "EchterAlsFake", email = "EchterAlsFake@proton.me"}
+]
 license = {file = "LICENSE"}
 readme = {file = "pypi.md", content-type = "text/markdown"}
 keywords = ["pornhub", "phub", "porn", "api", "web scrapper", "api wrapper"]
