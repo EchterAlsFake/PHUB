@@ -272,7 +272,25 @@ class Video:
                    some properties (like watched).
         '''
         
-        assert not self.ALLOW_QUERY_SIMULATION, 'Query simulation is disabled for this object'
+        # Now i really don't want people to use this without knowing what it
+        # really does 
+        if not self.ALLOW_QUERY_SIMULATION:
+            
+            # Personnalised error for the JSONQuery
+            from . import queries
+            parent = self.data.get('query@parent')
+            
+            if isinstance(parent, queries.JSONQuery): raise Exception(
+                'Data is not available while using the hubtraffic wrapper. '
+                'Please set use_hubtraffic=False in query initialisation.'
+            )
+            
+            raise Exception(
+                'Query simulation is disabled for this video object. '
+                'If you still want to continue, set video.ALLOW_QUERY_SIMULATION=True. '
+                'Be advised this method is not recomended and requires user logging.'
+            )
+        
         logger.warning('Attempting query simulation')
         
         # 1. Create playlist

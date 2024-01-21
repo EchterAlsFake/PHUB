@@ -32,7 +32,8 @@ class Query:
                  client: Client,
                  func: str,
                  param: Param = NO_PARAM,
-                 container_hint: consts.WrappedRegex | Callable = None) -> None:
+                 container_hint: consts.WrappedRegex | Callable = None,
+                 query_repr: str = None) -> None:
         '''
         Initialise a new query.
         
@@ -41,10 +42,12 @@ class Query:
             func                (str): The URL function.
             param             (Param): Filter parameter.
             container_hint (Callable): An hint function to help determine where should the target container be.
+            query_repr          (str): Indication for the query representation.
         '''
 
         self.client = client
         self.hint = container_hint
+        self._query_repr = query_repr
         
         # Parse param
         param |= Param('page', '{page}')
@@ -63,7 +66,8 @@ class Query:
     
     def __repr__(self) -> str:
         
-        return f'phub.Query(url={self.url})'
+        s = f'"{self._query_repr}"' if self._query_repr else f'url="{self.url}"'
+        return f'phub.Query({s})'
     
     def __len__(self) -> int:
         '''
@@ -105,13 +109,19 @@ class Query:
             for item in page:
                 yield item
     
-    def sample(self, max: int = 0, filter: Callable[[QueryItem], bool] = None) -> Iterator[QueryItem]:
+    def sample(self,
+               max: int = 0,
+               filter: Callable[[QueryItem], bool] = None,
+               watched: bool | None = None,
+               free_premium: bool | None = None) -> Iterator[QueryItem]:
         '''
         Get a sample of the query.
         
         Args:
-            max (int): Maximum amount of items to fetch.
-            filter (Callable): A filter function that decides whether to keep each QueryItems.
+            max           (int): Maximum amount of items to fetch.
+            filter   (Callable): A filter function that decides whether to keep each QueryItems.
+            watched      (bool): Whether videos should have been watched by the account or not.
+            free_premium (bool): Whether videos should be free premium or not.
         
         Returns:
             Iterator: Response iterator containing QueryItems.
@@ -119,12 +129,13 @@ class Query:
         
         i = 0
         for item in self:
+            # Maximum sample size
+            if max and i >= max: return
             
-            if max and i >= max:
-                return
-            
-            if filter and not filter(item):
-                continue
+            # Custom filters
+            if ((watched is not None and watched != item.watched)
+                or (free_premium is not None and free_premium != item.is_free_premium)
+                or (filter and not filter(item))): continue
             
             i += 1
             yield item
@@ -239,7 +250,7 @@ class queries:
             
             # Create the object and inject data
             video = Video(self.client, url = data['url'])
-            video.data = {f'data@{k}': v for k, v in data.items()}
+            video.data = {f'data@{k}': v for k, v in data.items()} | {'query@parent': self}
             
             return video
         
@@ -294,13 +305,16 @@ class queries:
             obj._as_query = data
             
             # Parse markers
-            markers = ' '.join(consts.re.get_markers(data['markers'])).split()
+            # markers = ' '.join(consts.re.get_markers(data['markers'])).split()
             
             obj.data = {
                 # Property overrides
                 'page@title': data["title"],
                 'data@thumb': data["image"],
-                'page@id': id
+                'page@id': id,
+                
+                # Custom query properties
+                'query@parent': self
             }
             
             return obj

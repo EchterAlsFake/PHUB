@@ -278,9 +278,9 @@ class Client:
         param_ = Param('search', query) | param
         
         if use_hubtraffic:
-            return queries.JSONQuery(self, 'search', param_)
+            return queries.JSONQuery(self, 'search', param_, query_repr = query)
         
-        return queries.VideoQuery(self, 'video/search', param_)
+        return queries.VideoQuery(self, 'video/search', param_, query_repr = query)
     
     def search_user(self,
                     username: str = None,
