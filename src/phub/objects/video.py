@@ -570,7 +570,7 @@ class Video:
                      name = f'preview-{self.key}')
     
     @cached_property
-    def HD(self) -> bool:
+    def is_HD(self) -> bool:
         '''
         Whether the video is in High Definition.
         '''
@@ -578,7 +578,7 @@ class Video:
         return self.fetch('page@isHD') == 'true'
     
     @cached_property
-    def VR(self) -> bool:
+    def is_VR(self) -> bool:
         '''
         Whether the video is in Virtual Reality.
         '''

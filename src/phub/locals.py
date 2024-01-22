@@ -218,15 +218,15 @@ class Sort:
     VIDEO_MOST_RECENT = Param('o', 'mr', single = True)
     VIDEO_MOST_VIEWS  = Param('o', 'mv', single = True)
     VIDEO_TOP_RATED   = Param('o', 'tr', single = True)
-    VIDEO_LONGEST    = Param('o', 'lg', single = True)
+    VIDEO_LONGEST    = Param('o', 'lg',  single = True)
     
     # User sorting
     USER_POPULAR = Param('o', 'popular', single = True)
-    USER_NEWEST  = Param('o', 'newest', single = True)
+    USER_NEWEST  = Param('o', 'newest',  single = True)
     
     # Time sorting
     ALL_TIME = Param('t', None, single = True)
-    DAILY    = Param('t', 't', single = True)
+    DAILY    = Param('t', 't',  single = True)
     WEEKLY   = Param('t', 'w',  single = True)
     MONTHLY  = Param('t', 'm',  single = True)
     YEARLY   = Param('t', 'y',  single = True)
@@ -301,15 +301,6 @@ FEED_CLASS_TO_CONST = {
     'stream_subscriptions_pornstars': Section.VERIFIED_VIDEO,
     # etc.
 }
-
-class DeletedVideo:
-    '''
-    Represent a video that was available at some point,
-    but isn't anymore. 
-    '''
-    
-    def __repr__(self) -> str:
-        return f'phub.Video( DELETED VIDEO )'
 
 __all__ = [
     'NO_PARAM',

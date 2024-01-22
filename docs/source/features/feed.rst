@@ -17,7 +17,7 @@ successfully, you can access your account :py:class:`.Feed`.
     feed = client.account.feed.feed
 
     # Print the first 10 feed news
-    for item in feed[:10]:
+    for item in feed.sample(max = 10):
         print(item)
 
 You can also specify custom feed filters:
@@ -32,5 +32,5 @@ You can also specify custom feed filters:
     )
 
     # Print the first 10 feed news
-    for item in comments_feed[:10]:
+    for item in comments_feed.sample(max = 10):
         print(item)

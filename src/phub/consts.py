@@ -172,6 +172,7 @@ class re:
     # Verification regexes
     is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                    ) # Check if a string is a URL
     is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}' ) # Check if a string is a video URL
+    is_quality   = comp( p.fullmatch, r'\d+p?'                                            ) # Check if a string is a video quality (e.g. 144p)
     is_favorite  = find( r'<div class=\".*?js-favoriteBtn.*?active\"'                     ) # Check if a video is favorite
     
     # Challenge regexes

@@ -175,8 +175,20 @@ class _BaseQuality:
         if isinstance(value, _BaseQuality):
             self.value = value.value
         
-        if isinstance(self.value, str):
-            assert self.value.lower() in ('best', 'half', 'worst')
+        elif isinstance(value, str):
+            
+            if consts.re.is_quality(value):
+                self.value = value.replace('p', '')
+            
+            else:
+                assert value.lower() in ('best', 'half', 'worst')
+        
+        elif not isinstance(value, int):
+            raise TypeError(f'Invalid quality: `{value}`')
+    
+    def __repr__(self) -> str:
+        
+        return f'phub.Quality({self.value})'
     
     def select(self, qualities: dict) -> str:
         '''
