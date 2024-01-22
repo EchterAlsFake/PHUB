@@ -3,6 +3,9 @@
 </p>
 
 # PHUB - An API for Pornhub.
+[![Downloads](https://static.pepy.tech/badge/phub)](https://pepy.tech/project/phub)
+[![PyPI version](https://badge.fury.io/py/phub.svg)](https://badge.fury.io/py/phub)
+
 
 PHUB is a hybrid API for Pornhub. It is able to communicate with Pornhub
 using both web-scraping and Pornhub's HubTraffic API. It is
