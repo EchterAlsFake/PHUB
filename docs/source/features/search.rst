@@ -69,13 +69,8 @@ For more in-depth iteration, you can use the sample method.
         print(video.title)
     
     # Fetch only non watched
-    for video in query.sample(filter = lambda v: not v.watched):
+    for video in query.sample(watched = False):
         print(video.title)
-
-.. warning::
-    Beware that if :meth:`Video.watched` is used without a query, 
-    it can provide wrong results by considering 'watched' certain
-    videos.
 
 To exploit video data, see :doc:`here </features/video>`.
 
@@ -92,6 +87,10 @@ You should choose which one to use depending on what you want to do.
 
     # Uses a VideoQuery - slower, but fetches all of the video data
     query = client.search(..., use_hubtraffic = False)
+
+.. note::
+
+    To access others properties from a JSONQuery, see the warning on :doc:`Using videos </features/video>`.
 
 Refreshing queries
 ------------------

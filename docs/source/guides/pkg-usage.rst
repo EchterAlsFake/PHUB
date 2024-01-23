@@ -41,7 +41,7 @@ like so:
 
         .. code-block:: python
 
-            video = client.get(key = 'xxx')
+            video = client.get('xxx')
 
 Accessing data
 --------------
@@ -59,7 +59,7 @@ the cache by calling :meth:`.Video.refresh`.
 
 .. code-block:: python
 
-    video = client.get(key = 'xxx')
+    video = client.get('xxx')
 
     print(f'The "{video.title}" has {video.likes.up} likes!')
 
@@ -160,22 +160,22 @@ that can fetch video data:
         # etc.
     }
 
-Each ``dictify`` method can take as argument a :py:class`list[str]` of keys,
+Each ``dictify`` method can take as argument a :py:class:`list[str]` of keys,
 if you want to avoid fetching specific things.
 
-Below is a list of all serializable PHUB objects, along with their keys and recursive
-keys (PHUB objects that require further parsing and serialization).
+Below is a list of all serializable PHUB objects, along with their keys.
+PHUB objects are keys that redirect to a PHUB object.
 
 .. list-table:: Serializable objects
     :header-rows: 1
 
     * - Object
       - Default keys
-      - Recursive keys
+      - PHUB objects
 
     * - :py:class:`.Video`
-      - ``url``, ``key``, ``is_vertical``, ``duration``, ``views``, ``date``, ``orientation``
-      - ``image``, ``tags``, ``like``, ``pornstars``, ``categories``, ``author``
+      - ``id``, ``title``, ``is_vertical``, ``duration``, ``orientation``, ``orientation``, ``views``, ``hotspots``, ``date``, ``is_free_premium``, ``is_HD``, ``is_VR``, ``embed``, ``liked``, ``watched``, ``is_favorite``
+      - ``image``, ``tags``, ``likes``, ``pornstars``, ``categories``, ``author``, ``preview``
     
     * - :py:class:`.User`
       - ``name``, ``url``, ``type``, ``bio``, ``info``

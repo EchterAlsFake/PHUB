@@ -124,6 +124,8 @@ There are a few presets available in the `.download` submodule.
                                                        timeout = 10))
 
 You can also specify custom downloaders.
+You can use :meth:`.Video.get_segments`, which outputs a generator
+containing a list of segment URLs.
 
 .. code-block:: python
 
@@ -148,9 +150,6 @@ You can also specify custom downloaders.
                 callback(i, length)
     
     video.download(..., downloader = my_downloader)
-
-For even more advanced downloading, you can use :meth:`.Video.get_segments`,
-which outputs a generator containing a list segment URLs.
 
 Alternatively, :meth:`.Video.get_M3U_url` outputs the URL of the master
 M3U file for a desired quality.

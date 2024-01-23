@@ -14,10 +14,8 @@ successfully, you can access your account :py:class:`.Feed`.
 
     client = phub.Client('my-username', 'my-password')
 
-    feed = client.account.feed.feed
-
     # Print the first 10 feed news
-    for item in feed.sample(max = 10):
+    for item in client.account.feed.sample(max = 10):
         print(item)
 
 You can also specify custom feed filters:

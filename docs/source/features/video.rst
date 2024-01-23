@@ -4,7 +4,7 @@ Using Videos
 :py:class:`.Video` objects are emitted by:
 
 - :meth:`.Client.get` when searching for a specific video
-- :meth:`.Query.get` when enumerating for videos in a query
+- :py:class:`.Query` when enumerating for videos in a query
 
 Once initialised, a :py:class:`.Video` object does not do anything.
 It manages requests and caches automatically to be as fast as possible.
@@ -73,6 +73,37 @@ You can use the following properties on a video:
     * - :literal:`video.is_favorite`
       - Whether the video is set a favorite by the client.
 
+    * - :literal:`video.is_HD`
+      - Whether the video is available in a High Definition quality.
+    
+    * - :literal:`video.is_VR`
+      - Whether the video is available in VR.
+
+    * - :literal:`video.id`
+      - The internal video ID, used for API calls (different than the viewkey).
+    
+    * - :literal:`video.embed`
+      - The video embed URL, if you want to integrate it into a website.
+
+.. warning::
+  Some video properties (`preview`, `watched` and `is_free_premium`) are only available
+  if the video comes from a :py:class:`.VideoQuery` because of the limited visibility of
+  the data. You can use these properties by using :meth:`.Query.sample` and directly on the
+  video object, although it is not recommended. 
+
+  .. code-block:: python
+
+    for video in query.sample(watched = True):
+      print(video.title)
+    # Is the same as
+    for video in query.sample():
+      if video.watched:
+        print(video.title)
+  
+  If you absolutely need to access these properties outside of a query, you can turn on
+  query emulation with `video.ALLOW_QUERY_SIMULATION = True`. This will create a fake query
+  but is very slow and requires user authentification.
+
 Interactions
 ------------
 
@@ -80,6 +111,9 @@ As of version 4.3, some interactions are available with the video:
 
 .. list-table:: PHUB Video Interactions
     :header-rows: 1
+
+    * - Method
+      - Description
 
     * - :meth:`.Video.like`
       - Set or unset the video as liked.
