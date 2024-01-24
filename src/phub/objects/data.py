@@ -178,7 +178,7 @@ class _BaseQuality:
         elif isinstance(value, str):
             
             if consts.re.is_quality(value):
-                self.value = value.replace('p', '')
+                self.value = int(value.replace('p', ''))
             
             else:
                 assert value.lower() in ('best', 'half', 'worst')

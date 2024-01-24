@@ -248,6 +248,30 @@ class Video:
         
         return path
     
+    def get_direct_url(self, quality: Quality) -> str:
+        '''
+        Get the direct video URL given a specific quality.
+        
+        Args:
+            quality (Quality): The video quality.
+        
+        Returns:
+            str: The direct url.
+        '''
+        
+        from ..locals import Quality
+        qual = Quality(quality)
+        
+        # Get remote    
+        sources = self.fetch('page@mediaDefinitions')
+        remote = [s for s in sources if 'remote' in s][0]['videoUrl']
+
+        # Parse quality
+        quals = {int(s['quality']): s['videoUrl']
+                 for s in self.client.call(remote).json()}
+        
+        return qual.select(quals)
+    
     # === Interaction methods === #
     
     def _assert_internal_success(self, res: dict) -> None:
