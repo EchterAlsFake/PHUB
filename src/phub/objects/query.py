@@ -256,13 +256,19 @@ class queries:
         
         def _parse_page(self, raw: str) -> list[dict]:
             
-            data = json.loads(raw).get('videos')
+            data = json.loads(raw)
+            
+            videos = data.get('videos')
+            
+            if data.get('code') == '2001':
+                raise errors.NoResult()
 
-            if data is None:
+            elif videos is None:
+                print(raw)
                 logger.error('Invalid API response from `%s`', self.url)
                 raise errors.ParsingError('Invalid API response')
 
-            return data
+            return videos
         
         def sample(self, max: int = 0, filter: Callable[[QueryItem], bool] = None) -> Iterator[QueryItem]:
             return super().sample(max, filter)
