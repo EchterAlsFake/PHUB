@@ -429,7 +429,7 @@ class Video:
         The video title.
         '''
         
-        return (self.data.get('page@title')  # Use page title if cached
+        return (self.data.get('page@video_title')  # Use page title if cached
                 or self.fetch('data@title')) # Use HubTraffic by default
 
     @cached_property
