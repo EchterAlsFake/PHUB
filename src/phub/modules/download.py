@@ -73,11 +73,7 @@ def default(video: Video,
     
     logger.info('Downloading successful.')
 
-def FFMPEG(video: Video,
-           quality: Quality,
-           callback: CallbackType,
-           path: str,
-           start: int = 0) -> None:
+def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: str, start: int = 0) -> None:
     '''
     Download using FFMPEG with real-time progress reporting.
     FFMPEG must be installed on your system.
@@ -94,12 +90,17 @@ def FFMPEG(video: Video,
     logger.info('Downloading using FFMPEG')
     M3U = video.get_M3U_URL(quality)
 
-    # Build the command for FFMPEG
-    command = consts.FFMPEG_COMMAND.format(input=M3U, output=path).split()
+    # If FFMPEG_COMMAND is a string needing format, replace it with direct list construction
+    command = [
+        "ffmpeg",
+        "-i", M3U,
+        "-bsf:a", "aac_adtstoasc",
+        "-y",
+        "-c", "copy",
+        path  # Output file path
+    ]
 
-    # Removes quotation marks from the url
-    command[2] = command[2].strip('"')
-
+    # Log the command being executed
     logger.info('Executing `%s`', ' '.join(command))
 
     # Initialize FfmpegProgress and execute the command
