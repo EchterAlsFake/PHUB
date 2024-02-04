@@ -65,29 +65,57 @@ def eval_flags(flags: list[int]) -> int:
     
     return 0
 
+
 def find(*args) -> WrappedRegex:
     '''
     Compile a single find regex and wraps handling its errors.
-    
+
     Returns:
         Callable: Wrapped regex callable. If the second argument evaluates to False, it won't raise an error.
     '''
-    
+
     *flags, pattern = args
     flags = eval_flags(flags)
-    
+
     regex = engine.compile(pattern, flags)
 
     def wrapper(string: str, throw: bool = True):
-        
+
+        print(string)
         matches = regex.findall(string)
         if throw and not matches:
             logger.error('Pattern \033[91m%s\033[0m failed', pattern)
             raise errors.RegexError('Find regex failed.')
-        
+
         if len(matches): return matches[0]
-    
+
     return wrapper
+
+
+def find_viewkey(*args) -> WrappedRegex:
+    '''
+    Compile a regex specifically for finding the viewkey in a URL and wraps handling its errors.
+
+    Returns:
+        Callable: Wrapped regex callable for extracting viewkey. If the second argument evaluates to False, it won't raise an error.
+    '''
+
+    *flags, pattern = args
+    flags = eval_flags(flags)
+
+    regex = engine.compile(r'[&\?]viewkey=([a-z\d]{8,})(?=&|$)', flags)
+
+    def wrapper(string: str, throw: bool = True):
+        match = regex.search(string)
+        if match:
+            return match.group(1)
+
+        if throw:
+            logger.error('Pattern \033[91m%s\033[0m failed to extract viewkey', pattern)
+            raise errors.RegexError('Viewkey extraction failed.')
+
+    return wrapper
+
 
 def comp(*args) -> WrappedRegex:
     '''
@@ -149,7 +177,7 @@ class re:
     ffmpeg_line   = find( r'seg-(\d*?)-'                                                                ) # Get FFMPEG segment progress
     get_flash     = find( r'var (flashvars_\d*) = ({.*});\n'                                            ) # Get flash data from a video page
     get_token     = find( r'token *?= \"(.*?)\",'                                                       ) # Get authentification token
-    get_viewkey   = find(r'[&\?]viewkey=([a-z\d]{8,})(?=&|$)'                                           ) # Get video URL viewkey
+    get_viewkey   = find_viewkey(r'[&\?]viewkey=([a-z\d]{8,})(?=&|$)'                                           ) # Get video URL viewkey
     video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<'          ) # Get video author, if channel
     video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' ) # Get video author, if model
     get_feed_type = find( r'data-table="(.*?)"'                                                         ) # Get feed section type
@@ -174,7 +202,7 @@ class re:
     
     # Verification regexes
     is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                    ) # Check if a string is a URL
-    is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}' ) # Check if a string is a video URL
+    is_video_url = comp(p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}(&pkey=\d+)?')    # Check if a string is a video URL
     is_quality   = comp( p.fullmatch, r'\d+p?'                                            ) # Check if a string is a video quality (e.g. 144p)
     is_favorite  = find( r'<div class=\".*?js-favoriteBtn.*?active\"'                     ) # Check if a video is favorite
     
