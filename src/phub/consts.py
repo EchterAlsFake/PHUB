@@ -81,7 +81,6 @@ def find(*args) -> WrappedRegex:
 
     def wrapper(string: str, throw: bool = True):
 
-        print(string)
         matches = regex.findall(string)
         if throw and not matches:
             logger.error('Pattern \033[91m%s\033[0m failed', pattern)
