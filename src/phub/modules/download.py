@@ -92,7 +92,7 @@ def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: str, st
 
     # If FFMPEG_COMMAND is a string needing format, replace it with direct list construction
     command = [
-        "ffmpeg",
+        f"{consts.FFMPEG_EXECUTABLE}",
         "-i", M3U,
         "-bsf:a", "aac_adtstoasc",
         "-y",
@@ -108,7 +108,7 @@ def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: str, st
         ff = FfmpegProgress(command)
         for progress in ff.run_command_with_progress():
             # Update the callback with the current progress
-            callback(progress, 100)
+            callback(round(progress), 100)
 
             if progress == 100:
                 logger.info("Download successful")
