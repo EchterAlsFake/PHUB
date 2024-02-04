@@ -149,7 +149,7 @@ class re:
     ffmpeg_line   = find( r'seg-(\d*?)-'                                                                ) # Get FFMPEG segment progress
     get_flash     = find( r'var (flashvars_\d*) = ({.*});\n'                                            ) # Get flash data from a video page
     get_token     = find( r'token *?= \"(.*?)\",'                                                       ) # Get authentification token
-    get_viewkey   = find( r'[&\?]viewkey=([a-z\d]{8,})'                                                 ) # Get video URL viewkey
+    get_viewkey   = find(r'[&\?]viewkey=([a-z\d]{8,})(?=&|$)'                                           ) # Get video URL viewkey
     video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<'          ) # Get video author, if channel
     video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' ) # Get video author, if model
     get_feed_type = find( r'data-table="(.*?)"'                                                         ) # Get feed section type
