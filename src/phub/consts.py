@@ -32,8 +32,6 @@ RSS = 'https://www.pornhub.com/video/webmasterss'
 MAX_CALL_RETRIES = 4 # Maximum times a HTTPError can be reproduced
 MAX_CALL_TIMEOUT = .4 # Time to wait before retrying basic calls 
 
-SEGMENT_LENGTH = 4 # Length of a PH video segment (in seconds)
-MAX_VIDEO_RENEW_ATTEMPTS = 3
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 DOWNLOAD_SEGMENT_ERROR_DELAY = .5
 
@@ -47,7 +45,19 @@ LANGUAGES = [ 'cn', 'de', 'fr', 'it', 'pt', 'pl', 'rt', 'nl', 'cz', 'jp' ]
 
 # Regex wrappers
 
-WrappedRegex = Callable[[str, bool], str]
+WrappedRegex = Callable[[str, bool | None], str]
+
+def _throw_re_error(pattern: str) -> None:
+    '''
+    Raises an error based on a pattern name.
+    
+    Args:
+        pattern (str): The regex pattern.
+    '''
+    
+    regex_name = _REGEXES_NAMES.get(pattern) or f'Unknown ({pattern})'
+    logger.error('Pattern <%s> failed', regex_name)
+    raise errors.RegexError(f'Regex <{regex_name}> failed.')
 
 def eval_flags(flags: list[int]) -> int:
     '''
@@ -64,7 +74,6 @@ def eval_flags(flags: list[int]) -> int:
         return flags[0]
     
     return 0
-
 
 def find(*args) -> WrappedRegex:
     '''
@@ -83,15 +92,15 @@ def find(*args) -> WrappedRegex:
 
         matches = regex.findall(string)
         if throw and not matches:
-            logger.error('Pattern \033[91m%s\033[0m failed', pattern)
-            raise errors.RegexError('Find regex failed.')
+            _throw_re_error(pattern)
 
         if len(matches): return matches[0]
 
+    wrapper.__doc__ = pattern
+    
     return wrapper
 
-
-def find_viewkey(*args) -> WrappedRegex:
+def mtch(*args) -> WrappedRegex:
     '''
     Compile a regex specifically for finding the viewkey in a URL and wraps handling its errors.
 
@@ -110,11 +119,9 @@ def find_viewkey(*args) -> WrappedRegex:
             return match.group(1)
 
         if throw:
-            logger.error('Pattern \033[91m%s\033[0m failed to extract viewkey', pattern)
-            raise errors.RegexError('Viewkey extraction failed.')
+            _throw_re_error(pattern)
 
     return wrapper
-
 
 def comp(*args) -> WrappedRegex:
     '''
@@ -138,6 +145,9 @@ def comp(*args) -> WrappedRegex:
         except AttributeError:
             logger.error('Invalid regex method: \033[91m%s\033[0m', method)
             raise AttributeError('Invalid compiled regex method:', method)
+
+        except Exception:
+            _throw_re_error(pattern)
     
     return wrapper
 
@@ -159,9 +169,8 @@ def subc(*args) -> WrappedRegex:
         try:
             return regex.sub(repl, *args)
         
-        except Exception as err:
-            logger.error('Pattern \033[91m%s\033[0m replacing \033[91m%s\033[0m failed', pattern, repl)
-            raise errors.RegexError('Substraction failed:', err)
+        except Exception:
+            _throw_re_error(pattern)
     
     return wrapper
 
@@ -176,7 +185,7 @@ class re:
     ffmpeg_line   = find( r'seg-(\d*?)-'                                                                ) # Get FFMPEG segment progress
     get_flash     = find( r'var (flashvars_\d*) = ({.*});\n'                                            ) # Get flash data from a video page
     get_token     = find( r'token *?= \"(.*?)\",'                                                       ) # Get authentification token
-    get_viewkey   = find_viewkey(r'[&\?]viewkey=([a-z\d]{8,})(?=&|$)'                                           ) # Get video URL viewkey
+    get_viewkey   = mtch( r'[&\?]viewkey=([a-z\d]{8,})(?=&|$)'                                          ) # Get video URL viewkey
     video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<'          ) # Get video author, if channel
     video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' ) # Get video author, if model
     get_feed_type = find( r'data-table="(.*?)"'                                                         ) # Get feed section type
@@ -186,30 +195,31 @@ class re:
     user_bio      = find( engine.DOTALL, r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'            ) # Get the user bio
     container     = find( engine.DOTALL, r'class=\"container(.*)'                                       ) # Get the page container
     get_thumb_id  = find( r'\/([a-z0-9]+?)\/(?=original|thumb)'                                         ) # Get video id from its thumbnail 
-    eval_video    = find( engine.DOTALL, r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div' ) # Parse video data
+    eval_video    = find( engine.DOTALL, r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.'
+                                         r'*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div') # Parse video data
     
     # Findall regexess
-    get_users   = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                                   ) # Get all users while performing an advanced user search
-    user_infos  = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'                               ) # Get user info
-    feed_items  = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                                                        ) # Get all items in the Feed
-    get_ps      = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s'                              ) # Get all pornstars in a container (avatar, url, name, video count)
-    get_videos  = comp( engine.DOTALL, p.findall, r'<li.*?videoblock(.*?)</li' ) # Get all videos
-    get_markers = comp( engine.DOTALL, p.findall, r'class=\"(.*?)\"' ) # Get markers identifiers
+    get_users   = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                      ) # Get all users while performing an advanced user search
+    user_infos  = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'  ) # Get user info
+    feed_items  = comp( engine.DOTALL, p.findall, r'feedItemSection\"(.*?)<\/section'                           ) # Get all items in the Feed
+    get_ps      = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s' ) # Get all pornstars in a container (avatar, url, name, video count)
+    get_videos  = comp( engine.DOTALL, p.findall, r'<li.*?videoblock(.*?)</li'                                  ) # Get all videos
+    get_markers = comp( engine.DOTALL, p.findall, r'class=\"(.*?)\"'                                            ) # Get markers identifiers
     
     # Substraction regexes
     remove_host = subc( _raw_root, '' ) # Remove the HOST root from a URL
     
     # Verification regexes
-    is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                    ) # Check if a string is a URL
-    is_video_url = comp(p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}(&pkey=\d+)?')    # Check if a string is a video URL
-    is_quality   = comp( p.fullmatch, r'\d+p?'                                            ) # Check if a string is a video quality (e.g. 144p)
-    is_favorite  = find( r'<div class=\".*?js-favoriteBtn.*?active\"'                     ) # Check if a video is favorite
+    is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                                ) # Check if is a URL
+    is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}(&pkey=\d+)?' ) # Check if is a video URL
+    is_quality   = comp( p.fullmatch, r'\d+p?'                                                        ) # Check if is a video quality
+    is_favorite  = find( r'<div class=\".*?js-favoriteBtn.*?active\"'                                 ) # Check if is favorite
     
     # Challenge regexes
-    get_challenge   = find( engine.DOTALL, r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):' )
-    parse_challenge = subc( engine.DOTALL, r'(?:var )|(?:/\*.*?\*/)|\s|\n|\t|(?:n;)', '' )
-    ponct_challenge = subc( engine.DOTALL, r'(if.*?&1\)|else)', r'\1:' )
-    
-    # feed item user = .*?userLink.*?href=\"(.*?)\"
+    get_challenge   = find( engine.DOTALL, r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):'  ) # Get challenge content
+    parse_challenge = subc( engine.DOTALL, r'(?:var )|(?:/\*.*?\*/)|\s|\n|\t|(?:n;)', '' ) # Parse challenge syntax
+    ponct_challenge = subc( engine.DOTALL, r'(if.*?&1\)|else)', r'\1:'                   ) # Convert challenge syntax
+
+_REGEXES_NAMES = {v.__doc__: k for k, v in vars(re).items() if v.__doc__}
 
 # EOF
