@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import time
 import logging
+from pathlib import Path
 from typing import TYPE_CHECKING, Callable
 from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
 from ffmpeg_progress_yield import FfmpegProgress
@@ -73,7 +74,7 @@ def default(video: Video,
     
     logger.info('Downloading successful.')
 
-def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: str, start: int = 0) -> None:
+def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: str | Path, start: int = 0) -> None:
     '''
     Download using FFMPEG with real-time progress reporting.
     FFMPEG must be installed on your system.
@@ -97,11 +98,11 @@ def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: str, st
         "-bsf:a", "aac_adtstoasc",
         "-y",
         "-c", "copy",
-        path  # Output file path
+        str(path)  # Output file path
     ]
 
     # Log the command being executed
-    logger.info('Executing `%s`', ' '.join(command))
+    logger.info('Executing `%s`', ' '.join(map(str, command)))
 
     # Initialize FfmpegProgress and execute the command
     try:

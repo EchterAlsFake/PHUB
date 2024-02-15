@@ -17,26 +17,35 @@ INCREMENT = 30
 KNOWN_PRIME_FACTORS = [2, 3, 5]
 
 
-def concat(*args: list[str]) -> str:
+def concat(*args) -> str:
     '''
-    Concatenate multiple URL parts.
-    
+    Concatenate multiple URL or file path parts.
+
+    Args:
+        *args: A variable number of arguments, each can be a str or a pathlib.Path object.
+
     Returns:
-        str: The concatenated path.
+        str: The concatenated path as a string.
     '''
-    
-    string: str = args[0].strip()
-        
+
+    # Convert all arguments to strings first
+    args = [str(arg).strip() for arg in args]
+
+    string = args[0]
+
     for arg in args[1:]:
-        arg = arg.strip()
         a = string.endswith('/')
         b = arg.startswith('/')
-        
-        if a ^ b:     string += arg       # 1 '/'
-        elif a and b: string += arg[1:]   # 2 '/'
-        else:         string += '/' + arg # 0 '/'
-    
+
+        if a ^ b:
+            string += arg  # 1 '/'
+        elif a and b:
+            string += arg[1:]  # 2 '/'
+        else:
+            string += '/' + arg  # 0 '/'
+
     return string
+
 
 def urlify(dict_: dict) -> str:
     '''
