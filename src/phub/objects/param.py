@@ -147,7 +147,7 @@ class Param:
         assert len(query.value) == 1, f'{query} must be an un-modified Param constant to be compared.'
         
         item_key, item_values = list(query.value.items())[0]
-        item_value = item_values.pop()
+        item_value = item_values.copy().pop()
         
         for key, values in self.value.items():
             if key == item_key and item_value in values:
