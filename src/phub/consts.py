@@ -111,7 +111,8 @@ def mtch(*args) -> WrappedRegex:
     *flags, pattern = args
     flags = eval_flags(flags)
 
-    regex = engine.compile(r'[&\?]viewkey=([a-z\d]{8,})(?=&|$)', flags)
+    # Use the provided pattern argument to compile the regex
+    regex = engine.compile(pattern, flags)
 
     def wrapper(string: str, throw: bool = True):
         match = regex.search(string)
@@ -123,6 +124,7 @@ def mtch(*args) -> WrappedRegex:
 
     return wrapper
 
+
 def comp(*args) -> WrappedRegex:
     '''
     Compile a regex using a custom method with error handling.
@@ -133,22 +135,22 @@ def comp(*args) -> WrappedRegex:
     
     *flags, method, pattern = args
     flags = eval_flags(flags)
-    
+
     regex = engine.compile(pattern, flags)
-    
+
     def wrapper(*args):
-        
+
         try:
             matches = method(regex, *args)
             return matches
-        
+
         except AttributeError:
             logger.error('Invalid regex method: \033[91m%s\033[0m', method)
             raise AttributeError('Invalid compiled regex method:', method)
 
         except Exception:
             _throw_re_error(pattern)
-    
+
     return wrapper
 
 def subc(*args) -> WrappedRegex:
@@ -178,14 +180,14 @@ class re:
     '''
     API regexes.
     '''
-    
+
     _raw_root = r'https:\/\/.{2,3}\.pornhub\..{2,3}\/'
-    
+
     # Find regexes
     ffmpeg_line   = find( r'seg-(\d*?)-'                                                                ) # Get FFMPEG segment progress
     get_flash     = find( r'var (flashvars_\d*) = ({.*});\n'                                            ) # Get flash data from a video page
     get_token     = find( r'token *?= \"(.*?)\",'                                                       ) # Get authentification token
-    get_viewkey   = mtch( r'[&\?]viewkey=([a-z\d]{8,})(?=&|$)'                                          ) # Get video URL viewkey
+    get_viewkey = mtch(r'[&\?]viewkey=([a-z\d]+)(?=&|$)')  # Get video URL viewkey
     video_channel = find( r'href=\"(.*?)\" data-event=\"Video Underplayer\".*?bolded\">(.*?)<'          ) # Get video author, if channel
     video_model   = find( r'n class=\"usernameBadgesWrapper.*? href=\"(.*?)\"  class=\"bolded\">(.*?)<' ) # Get video author, if model
     get_feed_type = find( r'data-table="(.*?)"'                                                         ) # Get feed section type
@@ -205,16 +207,18 @@ class re:
     get_ps      = comp( engine.DOTALL, p.findall, r'img.*?src=\"(.*?)\".*?href=\"(.*?)\".*?>(.*?)<.*?(\d.*?)\s' ) # Get all pornstars in a container (avatar, url, name, video count)
     get_videos  = comp( engine.DOTALL, p.findall, r'<li.*?videoblock(.*?)</li'                                  ) # Get all videos
     get_markers = comp( engine.DOTALL, p.findall, r'class=\"(.*?)\"'                                            ) # Get markers identifiers
-    
+    get_playlist_videos = comp(engine.DOTALL, p.findall, r' <a href="/view_video(.*?)"')
+
     # Substraction regexes
     remove_host = subc( _raw_root, '' ) # Remove the HOST root from a URL
     
     # Verification regexes
     is_url       = comp( p.fullmatch, r'https*:\/\/.*'                                                ) # Check if is a URL
-    is_video_url = comp( p.fullmatch, _raw_root + r'view_video\.php\?viewkey=[a-z\d]{8,}(&pkey=\d+)?' ) # Check if is a video URL
+    is_video_url = comp(p.fullmatch, _raw_root + r'view_video\.php\?viewkey=(?:ph)?[a-z\d]{3,}(&pkey=\d+)?')
     is_quality   = comp( p.fullmatch, r'\d+p?'                                                        ) # Check if is a video quality
     is_favorite  = find( r'<div class=\".*?js-favoriteBtn.*?active\"'                                 ) # Check if is favorite
-    
+    is_playlist  = comp(p.fullmatch, r'^https?:\/\/(?:www\.)?(?:[a-z]{2}\.)?pornhub\.[a-z]{2,3}\/playlist\/\d+$')  # Checks if it's a playlist
+
     # Challenge regexes
     get_challenge   = find( engine.DOTALL, r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):'  ) # Get challenge content
     parse_challenge = subc( engine.DOTALL, r'(?:var )|(?:/\*.*?\*/)|\s|\n|\t|(?:n;)', '' ) # Parse challenge syntax

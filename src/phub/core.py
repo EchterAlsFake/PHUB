@@ -16,7 +16,7 @@ from . import locals
 from .modules import parser
 
 from .objects import (Param, NO_PARAM, Video, User,
-                      Account, Query, queries)
+                      Account, Query, queries, Playlist)
 
 logger = logging.getLogger(__name__)
 
@@ -282,6 +282,22 @@ class Client:
         
         return queries.VideoQuery(self, 'video/search', param_, query_repr = query)
     
+    def get_playlist(self, url: str = None):
+        '''
+        Initializes a Playlist object
+
+        Args:
+            url (str): The playlist url
+
+        Returns:
+            Playlist object
+        '''
+
+        if isinstance(url, Playlist):
+            url = url.url
+
+        return Playlist(self, url)
+
     def search_user(self,
                     username: str = None,
                     country: str = None,

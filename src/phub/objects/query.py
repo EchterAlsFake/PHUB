@@ -333,7 +333,7 @@ class queries:
             
             for item in page:
                 wrapped: QueryItem = self._parse_item(item)
-                
+
                 # Yield each object of the page, but only if it does not have the spicevids
                 # markers and we explicitely suppress spicevids videos.    
                 if not(self.suppress_spicevids
@@ -342,7 +342,7 @@ class queries:
                 
                 else:
                     logger.info('Bypassed spicevid video: %s', wrapped)
-    
+
     class UserQuery(VideoQuery):
         '''
         Represents an advanced member search query.

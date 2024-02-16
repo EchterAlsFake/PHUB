@@ -102,7 +102,7 @@ You can use the following properties on a video:
   
   If you absolutely need to access these properties outside of a query, you can turn on
   query emulation with `video.ALLOW_QUERY_SIMULATION = True`. This will create a fake query
-  but is very slow and requires user authentification.
+  but is very slow and requires user authentication.
 
 Interactions
 ------------

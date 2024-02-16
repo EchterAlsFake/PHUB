@@ -6,7 +6,7 @@ __all__ = [
     'Image', 'Param', 'NO_PARAM',
     'Tag', 'Like', 'FeedItem', 'User',
     'Feed', 'Video', 'Account',
-    '_BaseQuality', 'Query', 'queries'
+    '_BaseQuality', 'Query', 'queries', 'Playlist'
 ]
 
 # Dataclasses
@@ -20,5 +20,6 @@ from .feed import Feed
 from .video import Video
 from .account import Account
 from .query import Query, queries
+from .playlist import Playlist
 
 # EOF
