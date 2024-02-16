@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-import os
 import time
 import logging
+import requests.adapters
 from pathlib import Path
 from typing import TYPE_CHECKING, Callable
 from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
 from ffmpeg_progress_yield import FfmpegProgress
-
-import requests.adapters
-
 from .. import consts
 
 if TYPE_CHECKING:
@@ -20,6 +17,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 CallbackType = Callable[[int, int], None]
+
 
 
 def default(video: Video,
@@ -120,75 +118,53 @@ def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: str | P
 
 def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
-    Download a single segment.
+    Download a single segment using the client's call method.
+    This function is intended to be used within a ThreadPoolExecutor.
     '''
-    
-    return client.call(url, timeout = timeout, silent = True).content
+    try:
+        response = client.call(url, timeout=timeout, silent=True)
+        response.raise_for_status()  # Assuming client.call returns an object with a similar interface to requests.Response
+        return (url, response.content, True)
+
+    except Exception as e:
+        logging.warning(f"Failed to download segment {url}: {e}")
+        return (url, b'', False)
 
 
-def _base_threaded(client: Client,
-                   segments: list[str],
-                   callback: CallbackType,
-                   max_workers: int = 50,
-                   timeout: int = 10,
-                   disable_client_delay: bool = True) -> dict[str, bytes]:
+# Modify _base_threaded to use ThreadPoolExecutor
+def _base_threaded(client: Client, segments: list[str], callback: CallbackType, max_workers: int = 20,
+                   timeout: int = 10) -> dict[str, bytes]:
     '''
-    base thread downloader for threaded backends.
+    Base threaded downloader using ThreadPoolExecutor.
     '''
-    
-    logger.info('Threaded download amorced')
+    logging.info('Threaded download initiated')
+    buffer = {}
     length = len(segments)
-    
-    # Mount special adapter for handling large requests
     logger.info('Mounting download adapter')
     old_adapter = client.session.adapters.get('https://')
     adapter = requests.adapters.HTTPAdapter(pool_maxsize = max_workers)
     client.session.mount('https://', adapter)
 
-    with Pool(max_workers = max_workers) as executor:
-        logger.info('Opened executor')
-        
-        buffer: dict[str, bytes] = {}
-        segments = segments.copy() # Avoid deleting parsed segments
-        
-        while 1:
-            futures = {executor.submit(_thread, client, url, timeout): url
-                       for url in segments}
-            
-            logger.info('Submitted %s futures, starting executor', len(futures))
-            
-            for future in as_completed(futures):
-                
-                url = futures[future]
-                segment_name = consts.re.ffmpeg_line(url)
-                
-                # Disable delay
-                client.start_delay = not disable_client_delay
-                
-                try:
-                    segment = future.result()
-                    buffer[url] = segment
-                    
-                    # Remove future and call callback
-                    segments.remove(url)
-                    callback(len(buffer), length)
-                
-                except Exception as err:
-                    logger.warning('Segment `%s` failed: %s', segment_name, err)
-            
-            if lns := len(segments):
-                logger.warning('Retrying to fetch %s segments', lns)
-                continue
-            
-            break
-    
-    logger.info('Threaded download finished, mounting back old adapter')
+    with Pool(max_workers=max_workers) as executor:
+        future_to_url = {executor.submit(_thread, client, url, timeout): url for url in segments}
+
+        for future in as_completed(future_to_url):
+            url = future_to_url[future]
+            try:
+                url, data, success = future.result()
+                if success:
+                    buffer[url] = data
+                # Regardless of success, update the progress
+                callback(len(buffer), length)
+            except Exception as e:
+                logging.warning(f"Error processing segment {url}: {e}")
+
     client.session.mount('https://', old_adapter)
-    
     return buffer
 
-def threaded(max_workers: int = 100,
-             timeout: int = 30) -> Callable:
+
+def threaded(max_workers: int = 20,
+             timeout: int = 10) -> Callable:
     '''
     Simple threaded downloader.
     
