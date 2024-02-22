@@ -8,10 +8,11 @@ from datetime import datetime, timedelta
 from typing import (TYPE_CHECKING, Iterator, Literal,
                     LiteralString, Callable, Any)
 
-from . import Tag, Like, User, Image, Param
+from . import Tag, Like, User, Image
 from .. import utils
 from .. import errors
 from .. import consts
+from .. import literals
 from ..modules import download, parser, display
 
 if TYPE_CHECKING:
@@ -536,28 +537,13 @@ class Video:
                 for ps in self.fetch('data@pornstars')]
     
     @cached_property
-    def categories(self) -> Iterator[Category]:
+    def categories(self) -> list[literals.category]:
         '''
         The categories of the video.
         '''
         
-        from ..locals import Category
+        return [item['category'] for item in self.fetch('data@categories')]
         
-        raw = self.fetch('data@categories')
-        
-        for item in raw:
-            
-            constant = utils.make_constant(name := item['category'])
-            cat = getattr(Category, constant, None)
-            
-            if cat is None:
-                logger.warning('Category not found: %s. You should update PHUB locals (python -m phub update_locals)', constant)
-                
-                # Create temporary category
-                cat = Param('*', name)
-            
-            yield cat
-
     @cached_property
     def orientation(self) -> LiteralString:
         '''

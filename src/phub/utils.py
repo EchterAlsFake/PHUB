@@ -3,12 +3,10 @@ PHUB utilities.
 '''
 
 import math
-import json
 import logging
-import requests
 from typing import Generator, Iterable, Iterator
 
-from . import consts, locals, errors
+from . import errors
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +33,7 @@ def concat(*args) -> str:
 
     for arg in args[1:]:
         a = string.endswith('/')
-        b = arg.startswith('/')
+        b = arg.startswith('/') or arg.startswith(('?', '&'))
 
         if a ^ b:
             string += arg  # 1 '/'
@@ -47,12 +45,12 @@ def concat(*args) -> str:
     return string
 
 
-def urlify(dict_: dict) -> str:
+def urlify(data: dict) -> str:
     '''
     Convert a dictionary to string arguments.
     
     Args:
-        dict_ (dict): Parameters values.
+        data (dict): Parameters values.
     
     Returns:
         str: A raw URL arguments string.
@@ -60,7 +58,7 @@ def urlify(dict_: dict) -> str:
     
     raw = ''
 
-    for key, value in dict_.items():
+    for key, value in data.items():
         
         if value is None: continue
         
@@ -82,70 +80,6 @@ def closest(numbers: list[int], value: int) -> int:
     '''
     
     return min(numbers, key = lambda x: abs(x - value))
-
-def make_constant(string: str) -> str:
-    '''
-    Format the name of a variable to be a valid
-    python constant.
-    
-    Args:
-        string (str): The variable name.
-    
-    Returns:
-        str: A python compatible constant name.
-    '''
-    
-    var_name = string.upper() \
-               .replace('-', '_') \
-               .replace('/', '_') \
-               .replace(' ', '_')
-
-    if var_name[0].isdigit():
-        var_name = '_' + var_name
-    
-    return var_name
-
-def update_locals() -> None:
-    '''
-    Update the locals.
-
-    Warning: This will modify phub.locals.py.
-    '''
-    
-    # TODO - Refactor
-    
-    url = concat(consts.API_ROOT, 'categories')
-    response = requests.get(url, timeout = 30)
-    response.raise_for_status()
-
-    sorted_categories = sorted(
-        json.loads(response.text)['categories'],
-        key = lambda d: d['id']
-    )
-    
-    max_length = len(sorted(sorted_categories,
-                            key = lambda d: len(d['category']))[-1]['category'])
-    
-    categories_str = ''
-    for obj in sorted_categories:
-        name = obj['category']
-        var_name = make_constant(name)
-        name = f'{obj["id"]}@{name}\''
-        
-        categories_str += f'\n    {var_name: <21} = Param( \'category\', \'{name: <{max_length + 1}}, reverse = True)'
-
-    start_tag = '#START@CATEGORIES'
-    end_tag = '#END@CATEGORIES'
-
-    with open(locals.__file__, 'r+', encoding = 'utf-8') as file:
-        content = file.read()
-        content = content.split(start_tag)[0] + start_tag + \
-                  categories_str + '\n' + '    ' + end_tag + \
-                  content.split(end_tag)[1]
-
-        file.seek(0)
-        file.write(content)
-        file.truncate()
 
 def serialize(object_: object, recursive: bool = False) -> object:
     '''

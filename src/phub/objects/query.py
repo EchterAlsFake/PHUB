@@ -31,7 +31,7 @@ class Query:
     def __init__(self,
                  client: Client,
                  func: str,
-                 param: Param = NO_PARAM,
+                 args: dict[str] = {},
                  container_hint: consts.WrappedRegex | Callable = None,
                  query_repr: str = None) -> None:
         '''
@@ -40,7 +40,7 @@ class Query:
         Args:
             client           (Client): The parent client.
             func                (str): The URL function.
-            param             (Param): Filter parameter.
+            args               (dict): Arguments.
             container_hint (Callable): An hint function to help determine where should the target container be.
             query_repr          (str): Indication for the query representation.
         '''
@@ -49,18 +49,11 @@ class Query:
         self.hint = container_hint
         self._query_repr = query_repr
         
-        # Parse param
-        param |= Param('page', '{page}')
-        self.url = utils.concat(self.BASE, func)
+        # Build URL
+        args |= {'page': '{page}'}
+        self.url = utils.concat(self.BASE, func, utils.urlify(args))
         
         self.suppress_spicevids = True
-        
-        add_qm = True
-        for key, set_ in param.value.items():
-            self.url += '&?'[add_qm]
-            nk, ns = self._parse_param_set(key, set_)
-            self.url += f'{nk}={ns}'
-            add_qm = False
         
         logger.debug('Initialised new query %s', self)
     

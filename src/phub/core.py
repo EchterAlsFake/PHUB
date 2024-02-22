@@ -6,16 +6,17 @@ import time
 import logging
 
 import requests
+from typing import Iterable
 from functools import cached_property
 
 from . import utils
 from . import consts
 from . import errors
-from . import locals
+from . import literals
 
 from .modules import parser
 
-from .objects import (Param, NO_PARAM, Video, User,
+from .objects import (Video, User,
                       Account, Query, queries, Playlist)
 
 logger = logging.getLogger(__name__)
@@ -251,40 +252,54 @@ class Client:
 
     def search(self,
                query: str,
-               param: locals.constant = NO_PARAM,
-               use_hubtraffic = True) -> Query:
+               production: literals.production = None,
+               category: literals.category = None,
+               exclude_category: literals.category | Iterable[literals.category] = None,
+               hd: bool = None,
+               sort: literals.sort = None,
+               period: literals.period = None,
+               use_hubtraffic: bool = False) -> Query:
         '''
         Performs searching on Pornhub.
         
         Args:
             query (str): The query to search.
-            param (Param): Filters parameter.
+            ...
             use_hubtraffic (bool): Whether to use the HubTraffic Pornhub API (faster but less precision).
         
         Returns:
             Query: Initialised query.
         '''
         
-        # Assert a param type
-        assert isinstance(param, Param)
-        logger.info('Opening search query for `%s`', query)
-        
-        # Assert sorting is compatible
-        if (not (locals._allowed_sort_types in param)
-            and locals._sort_period_types in param):
-            
-            raise errors.InvalidSortParam('Sort parameter not allowed')
-        
-        param_ = Param('search', query) | param
+        args = {
+            'search': query,
+            'p': production,
+            'category': category,
+            'exclude-category': literals._craft_category(exclude_category),
+            'o': literals._sort_map.get(sort),
+            't': literals._period_map.get(period),
+            'hd': literals._craft_boolean(hd)
+        }
         
         if use_hubtraffic:
-            return queries.JSONQuery(self, 'search', param_, query_repr = query)
         
-        return queries.VideoQuery(self, 'video/search', param_, query_repr = query)
+            return queries.JSONQuery(
+                client = self,
+                func = 'search',
+                args = args, # TODO - Args mod
+                query_repr = query
+            )
+        
+        return queries.VideoQuery(
+            client = self,
+            func = 'video/search',
+            args = args,
+            query_repr = query
+        )
     
-    def get_playlist(self, url: str = None):
+    def get_playlist(self, url: str) -> Playlist:
         '''
-        Initializes a Playlist object
+        Initializes a Playlist object.
 
         Args:
             url (str): The playlist url
@@ -303,7 +318,7 @@ class Client:
                     country: str = None,
                     city: str = None,
                     age: tuple[int] = None,
-                    param: Param = NO_PARAM
+                    # TODO replace params
                     ) -> queries.UserQuery:
         '''
         Search for users in the community.
@@ -311,13 +326,14 @@ class Client:
         Args:
             username (str): The member username.
             country (str): The member **country code** (AF, FR, etc.)
-            param (Param): Filters parameter.
+            ...
         
         Returns:
             MQuery: Initialised query.
         
         '''
         
+        '''
         params = (param
                   | Param('username', username)
                   | Param('city', city)
@@ -326,6 +342,7 @@ class Client:
         if age:
             params |= Param('age1', age[0])
             params |= Param('age2', age[1])
+        '''
         
         return queries.UserQuery(self, 'user/search', params)
 
