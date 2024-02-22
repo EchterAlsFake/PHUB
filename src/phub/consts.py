@@ -8,6 +8,7 @@ from re import Pattern as p
 from typing	import Callable
 
 from . import errors
+from .objects import _BaseQuality
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,25 @@ IFRAME = '<iframe src="https://www.pornhub.com/embed/{key}" frameborder="0" widt
 
 # Supported languages
 LANGUAGES = [ 'cn', 'de', 'fr', 'it', 'pt', 'pl', 'rt', 'nl', 'cz', 'jp' ]
+
+FEED_CLASS_TO_CONST = {
+    'stream_videos_uploaded': 'Section.VIDEO',
+    'stream_favourites_videos': 'Section.FAVORITE',
+    'stream_grouped_comments_videos': 'Section.COMMENT',
+    # TODO - More options
+}
+
+class Quality(_BaseQuality):
+    '''
+    Represents a video quality.
+    Can also be represented as an int
+    or string.
+    '''
+    
+    BEST  = _BaseQuality('best' )
+    HALF  = _BaseQuality('half' )
+    WORST = _BaseQuality('worst')
+
 
 # Regex wrappers
 

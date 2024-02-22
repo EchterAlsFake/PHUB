@@ -154,7 +154,7 @@ class FeedItem:
         
         raw = consts.re.get_feed_type(self.raw)
         
-        return locals.FEED_CLASS_TO_CONST.get(raw)
+        return consts.FEED_CLASS_TO_CONST.get(raw)
 
 class _BaseQuality:
     '''

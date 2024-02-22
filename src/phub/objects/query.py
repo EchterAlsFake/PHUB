@@ -3,11 +3,9 @@ from __future__ import annotations
 import json
 import logging
 from functools import cache, cached_property
-from typing import TYPE_CHECKING, Iterator, Any, Self, Callable
+from typing import TYPE_CHECKING, Iterator, Any, Callable
 
-from phub.objects import NO_PARAM, Param
-
-from . import Video, User, FeedItem, Param, NO_PARAM
+from . import Video, User, FeedItem
 
 from .. import utils
 from .. import consts
@@ -183,24 +181,7 @@ class Query:
         for item in page:
             yield self._parse_item(item)
 
-    # Methods defined by subclasses
-    def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
-        '''
-        Parse param set.
-        
-        Args:
-            key  (str): The parameter key.
-            set_ (set): The parameter value.
-        
-        Returns:
-            tuple: The final key and raw value.
-        '''
-        
-        set_ = [v.split('@')[1] if '@' in v else v for v in set_]
-        
-        raw = '|'.join(set_)
-        return key, raw
-
+    #@override
     def _parse_item(self, raw: Any) -> QueryItem:
         '''
         Get a single query item.
@@ -214,6 +195,7 @@ class Query:
         
         return NotImplemented
     
+    #@override
     def _parse_page(self, raw: str) -> list[Any]:
         '''
         Get a query page.
@@ -273,16 +255,6 @@ class queries:
         
         BASE = consts.HOST
         
-        def _parse_param_set(self, key: str, set_: set) -> tuple[str, str]:
-            
-            if key == 'category':
-                key = 'filter-category'
-            
-            set_ = [v.split('@')[0] if '@' in v else v for v in set_]
-            
-            raw = '|'.join(set_)
-            return key, raw
-        
         def _eval_video(self, raw: str) -> dict:
             # Evaluate video data.
             # Can be used externally from this query
@@ -302,9 +274,6 @@ class queries:
             
             # Override the _as_query property since we already have a query 
             obj._as_query = data
-            
-            # Parse markers
-            # markers = ' '.join(consts.re.get_markers(data['markers'])).split()
             
             obj.data = {
                 # Property overrides
@@ -328,9 +297,8 @@ class queries:
                 wrapped: QueryItem = self._parse_item(item)
 
                 # Yield each object of the page, but only if it does not have the spicevids
-                # markers and we explicitely suppress spicevids videos.    
-                if not(self.suppress_spicevids
-                    and 'premiumIcon' in wrapped._as_query['markers']):
+                # markers and we explicitely suppress spicevids videos.
+                if not(self.suppress_spicevids and 'premiumIcon' in wrapped._as_query['markers']):
                     yield wrapped
                 
                 else:

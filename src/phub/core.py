@@ -236,7 +236,7 @@ class Client:
         
         return Video(self, url)
 
-    def get_user(self, user: str) -> User:
+    def get_user(self, user: str | User) -> User:
         '''
         Get a specific user.
         
@@ -246,6 +246,9 @@ class Client:
         Returns:
             User: The corresponding user object.
         '''
+        
+        if isinstance(user, User):
+            user = user.url
         
         logger.debug('Fetching user %s', user)
         return User.get(self, user)
@@ -274,10 +277,10 @@ class Client:
         args = {
             'search': query,
             'p': production,
-            'category': category,
-            'exclude-category': literals._craft_category(exclude_category),
-            'o': literals._sort_map.get(sort),
-            't': literals._period_map.get(period),
+            'filter-category': literals.map.category(category),
+            'exclude-category': literals._craft_category(exclude_category), # TODO
+            'o': literals.map.sort.get(sort),
+            't': literals.map.period.get(period),
             'hd': literals._craft_boolean(hd)
         }
         
@@ -317,34 +320,51 @@ class Client:
                     username: str = None,
                     country: str = None,
                     city: str = None,
-                    age: tuple[int] = None,
-                    # TODO replace params
+                    min_age: int = None,
+                    max_age: int = None,
+                    gender: literals.gender = None,
+                    orientation: literals.orientation = None,
+                    offers: literals.offers = None,
+                    relation: literals.relation = None,
+                    sort: literals.sort_user = None,
+                    is_online: bool = None,
+                    is_model: bool = None,
+                    is_staff: bool = None,
+                    has_avatar: bool = None,
+                    has_videos: bool = None,
+                    has_photos: bool = None,
+                    has_playlists: bool = None    
                     ) -> queries.UserQuery:
         '''
         Search for users in the community.
         
-        Args:
-            username (str): The member username.
-            country (str): The member **country code** (AF, FR, etc.)
-            ...
-        
         Returns:
-            MQuery: Initialised query.
-        
+            UserQuery: Initialised query.
         '''
         
-        '''
-        params = (param
-                  | Param('username', username)
-                  | Param('city', city)
-                  | Param('country', country))
-        
-        if age:
-            params |= Param('age1', age[0])
-            params |= Param('age2', age[1])
-        '''
-        
-        return queries.UserQuery(self, 'user/search', params)
+        return queries.UserQuery(
+            client = self,
+            func = 'user/search',
+            args = {
+                'o': sort,
+                'username': username,
+                'country': country,
+                'city': city,
+                'age1': min_age,
+                'age2': max_age,
+                'gender': literals.map.gender.get(gender),
+                'orientation': literals.map.orientation.get(orientation),
+                'offers': literals.map.offers.get(offers),
+                'relation': literals.map.relation(relation),
+                'online': literals._craft_boolean(is_online),
+                'isPornhubModel': literals._craft_boolean(is_model),
+                'staff': literals._craft_boolean(is_staff),
+                'avatar': literals._craft_boolean(has_avatar),
+                'vidos': literals._craft_boolean(has_videos),
+                'photos': literals._craft_boolean(has_photos),
+                'playlists': literals._craft_boolean(has_playlists),
+            }
+        )
 
     def _clear_granted_token(self) -> None:
         '''

@@ -17,7 +17,7 @@ from ..modules import download, parser, display
 
 if TYPE_CHECKING:
     from ..core import Client
-    from ..locals import Quality, Category
+    from ..consts import Quality
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +167,7 @@ class Video:
             str: The M3U url.
         '''
         
-        from ..locals import Quality
+        from ..consts import Quality
         
         # Get qualities
         qualities = {int(v): q['videoUrl']
@@ -260,7 +260,7 @@ class Video:
             str: The direct url.
         '''
         
-        from ..locals import Quality
+        from ..consts import Quality
         qual = Quality(quality)
         
         # Get remote    
@@ -561,7 +561,7 @@ class Video:
         return User.from_video(self)
 
     @cached_property
-    def is_free_premium(self) -> bool | NotImplemented:
+    def is_free_premium(self) -> bool:
         '''
         Whether the video is part of free premium.
         '''
@@ -569,7 +569,7 @@ class Video:
         return 'phpFreeBlock' in self._as_query['markers']
 
     @cached_property
-    def preview(self) -> Image | NotImplemented:
+    def preview(self) -> Image:
         '''
         The preview 'mediabook' of the video.
         This is the lazy video displayed when hovering the video.
@@ -606,7 +606,7 @@ class Video:
     # === Dynamic data properties === #
     
     @property
-    def liked(self) -> NotImplemented:
+    def liked(self) -> bool:
         '''
         Whether the video was liked by the account.
         '''
