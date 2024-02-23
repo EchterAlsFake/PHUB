@@ -15,6 +15,20 @@ INCREMENT = 30
 KNOWN_PRIME_FACTORS = [2, 3, 5]
 
 
+from .objects import _BaseQuality
+
+class Quality(_BaseQuality):
+    '''
+    Represents a video quality.
+    Can also be represented as an int
+    or string.
+    '''
+    
+    BEST  = _BaseQuality('best' )
+    HALF  = _BaseQuality('half' )
+    WORST = _BaseQuality('worst')
+
+
 def concat(*args) -> str:
     '''
     Concatenate multiple URL or file path parts.

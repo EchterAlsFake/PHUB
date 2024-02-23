@@ -353,5 +353,5 @@ class queries:
         @cached_property
         def pages(self):
             return []
-        
+
 # EOF

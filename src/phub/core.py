@@ -6,7 +6,7 @@ import time
 import logging
 
 import requests
-from typing import Iterable
+from typing import Iterable, overload
 from functools import cached_property
 
 from . import utils
@@ -253,8 +253,32 @@ class Client:
         logger.debug('Fetching user %s', user)
         return User.get(self, user)
 
+    @overload
     def search(self,
                query: str,
+               *,
+               production: literals.production = None,
+               category: literals.category = None,
+               exclude_category: literals.category | Iterable[literals.category] = None,
+               hd: bool = None,
+               sort: literals.sort = None,
+               period: literals.period = None,
+               use_hubtraffic: bool = False) -> Query:
+        ...
+    
+    @overload
+    def search(self,
+               query: str,
+               *,
+               category: literals.category = None,
+               sort: literals.ht_sort = None,
+               period: literals.ht_period = None,
+               use_hubtraffic: bool = True) -> Query:
+        ...
+    
+    def search(self,
+               query: str,
+               *,
                production: literals.production = None,
                category: literals.category = None,
                exclude_category: literals.category | Iterable[literals.category] = None,
@@ -274,17 +298,14 @@ class Client:
             Query: Initialised query.
         '''
         
-        args = {
-            'search': query,
-            'p': production,
-            'filter-category': literals.map.category(category),
-            'exclude-category': literals._craft_category(exclude_category), # TODO
-            'o': literals.map.sort.get(sort),
-            't': literals.map.period.get(period),
-            'hd': literals._craft_boolean(hd)
-        }
-        
         if use_hubtraffic:
+            
+            args = {
+                'search': query,
+                'category': category,
+                'sort': literals.map.ht_sort.get(sort),
+                'period': literals.map.ht_period.get(period),
+            }
         
             return queries.JSONQuery(
                 client = self,
@@ -292,6 +313,16 @@ class Client:
                 args = args, # TODO - Args mod
                 query_repr = query
             )
+        
+        args = {
+            'search': query,
+            'p': production,
+            'filter-category': literals.map.category.get(category),
+            'exclude-category': literals._craft_category(exclude_category), # TODO
+            'o': literals.map.sort.get(sort),
+            't': literals.map.period.get(period),
+            'hd': literals._craft_boolean(hd)
+        }
         
         return queries.VideoQuery(
             client = self,
@@ -355,7 +386,7 @@ class Client:
                 'gender': literals.map.gender.get(gender),
                 'orientation': literals.map.orientation.get(orientation),
                 'offers': literals.map.offers.get(offers),
-                'relation': literals.map.relation(relation),
+                'relation': literals.map.relation.get(relation),
                 'online': literals._craft_boolean(is_online),
                 'isPornhubModel': literals._craft_boolean(is_model),
                 'staff': literals._craft_boolean(is_staff),

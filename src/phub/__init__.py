@@ -16,7 +16,7 @@ __all__ = ['Client', 'Quality', 'core', 'utils',
 
 # Shortcuts
 from .core import Client
-from .locals import Quality
+from .utils import Quality
 
 # Sub modules
 from . import core

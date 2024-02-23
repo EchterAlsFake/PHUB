@@ -4,33 +4,44 @@
 
 from typing import Literal, Iterable
 
-
+# Production type
 production = Literal['homemade', 'professional']
 
+# Sortings for videos
 sort = Literal['recent', 'views', 'rated', 'longuest']
+ht_sort = Literal['recent', 'views', 'rated', 'featured']
 
+# Sortings for users
 sort_user = Literal['popular', 'newest']
 
+# Sorting period
 period = Literal['all', 'day', 'week', 'month', 'year']
+ht_period = Literal['all', 'week', 'month']
 
+# Feed sections
 section = Literal['all', 'post', 'photo', 'video', 'comment', 'favorite', 'playlist']
 
+# Allowed genders
 gender = Literal[
     'male', 'female', 'couple', 'female couple', 'trans female',
     'male couple', 'trans male', 'other', 'non binary'
 ]
 
+# User sexual orientation
 orientation = Literal['none', 'male', 'female', 'all']
 
+# What content user offers 
 offers = Literal['custom videos', 'fan club']
 
+# User relationship
 relation = Literal['single', 'taken', 'open']
 
+# Video segment (orientation)
 Segment = Literal['female', 'male', 'straight', 'gay', 'transgender', 'miscellaneous', 'uncategorized']
 
 
 '''
-# Modifications
+For clarity, these categories where renamed:
 teen18-1      -> teen
 twink18       -> twink
 college-18    -> college
@@ -43,6 +54,7 @@ old-young-18  -> old-young
 pov-1         -> pov
 '''
 
+# Video categories
 category = Literal[
     'asian', 'orgy', 'amateur', 'big-ass', 'babe', 'bbw', 'big-dick', 'big-tits', 'blonde', 'bondage',
     'brunette', 'celebrity', 'blowjob', 'bukkake', 'creampie', 'cumshot', 'ebony', 'fetish', 'fisting',
@@ -153,6 +165,19 @@ class map:
         'single': 1,
         'taken': 2,
         'open': 3
+    }
+    
+    # Hubtraffic maps
+    ht_sort = {
+        'recent': 'newest',
+        'views': 'mostviewed',
+        'rated': 'rating',
+    }
+    
+    ht_period = {
+        'all': 'alltime',
+        'week': 'weekly',
+        'month': 'monthly'
     }
 
 def _craft_category(args: Iterable[category]) -> str:
