@@ -6,7 +6,7 @@ import time
 import logging
 
 import requests
-from typing import Iterable, overload
+from typing import Iterable
 from functools import cached_property
 
 from . import utils
@@ -253,81 +253,87 @@ class Client:
         logger.debug('Fetching user %s', user)
         return User.get(self, user)
 
-    @overload
-    def search(self,
-               query: str,
-               *,
-               production: literals.production = None,
-               category: literals.category = None,
-               exclude_category: literals.category | Iterable[literals.category] = None,
-               hd: bool = None,
-               sort: literals.sort = None,
-               period: literals.period = None,
-               use_hubtraffic: bool = False) -> Query:
-        ...
-    
-    @overload
-    def search(self,
+    def search_hubtraffic(self,
                query: str,
                *,
                category: literals.category = None,
+               tags: str | list[str] = None,
                sort: literals.ht_sort = None,
-               period: literals.ht_period = None,
-               use_hubtraffic: bool = True) -> Query:
-        ...
-    
-    def search(self,
-               query: str,
-               *,
-               production: literals.production = None,
-               category: literals.category = None,
-               exclude_category: literals.category | Iterable[literals.category] = None,
-               hd: bool = None,
-               sort: literals.sort = None,
-               period: literals.period = None,
-               use_hubtraffic: bool = False) -> Query:
+               period: literals.ht_period = None) -> Query:
         '''
-        Performs searching on Pornhub.
+        Perform searching on Pornhub using the HubTraffic API.
+        It is condidered to be much faster but has less filters.
         
         Args:
-            query (str): The query to search.
-            ...
-            use_hubtraffic (bool): Whether to use the HubTraffic Pornhub API (faster but less precision).
+            query    (str): The query to search.
+            category (str): A category the video is in. 
+            sort     (str): Sorting type.
+            period   (str): When using sort, specify the search period.
         
         Returns:
             Query: Initialised query.
         '''
         
-        if use_hubtraffic:
-            
+        literals.ass('category', category, literals.category)
+        literals.ass('sort'    , sort    , literals.ht_sort)
+        literals.ass('period'  , period  , literals.ht_period)
+    
+        return queries.JSONQuery(
+            client = self,
+            func = 'search',
             args = {
                 'search': query,
                 'category': category,
-                'sort': literals.map.ht_sort.get(sort),
+                'tags[]': literals._craft_list(tags),
+                'ordering': literals.map.ht_sort.get(sort),
                 'period': literals.map.ht_period.get(period),
-            }
+            },
+            query_repr = query
+        )
+    
+    def search(self,
+               query: str,
+               *,
+               production: literals.production = None,
+               category: literals.category = None,
+               exclude_category: literals.category | Iterable[literals.category] = None,
+               hd: bool = None,
+               sort: literals.sort = None,
+               period: literals.period = None) -> Query:
+        '''
+        Performs searching on Pornhub.
         
-            return queries.JSONQuery(
-                client = self,
-                func = 'search',
-                args = args, # TODO - Args mod
-                query_repr = query
-            )
+        Args:
+            query                   (str): The query to search.
+            production              (str): Production type.
+            category                (str): A category the video is in. 
+            exclude_category (str | list): One or more categories to exclude.
+            hd                     (bool): Whether to search only HD videos.
+            sort                    (str): Sorting type.
+            period                  (str): When using sort, specify the search period.
         
-        args = {
-            'search': query,
-            'p': production,
-            'filter-category': literals.map.category.get(category),
-            'exclude-category': literals._craft_category(exclude_category), # TODO
-            'o': literals.map.sort.get(sort),
-            't': literals.map.period.get(period),
-            'hd': literals._craft_boolean(hd)
-        }
+        Returns:
+            Query: Initialised query.
+        '''
+        
+        literals.ass('production'      , production      , literals.production)
+        literals.ass('category'        , category        , literals.category  )
+        literals.ass('exclude_category', exclude_category, literals.category  )
+        literals.ass('sort'            , sort            , literals.sort      )
+        literals.ass('period'          , period          , literals.period    )
         
         return queries.VideoQuery(
             client = self,
             func = 'video/search',
-            args = args,
+            args = {
+                'search': query,
+                'p': production,
+                'filter_category': literals.map.category.get(category),
+                'exclude_category': literals._craft_list(exclude_category),
+                'o': literals.map.sort.get(sort),
+                't': literals.map.period.get(period),
+                'hd': literals._craft_boolean(hd)
+            },
             query_repr = query
         )
     

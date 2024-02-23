@@ -1,8 +1,8 @@
 '''
-    Literals.
+PHUB Literals.
 '''
 
-from typing import Literal, Iterable
+from typing import Literal, Iterable, Type
 
 # Production type
 production = Literal['homemade', 'professional']
@@ -38,7 +38,6 @@ relation = Literal['single', 'taken', 'open']
 
 # Video segment (orientation)
 Segment = Literal['female', 'male', 'straight', 'gay', 'transgender', 'miscellaneous', 'uncategorized']
-
 
 '''
 For clarity, these categories where renamed:
@@ -180,9 +179,9 @@ class map:
         'month': 'monthly'
     }
 
-def _craft_category(args: Iterable[category]) -> str:
+def _craft_list(args: Iterable[category]) -> str:
     '''
-    Craft a category list into a url-valid list.
+    Craft an item list list into a url-valid list.
     '''
     
     if isinstance(args, str):
@@ -198,5 +197,25 @@ def _craft_boolean(b: bool | None) -> str:
     
     if b is not None:
         return int(bool(b))
+
+def ass(name: str, item: str | list[str], literal: Type) -> None:
+    '''
+    Assert one or multiple items are part of a literal.
+    '''
+    
+    if not item: return
+    
+    if isinstance(item, str):
+        item = [item]
+    
+    items = literal.__args__
+    
+    if len(items) > 5:
+        message = ', '.join(items[:5]) + f' [+{abs(len(items) - 5)}]'
+    else:
+        message = ', '.join(items)
+    
+    for item_ in item:
+        assert item_ in items, f'Argument `{name}` must be one of: `{message}`'
 
 # EOF
