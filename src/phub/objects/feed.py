@@ -10,7 +10,6 @@ from . import User, FeedItem
 if TYPE_CHECKING:
     from . import queries
     from ..core import Client
-    from ..locals import Section
 
 logger = logging.getLogger(__name__)
 
