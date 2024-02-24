@@ -8,15 +8,16 @@ from datetime import datetime, timedelta
 from typing import (TYPE_CHECKING, Iterator, Literal,
                     LiteralString, Callable, Any)
 
-from . import Tag, Like, User, Image, Param
+from . import Tag, Like, User, Image
 from .. import utils
 from .. import errors
 from .. import consts
+from .. import literals
 from ..modules import download, parser, display
 
 if TYPE_CHECKING:
     from ..core import Client
-    from ..locals import Quality, Category
+    from ..consts import Quality
 
 logger = logging.getLogger(__name__)
 
@@ -166,7 +167,7 @@ class Video:
             str: The M3U url.
         '''
         
-        from ..locals import Quality
+        from ..consts import Quality
         
         # Get qualities
         qualities = {int(v): q['videoUrl']
@@ -259,7 +260,7 @@ class Video:
             str: The direct url.
         '''
         
-        from ..locals import Quality
+        from ..consts import Quality
         qual = Quality(quality)
         
         # Get remote    
@@ -536,28 +537,13 @@ class Video:
                 for ps in self.fetch('data@pornstars')]
     
     @cached_property
-    def categories(self) -> Iterator[Category]:
+    def categories(self) -> list[literals.category]:
         '''
         The categories of the video.
         '''
         
-        from ..locals import Category
+        return [item['category'] for item in self.fetch('data@categories')]
         
-        raw = self.fetch('data@categories')
-        
-        for item in raw:
-            
-            constant = utils.make_constant(name := item['category'])
-            cat = getattr(Category, constant, None)
-            
-            if cat is None:
-                logger.warning('Category not found: %s. You should update PHUB locals (python -m phub update_locals)', constant)
-                
-                # Create temporary category
-                cat = Param('*', name)
-            
-            yield cat
-
     @cached_property
     def orientation(self) -> LiteralString:
         '''
@@ -575,7 +561,7 @@ class Video:
         return User.from_video(self)
 
     @cached_property
-    def is_free_premium(self) -> bool | NotImplemented:
+    def is_free_premium(self) -> bool:
         '''
         Whether the video is part of free premium.
         '''
@@ -583,7 +569,7 @@ class Video:
         return 'phpFreeBlock' in self._as_query['markers']
 
     @cached_property
-    def preview(self) -> Image | NotImplemented:
+    def preview(self) -> Image:
         '''
         The preview 'mediabook' of the video.
         This is the lazy video displayed when hovering the video.
@@ -620,7 +606,7 @@ class Video:
     # === Dynamic data properties === #
     
     @property
-    def liked(self) -> NotImplemented:
+    def liked(self) -> bool:
         '''
         Whether the video was liked by the account.
         '''

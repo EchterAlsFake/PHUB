@@ -43,6 +43,13 @@ IFRAME = '<iframe src="https://www.pornhub.com/embed/{key}" frameborder="0" widt
 # Supported languages
 LANGUAGES = [ 'cn', 'de', 'fr', 'it', 'pt', 'pl', 'rt', 'nl', 'cz', 'jp' ]
 
+FEED_CLASS_TO_CONST = {
+    'stream_videos_uploaded': 'Section.VIDEO',
+    'stream_favourites_videos': 'Section.FAVORITE',
+    'stream_grouped_comments_videos': 'Section.COMMENT',
+    # TODO - More options
+}
+
 # Regex wrappers
 
 WrappedRegex = Callable[[str, bool | None], str]

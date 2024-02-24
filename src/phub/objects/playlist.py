@@ -1,18 +1,17 @@
+from __future__ import annotations
+
 import logging
 import re
 from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterator
 
 from urllib.parse import urlencode
 
 import requests.exceptions
 
-from . import Tag, Like, User, Image, Param, Video
-from .. import utils
+from . import Video
 from .. import errors
 from .. import consts
-from ..modules import download, parser, display
-
 
 if TYPE_CHECKING:
     from ..core import Client
@@ -26,7 +25,7 @@ class Playlist:
     '''
 
     # === Base methods === #
-    def __init__(self, client, url: str) -> None:
+    def __init__(self, client: Client, url: str) -> None:
         '''
         Initialise a new playlist object.
 
@@ -43,7 +42,7 @@ class Playlist:
         self.html_content = client.call(self.url).text
 
     @cached_property
-    def videos(self):
+    def videos(self) -> Iterator[Video]:
         page = 1
         has_more_videos = True
         playlist_id = re.search(r'/playlist/(.*?)', self.url).group(1)

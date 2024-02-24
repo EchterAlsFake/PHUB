@@ -1,6 +1,6 @@
 [project]
 name = "phub"
-version = "4.4.4"
+version = "4.5"
 description = "An API for Pornhub"
 authors = [
   {name = 'Egsagon', email = "egsagon12@gmail.com"},

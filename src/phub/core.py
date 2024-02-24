@@ -6,16 +6,17 @@ import time
 import logging
 
 import requests
+from typing import Iterable
 from functools import cached_property
 
 from . import utils
 from . import consts
 from . import errors
-from . import locals
+from . import literals
 
 from .modules import parser
 
-from .objects import (Param, NO_PARAM, Video, User,
+from .objects import (Video, User,
                       Account, Query, queries, Playlist)
 
 logger = logging.getLogger(__name__)
@@ -235,7 +236,7 @@ class Client:
         
         return Video(self, url)
 
-    def get_user(self, user: str) -> User:
+    def get_user(self, user: str | User) -> User:
         '''
         Get a specific user.
         
@@ -246,45 +247,99 @@ class Client:
             User: The corresponding user object.
         '''
         
+        if isinstance(user, User):
+            user = user.url
+        
         logger.debug('Fetching user %s', user)
         return User.get(self, user)
 
-    def search(self,
+    def search_hubtraffic(self,
                query: str,
-               param: locals.constant = NO_PARAM,
-               use_hubtraffic = True) -> Query:
+               *,
+               category: literals.category = None,
+               tags: str | list[str] = None,
+               sort: literals.ht_sort = None,
+               period: literals.ht_period = None) -> Query:
         '''
-        Performs searching on Pornhub.
+        Perform searching on Pornhub using the HubTraffic API.
+        It is condidered to be much faster but has less filters.
         
         Args:
-            query (str): The query to search.
-            param (Param): Filters parameter.
-            use_hubtraffic (bool): Whether to use the HubTraffic Pornhub API (faster but less precision).
+            query    (str): The query to search.
+            category (str): A category the video is in. 
+            sort     (str): Sorting type.
+            period   (str): When using sort, specify the search period.
         
         Returns:
             Query: Initialised query.
         '''
         
-        # Assert a param type
-        assert isinstance(param, Param)
-        logger.info('Opening search query for `%s`', query)
-        
-        # Assert sorting is compatible
-        if (not (locals._allowed_sort_types in param)
-            and locals._sort_period_types in param):
-            
-            raise errors.InvalidSortParam('Sort parameter not allowed')
-        
-        param_ = Param('search', query) | param
-        
-        if use_hubtraffic:
-            return queries.JSONQuery(self, 'search', param_, query_repr = query)
-        
-        return queries.VideoQuery(self, 'video/search', param_, query_repr = query)
+        literals.ass('category', category, literals.category)
+        literals.ass('sort'    , sort    , literals.ht_sort)
+        literals.ass('period'  , period  , literals.ht_period)
     
-    def get_playlist(self, url: str = None):
+        return queries.JSONQuery(
+            client = self,
+            func = 'search',
+            args = {
+                'search': query,
+                'category': category,
+                'tags[]': literals._craft_list(tags),
+                'ordering': literals.map.ht_sort.get(sort),
+                'period': literals.map.ht_period.get(period),
+            },
+            query_repr = query
+        )
+    
+    def search(self,
+               query: str,
+               *,
+               production: literals.production = None,
+               category: literals.category = None,
+               exclude_category: literals.category | Iterable[literals.category] = None,
+               hd: bool = None,
+               sort: literals.sort = None,
+               period: literals.period = None) -> Query:
         '''
-        Initializes a Playlist object
+        Performs searching on Pornhub.
+        
+        Args:
+            query                   (str): The query to search.
+            production              (str): Production type.
+            category                (str): A category the video is in. 
+            exclude_category (str | list): One or more categories to exclude.
+            hd                     (bool): Whether to search only HD videos.
+            sort                    (str): Sorting type.
+            period                  (str): When using sort, specify the search period.
+        
+        Returns:
+            Query: Initialised query.
+        '''
+        
+        literals.ass('production'      , production      , literals.production)
+        literals.ass('category'        , category        , literals.category  )
+        literals.ass('exclude_category', exclude_category, literals.category  )
+        literals.ass('sort'            , sort            , literals.sort      )
+        literals.ass('period'          , period          , literals.period    )
+        
+        return queries.VideoQuery(
+            client = self,
+            func = 'video/search',
+            args = {
+                'search': query,
+                'p': production,
+                'filter_category': literals.map.category.get(category),
+                'exclude_category': literals._craft_list(exclude_category),
+                'o': literals.map.sort.get(sort),
+                't': literals.map.period.get(period),
+                'hd': literals._craft_boolean(hd)
+            },
+            query_repr = query
+        )
+    
+    def get_playlist(self, url: str) -> Playlist:
+        '''
+        Initializes a Playlist object.
 
         Args:
             url (str): The playlist url
@@ -302,32 +357,51 @@ class Client:
                     username: str = None,
                     country: str = None,
                     city: str = None,
-                    age: tuple[int] = None,
-                    param: Param = NO_PARAM
+                    min_age: int = None,
+                    max_age: int = None,
+                    gender: literals.gender = None,
+                    orientation: literals.orientation = None,
+                    offers: literals.offers = None,
+                    relation: literals.relation = None,
+                    sort: literals.sort_user = None,
+                    is_online: bool = None,
+                    is_model: bool = None,
+                    is_staff: bool = None,
+                    has_avatar: bool = None,
+                    has_videos: bool = None,
+                    has_photos: bool = None,
+                    has_playlists: bool = None    
                     ) -> queries.UserQuery:
         '''
         Search for users in the community.
         
-        Args:
-            username (str): The member username.
-            country (str): The member **country code** (AF, FR, etc.)
-            param (Param): Filters parameter.
-        
         Returns:
-            MQuery: Initialised query.
-        
+            UserQuery: Initialised query.
         '''
         
-        params = (param
-                  | Param('username', username)
-                  | Param('city', city)
-                  | Param('country', country))
-        
-        if age:
-            params |= Param('age1', age[0])
-            params |= Param('age2', age[1])
-        
-        return queries.UserQuery(self, 'user/search', params)
+        return queries.UserQuery(
+            client = self,
+            func = 'user/search',
+            args = {
+                'o': sort,
+                'username': username,
+                'country': country,
+                'city': city,
+                'age1': min_age,
+                'age2': max_age,
+                'gender': literals.map.gender.get(gender),
+                'orientation': literals.map.orientation.get(orientation),
+                'offers': literals.map.offers.get(offers),
+                'relation': literals.map.relation.get(relation),
+                'online': literals._craft_boolean(is_online),
+                'isPornhubModel': literals._craft_boolean(is_model),
+                'staff': literals._craft_boolean(is_staff),
+                'avatar': literals._craft_boolean(has_avatar),
+                'vidos': literals._craft_boolean(has_videos),
+                'photos': literals._craft_boolean(has_photos),
+                'playlists': literals._craft_boolean(has_playlists),
+            }
+        )
 
     def _clear_granted_token(self) -> None:
         '''
