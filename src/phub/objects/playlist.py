@@ -79,7 +79,7 @@ class Playlist:
                 has_more_videos = False
                 break
 
-            return total_urls
+        return total_urls
 
     @cached_property
     def videos(self) -> Iterator[Video]:
