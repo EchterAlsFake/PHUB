@@ -9,7 +9,6 @@ from urllib.parse import urlencode
 
 import requests.exceptions
 
-import src.phub.errors
 from . import Video
 from .. import errors
 from .. import consts
@@ -98,7 +97,7 @@ class Playlist:
         try:
             return consts.re.playlist_get_unavailable_videos(self.html_content)
 
-        except src.phub.errors.RegexError:
+        except errors.RegexError:
             return 0 # If no banner is there, then all videos are available
 
     @cached_property
