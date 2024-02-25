@@ -12,7 +12,7 @@ from .. import consts
 if TYPE_CHECKING:
     from .. import Client
     from ..objects import Video
-    from ..locals import Quality
+    from ..utils import Quality
 
 logger = logging.getLogger(__name__)
 

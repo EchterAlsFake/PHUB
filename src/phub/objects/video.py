@@ -17,7 +17,7 @@ from ..modules import download, parser, display
 
 if TYPE_CHECKING:
     from ..core import Client
-    from ..consts import Quality
+    from ..utils import Quality
 
 logger = logging.getLogger(__name__)
 
@@ -166,9 +166,7 @@ class Video:
         Returns:
             str: The M3U url.
         '''
-        
-        from ..consts import Quality
-        
+
         # Get qualities
         qualities = {int(v): q['videoUrl']
                      for q in self.fetch('page@mediaDefinitions')
@@ -259,8 +257,7 @@ class Video:
         Returns:
             str: The direct url.
         '''
-        
-        from ..consts import Quality
+
         qual = Quality(quality)
         
         # Get remote    
