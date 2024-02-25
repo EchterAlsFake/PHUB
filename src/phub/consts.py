@@ -206,7 +206,15 @@ class re:
     get_thumb_id  = find( r'\/([a-z0-9]+?)\/(?=original|thumb)'                                         ) # Get video id from its thumbnail 
     eval_video    = find( engine.DOTALL, r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.'
                                          r'*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div') # Parse video data
-    
+    playlist_get_unavailable_videos = find(engine.DOTALL, r'Number of unavailable videos that are hidden: (.*?)</h5>')
+    playlist_get_likes = find(engine.DOTALL, r'<span class="votesUp">(.*?)</span>')
+    playlist_get_dislikes = find(engine.DOTALL, r'<span class="votesDown">(.*?)</span>')
+    playlist_get_like_ratio = find(engine.DOTALL, r'<span class="percent">(.*?)%</span>')
+    playlist_get_views = find(engine.DOTALL, r'<span class="count">(.*?)</span>')
+    playlist_get_author = find(engine.DOTALL, r'<a href="/users/(.*?)" title="')
+    playlist_get_total_videos = find(engine.DOTALL, r'- (\d+) Videos')
+    playlist_get_title = find(engine.DOTALL, r'<h1 id="watchPlaylist" class="playlistTitle watchPlaylistButton js-watchPlaylistHeader js-watchPlaylist">(.*?)</h1>')
+
     # Findall regexess
     get_users   = comp( engine.DOTALL, p.findall, r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                      ) # Get all users while performing an advanced user search
     user_infos  = comp( engine.DOTALL, p.findall, r'infoPiece\".*?span>\s*(.*?):.*?smallInfo\">\s*(.*?)\s*<\/'  ) # Get user info
@@ -215,6 +223,7 @@ class re:
     get_videos  = comp( engine.DOTALL, p.findall, r'<li.*?videoblock(.*?)</li'                                  ) # Get all videos
     get_markers = comp( engine.DOTALL, p.findall, r'class=\"(.*?)\"'                                            ) # Get markers identifiers
     get_playlist_videos = comp(engine.DOTALL, p.findall, r' <a href="/view_video(.*?)"')
+    get_playlist_tags = comp(engine.DOTALL, p.findall, r'<a data-event="Video Underplayer" data-label="Tag" class="gtm-event-link item" href="/video/search\?search=(.*?)">')
 
     # Substraction regexes
     remove_host = subc( _raw_root, '' ) # Remove the HOST root from a URL

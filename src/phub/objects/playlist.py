@@ -9,6 +9,7 @@ from urllib.parse import urlencode
 
 import requests.exceptions
 
+import src.phub.errors
 from . import Video
 from .. import errors
 from .. import consts
@@ -42,7 +43,10 @@ class Playlist:
         self.html_content = client.call(self.url).text
         self.total_urls = self.video_urls()
 
-    def video_urls(self):
+    def video_urls(self) -> list:
+        """
+        Scrapes all pages for video URLs
+        """
         page = 1
         has_more_videos = True
         playlist_id = re.search(r'playlist/(\d+)', self.url).group(1)
@@ -88,3 +92,43 @@ class Playlist:
 
         for url in self.total_urls:
             yield Video(url=url, client=self.client)
+
+    @cached_property
+    def hidden_videos_amount(self) -> str:
+        try:
+            return consts.re.playlist_get_unavailable_videos(self.html_content)
+
+        except src.phub.errors.RegexError:
+            return 0 # If no banner is there, then all videos are available
+
+    @cached_property
+    def likes(self) -> str:
+        return consts.re.playlist_get_likes(self.html_content)
+
+    @cached_property
+    def dislikes(self) -> str:
+        return consts.re.playlist_get_dislikes(self.html_content)
+
+    @cached_property
+    def like_ratio(self) -> str:
+        return consts.re.playlist_get_like_ratio(self.html_content)
+
+    @cached_property
+    def views(self) -> str:
+        return consts.re.playlist_get_views(self.html_content)
+
+    @cached_property
+    def author(self) -> str:
+        return consts.re.playlist_get_author(self.html_content)
+
+    @cached_property
+    def total_video_amount(self) -> str:
+        return consts.re.playlist_get_total_videos(self.html_content)
+
+    @cached_property
+    def tags(self) -> list:
+        return consts.re.get_playlist_tags(self.html_content)
+
+    @cached_property
+    def title(self) -> str:
+        return consts.re.playlist_get_title(self.html_content)
