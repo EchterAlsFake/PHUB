@@ -167,6 +167,8 @@ class Video:
             str: The M3U url.
         '''
 
+        from ..utils import Quality
+
         # Get qualities
         qualities = {int(v): q['videoUrl']
                      for q in self.fetch('page@mediaDefinitions')
@@ -258,6 +260,7 @@ class Video:
             str: The direct url.
         '''
 
+        from ..utils import Quality
         qual = Quality(quality)
         
         # Get remote    
