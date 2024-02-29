@@ -79,12 +79,9 @@ class Client:
         self.session = requests.Session()
         self._clear_granted_token()
         
-        # Bypass age disclaimer
-        self.session.cookies.set('accessAgeDisclaimerPH', '1')
-        self.session.cookies.set('accessAgeDisclaimerUK', '1')
-        self.session.cookies.set('accessPH', '1')
-        self.session.cookies.set('age_verified', '1')
-    
+        # Insert cookies
+        self.session.cookies.update(consts.COOKIES)
+        
     def call(self,
              func: str,
              method: str = 'GET',

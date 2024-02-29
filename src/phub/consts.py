@@ -23,6 +23,15 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0'
 }
 
+COOKIES = {
+    'accessAgeDisclaimerPH': '1',
+    'accessAgeDisclaimerUK': '1',
+    'accessPH': '1',
+    'age_verified': '1',
+    'cookieBannerState': '1',
+    'platform': 'pc'
+}
+
 LOGIN_PAYLOAD = {
     'from': 'pc_login_modal_:homepage_redesign',
 }

@@ -1,5 +1,5 @@
 '''
-## PHUB v4.4
+## PHUB v4.5.3
 
 See https://phub.readthedocs.io/en/latest/ for docs.
 See https://github.com/EchterAlsFake/PHUB for code.
@@ -9,7 +9,7 @@ See https://github.com/EchterAlsFake/PHUB for code.
 __author__ = 'Egsagon, EchterAlsFake'
 __copyright__ = 'Copyright 2024, PHUB'
 __license__ = 'GPLv3'
-__version__  = '4.4'
+__version__  = '4.5.3'
 
 __all__ = ['Client', 'Quality', 'core', 'utils',
            'consts', 'errors', 'objects', 'modules']

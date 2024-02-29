@@ -104,6 +104,23 @@ class Account:
                 logger.debug('Deleting key %s', key)
                 delattr(self, key)
     
+    def fix_recommendations(self) -> None:
+        '''
+        Allow recommandations cookies.
+        '''
+        
+        logger.info('Fixing account recommendations')
+        
+        payload = utils.urlify({
+            'token': self.client._granted_token,
+            'cookie_selection': 3,
+            'site_id': 1
+        })
+        
+        res = self.client.call('user/log_user_cookie_consent' + payload, silent = True)
+        
+        assert res.json().get('success')
+    
     @cached_property
     def recommended(self) -> queries.VideoQuery:
         '''
@@ -111,6 +128,9 @@ class Account:
         '''
         
         from . import queries
+        
+        # Called each account refresh
+        self.fix_recommendations()
         
         return queries.VideoQuery(self.client, 'recommended')
     

@@ -277,7 +277,7 @@ class queries:
             
             obj.data = {
                 # Property overrides
-                'page@title': data["title"],
+                'page@video_title': data["title"],
                 'data@thumb': data["image"],
                 'page@id': id,
                 
