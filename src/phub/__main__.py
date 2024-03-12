@@ -1,86 +1,45 @@
 '''
 PHUB built-in CLI.
 '''
-
+import os
+import click
 import phub
 
-import os
-import time
-import click
+@click.command()
+@click.argument('input')
+@click.option('--output', help = 'Output file or directory', default = './')
+@click.option('--quality', help = 'Video quality', default = 'best')
+@click.option('--downloader', help = 'Video downloader (default, FFMPEG or threaded)', default = 'FFMPEG')
+def main(input: str, output: str, quality: str, downloader: str) -> None:
+    
+    downloader = getattr(phub.download, downloader.strip())
+    
+    if os.path.isfile(input):
+        with open(input, encoding = 'utf-8') as file:
+            urls = phub.consts.re.get_urls(file.read())
 
-@click.group()
-def cli(): pass
-
-@cli.command()
-@click.argument('entry')
-@click.option('--quality', '-q', help = 'Video quality', default = 'best')
-@click.option('--output',  '-o', help = 'Output video file', default = '.')
-@click.option('--pause',  '-p', help = 'Pause between downloads', default = 5)
-@click.option('--threads',  '-t', help = 'Number of threads to use', default = 100)
-def download(entry: str, quality: str, output: str, pause: str, threads) -> None:
-    '''
-    Download videos given a URL or a text file containing urls or keys.
-    '''
-    
-    pause = int(pause)
-    threads = int(threads)
-    
-    if entry.startswith('https://'):
-            urls = [entry.strip()]
-    
     else:
-        with open(entry, 'r') as file:
-            urls = file.read().split()
+        urls = [input]
+        
+    if len(urls) > 1 and os.path.isfile(output):
+        raise Exception('Must specify directory when downloading multiple videos.')
     
-    client = phub.Client( delay = .1)
-    length = len(urls)
-    max_length = len(str(length))
+    client = phub.Client(delay = .02)
     
-    if length > 1 and os.path.isfile(output):
-        print('\033[91mError\033[0m ~ Output is not a directory')
-        exit()
-    
-    for index, url in enumerate(urls):
+    for url in urls:
         try:
-            video = client.get(url)
-            
-            video.download(path = output,
-                           quality = quality,
-                           downloader = phub.download.threaded(threads, 20),
-                           display = phub.display.progress(
-                               desc = f'{index: >{max_length}}/{length} ~ {video}',
-                               color = dict(c1=37, c2=33, c3=36, c4=0)))
-            
-            time.sleep(pause)
-            client.reset()
+            video = client.get(url.strip())
+            video.download(
+                path = output,
+                quality = quality,
+                downloader = downloader,
+                display = phub.display.bar(f'Downloading {video.key}')
+            )
         
         except Exception as err:
-            print(f'\033[91mError\033[0m ~ {repr(err)}')
-    
-    print('\n\033[33mProcess finished.\033[0m')
-
-@cli.command()
-@click.argument('entry')
-@click.option('--max', '-m', help = 'Maximum number of videos', default = '40')
-def search(entry: str, max: str) -> None:
-    '''
-    Search for videos.
-    '''
-    
-    client = phub.Client()
-    
-    for video in client.search(entry).sample(int(max)):    
-        print(f'{video.key} - {video.title}')
-
-@cli.command()
-def update_locals() -> None:
-    '''
-    Update PHUB locals that depend on PH.
-    '''
-    
-    phub.utils.update_locals()
+            print(f'\x1b[91mError: {err}\x1b[0m')
 
 if __name__ == '__main__':
-    cli()
+    main()
 
 # EOF
