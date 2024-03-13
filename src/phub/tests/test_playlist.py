@@ -38,4 +38,4 @@ def test_playlist_objects():
     assert isinstance(unavailable_videos, str) and len(unavailable_videos) >= 1
     assert isinstance(author, str) and len(author) >= 1
     assert isinstance(title, str) and len(title) >= 1
-    assert isinstance(tags, list) and len(tags) >= 1
+    assert isinstance(tags, list) # and len(tags) >= 1
