@@ -35,6 +35,15 @@ pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git
 pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git@py-3.10
 ```
 
+## Usage from command line
+```shell
+# Download a single video
+py -m phub https://www.pornhub.com/view_video.php?viewkey=abcdef
+# Download multiple videos from a text file
+py -m phub path/to/file.txt --quality best --downloader threaded --output video.mp4
+```
+###### Note: It does not matter how the URLs in the files are aranged, preferably one per line.
+
 ## Quickstart
 
 > [!NOTE]
