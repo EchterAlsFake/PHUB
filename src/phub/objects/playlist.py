@@ -1,133 +1,115 @@
 from __future__ import annotations
 
-import logging
-import re
-from functools import cached_property
-from typing import TYPE_CHECKING, Iterator
-
-from urllib.parse import urlencode
-
-import requests.exceptions
-
-from . import Video
-from .. import errors
-from .. import consts
+from typing import TYPE_CHECKING
+from functools import cache, cached_property
 
 if TYPE_CHECKING:
     from ..core import Client
 
-logger = logging.getLogger(__name__)
+from .. import consts
+from .. import errors
+
+from . import Like
+from .user import User
+from .query import queries
 
 
-class Playlist:
+class Playlist(queries.VideoQuery):
     '''
-    Represents a Pornhub playlist.
+    Represents a Pornhub Playlist.
+    Subclasses VideoQuery because it ressembles
+    a lot to other Pornhub video pages (search, etc.)
+    and it makes it possible to use .sample, .pages,
+    etc. on it.
     '''
-
-    # === Base methods === #
-    def __init__(self, client: Client, url: str) -> None:
+    
+    def __init__(self, client: Client, pid: str) -> None:
         '''
-        Initialise a new playlist object.
-
-        Args:
-            client (Client): The parent client.
-            url       (str): The playlist URL.
-        '''
-
-        if not consts.re.is_playlist(url):
-            raise errors.URLError('Invalid video URL:', url)
+        Initialise a new Playlist.
         
-        self.client = client
-        self.url = url
-        self.html_content = client.call(self.url).text
-        self.total_urls = self.video_urls()
-
-    def video_urls(self) -> list:
-        """
-        Scrapes all pages for video URLs
-        """
-        page = 1
-        has_more_videos = True
-        playlist_id = re.search(r'playlist/(\d+)', self.url).group(1)
-        token = consts.re.get_token(self.html_content)
-        total_urls = []
-        while has_more_videos:
-            # Construct the URL for fetching the playlist page
-            try:
-                params = {
-                    'id': playlist_id,
-                    'token': token,
-                    'page': page
-                }
-
-                logger.info(f"Loading video page: {page}")
-                query_string = urlencode(params)
-                playlist_url = f"https://www.pornhub.com/playlist/viewChunked?{query_string}"
-                response = self.client.call(func=playlist_url)
-                content = response.content.decode("utf-8")
-                video_urls = [consts.HOST + "view_video" + video for video in consts.re.get_playlist_videos(content) if
-                              "pkey=" in video]
-                if video_urls:
-                    for url in video_urls:
-                        total_urls.append(url)  # Not yielding the videos immediately, because PH will detect the high
-                        # amount of traffic and stop providing us with the next videos of the pages
-
-                    page += 1  # Prepare to load the next page
-                else:
-                    # No more videos found, stop the loop
-                    logger.info("No more videos found")
-                    has_more_videos = False
-
-            except requests.exceptions.HTTPError as e:
-                has_more_videos = False
-                break
-
-        return total_urls
+        Args:
+            client (Client): Parent client to use.
+            pid       (str): The playlist id.
+        '''
+        
+        # Initialise 
+        super().__init__(client, func = None)
+        
+        # Define both playlist url (first page) and chunked (next pages)
+        self.url = 'playlist/' + str(pid)
+        self.chunk_url = f'playlist/viewChunked?id={pid}' '&token={token}&page={page}'
+    
+    @cached_property
+    def _page(self) -> str:
+        return self.client.call(self.url).text
 
     @cached_property
-    def videos(self) -> Iterator[Video]:
-        if len(self.total_urls) == 0 or self.total_urls is None:
-            self.video_urls()
-
-        for url in self.total_urls:
-            yield Video(url=url, client=self.client)
-
+    def _token(self) -> str:
+        return consts.re.get_token(self._page)
+    
+    @cache
+    def _get_raw_page(self, index: int) -> str:
+        '''
+        Override for VideoQuery._get_raw_page.
+        This method is originally supposed to fetch the
+        raw content of a page and handle network errors,
+        but we also use it to separate first page/chunked pages.
+        '''
+        
+        if index == 0:
+            self.hint = consts.re.container
+            return self._page
+        
+        self.hint = consts.re.document
+        
+        response = self.client.call(self.chunk_url.format(page = index + 1,
+                                                          token = self._token),
+                                    throw = False)
+        
+        if response.status_code == 404:
+            raise errors.NoResult()
+        
+        return response.text
+    
     @cached_property
-    def hidden_videos_amount(self) -> str:
+    def _data(self) -> str:
+        return consts.re.playlist_data(self._page)
+
+    def __len__(self) -> int:
+        return int(consts.re.get_playlist_size(self._page))
+    
+    @cached_property
+    def hidden_videos_amount(self) -> int:
         try:
-            return consts.re.playlist_get_unavailable_videos(self.html_content)
+            return int(consts.re.get_playlist_unavailable(self._page))
 
-        except errors.RegexError:
-            return 0 # If no banner is there, then all videos are available
-
-    @cached_property
-    def likes(self) -> str:
-        return consts.re.playlist_get_likes(self.html_content)
+        # If no banner is there, then all videos are available
+        except errors.RegexError: return 0
 
     @cached_property
-    def dislikes(self) -> str:
-        return consts.re.playlist_get_dislikes(self.html_content)
+    def like(self) -> Like:
+        return Like(
+            int(consts.re.get_playlist_likes(self._data)),
+            int(consts.re.get_playlist_dislikes(self._data)),
+            float(consts.re.get_playlist_ratings(self._data))
+        )
 
     @cached_property
-    def like_ratio(self) -> str:
-        return consts.re.playlist_get_like_ratio(self.html_content)
+    def views(self) -> int:
+        raw: str = consts.re.get_playlist_views(self._data)
+        return int(raw.replace(',', ''))
+    
+    @cached_property
+    def tags(self) -> list[str]:
+        return consts.re.get_playlist_tags(self._data)
 
     @cached_property
-    def views(self) -> str:
-        return consts.re.playlist_get_views(self.html_content)
-
-    @cached_property
-    def author(self) -> str:
-        return consts.re.playlist_get_author(self.html_content)
-
-    @cached_property
-    def total_video_amount(self) -> str:
-        return consts.re.playlist_get_total_videos(self.html_content)
-
-    @cached_property
-    def tags(self) -> list:
-        return consts.re.get_playlist_tags(self.html_content)
-
+    def author(self) -> User:
+        url = consts.re.get_playlist_author(self._data)
+        return User.get(self.client, consts.HOST + url)
+    
     @cached_property
     def title(self) -> str:
-        return consts.re.playlist_get_title(self.html_content)
+        return consts.re.get_playlist_title(self._data)
+
+# EOF

@@ -334,21 +334,26 @@ class Client:
             query_repr = query
         )
     
-    def get_playlist(self, url: str) -> Playlist:
+    def get_playlist(self, pl: str | int | Playlist) -> Playlist:
         '''
         Initializes a Playlist object.
 
         Args:
-            url (str): The playlist url
+            url (str | int | Playlist): The playlist url or id
 
         Returns:
             Playlist object
         '''
+        
+        assert isinstance(pl, str | int | Playlist), 'Invalid type'
+        
+        if isinstance(pl, Playlist):
+            pl = pl.url
+        
+        if isinstance(pl, str) and 'playlist' in pl:
+            pl = pl.split('/')[-1]
 
-        if isinstance(url, Playlist):
-            url = url.url
-
-        return Playlist(self, url)
+        return Playlist(self, pl)
 
     def search_user(self,
                     username: str = None,
