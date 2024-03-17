@@ -226,7 +226,7 @@ class re:
     get_playlist_views       = find( engine.DOTALL,              r'<span class="count">(.*?)</span>'                                           ) # Get playlist views
     get_playlist_title       = find( engine.DOTALL,              r'id="watchPlaylist.*?>(.*?)<'                                                ) # Get playlist title
     get_playlist_author      = find( engine.DOTALL,              r'data-type=\"user.*?href=\"(.*?)\"'                                          ) # Get playlist author
-    get_challenge            = find( engine.DOTALL,              r'go\(\).*?{(.*?)n=l.*?RNKEY.*?s\+\":(\d+):'                                  ) # Get challenge content
+    get_challenge            = find( engine.DOTALL,              r'go\(\).*?{(.*?)n=l.*?KEY.*?s\+\":(\d+):'                                    ) # Get challenge content
     parse_challenge          = subc( engine.DOTALL,              r'(?:var )|(?:/\*.*?\*/)|\s|\n|\t|(?:n;)', ''                                 ) # Parse challenge syntax
     ponct_challenge          = subc( engine.DOTALL,              r'(if.*?&1\)|else)', r'\1:'                                                   ) # Convert challenge syntax
     get_users                = comp( engine.DOTALL, p.findall,   r'userLink.*?=\"(.*?)\".*?src=\"(.*?)\"'                                      ) # Get all users while user seearching
