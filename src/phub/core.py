@@ -87,7 +87,7 @@ class Client:
              method: str = 'GET',
              data: dict = None,
              headers: dict = {},
-             timeout: float = consts.TIMEOUT,
+             timeout: float = consts.CALL_TIMEOUT,
              throw: bool = True,
              silent: bool = False) -> requests.Response:
         '''
@@ -137,6 +137,8 @@ class Client:
                 if challenge := consts.re.get_challenge(response.text, False):
                     logger.info('\n\nChallenge found, attempting to resolve\n\n')
                     parser.challenge(self, *challenge)
+                    logging.info(f"Sleeping for {consts.CHALLENGE_TIMEOUT} seconds")
+                    time.sleep(consts.CHALLENGE_TIMEOUT)
                     continue # Reload page
                 
                 break

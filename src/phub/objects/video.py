@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import os
 import random
 import logging
@@ -430,7 +431,7 @@ class Video:
         The video title.
         '''
         
-        return (self.data.get('page@video_title')  # Use page title if cached
+        return html.unescape(self.data.get('page@video_title')  # Use page title if cached
                 or self.fetch('data@title')) # Use HubTraffic by default
 
     @cached_property

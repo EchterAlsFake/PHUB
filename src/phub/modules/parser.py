@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import time
 from typing import TYPE_CHECKING
 
 from .. import utils
@@ -60,11 +59,8 @@ def challenge(client: Client, challenge: str, token: str) -> None:
     n = utils.least_factors(p)
     
     # Build and inject cookie
-    logging.info(f"Sleeping for {consts.CHALLENGE_SLEEP} seconds")
-    time.sleep(consts.CHALLENGE_SLEEP)
-    cookie = f'{n}*{p / n}:{s}:{token}:1'
+    cookie = f'{n}*{p // n}:{s}:{token}:1'
     client.session.cookies.set('KEY', cookie)
     logger.info('Injected cookie %s', cookie)
-    
 
 # EOF

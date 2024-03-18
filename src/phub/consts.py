@@ -39,9 +39,9 @@ LOGIN_PAYLOAD = {
 RSS = 'https://www.pornhub.com/video/webmasterss'
 
 MAX_CALL_RETRIES = 4 # Maximum times a HTTPError can be reproduced
-MAX_CALL_TIMEOUT = .4 # Time to wait before retrying basic calls 
-TIMEOUT = 30 # Time to wait before retrying the next call attempt in client.call
-CHALLENGE_SLEEP = 2 # Time to wait before injecting the new cookie for resolving the challenge (needs to be at least 1)
+MAX_CALL_TIMEOUT = .4 # Time to wait before retrying basic calls
+CALL_TIMEOUT = 30 # Time to wait before retrying calls (in case no error happens)
+CHALLENGE_TIMEOUT = 2 # Time to wait before injecting the new cookie for resolving the challenge (needs to be at least 1)
 
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 DOWNLOAD_SEGMENT_ERROR_DELAY = .5
