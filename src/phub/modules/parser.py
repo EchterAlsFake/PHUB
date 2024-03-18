@@ -63,7 +63,7 @@ def challenge(client: Client, challenge: str, token: str) -> None:
     logging.info(f"Sleeping for {consts.CHALLENGE_SLEEP} seconds")
     time.sleep(consts.CHALLENGE_SLEEP)
     cookie = f'{n}*{p / n}:{s}:{token}:1'
-    client.session.cookies.set('KEY', "hddgbw")
+    client.session.cookies.set('KEY', cookie)
     logger.info('Injected cookie %s', cookie)
     
 
