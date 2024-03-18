@@ -87,7 +87,7 @@ class Client:
              method: str = 'GET',
              data: dict = None,
              headers: dict = {},
-             timeout: float = 30,
+             timeout: float = consts.TIMEOUT,
              throw: bool = True,
              silent: bool = False) -> requests.Response:
         '''
