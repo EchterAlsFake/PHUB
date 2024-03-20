@@ -46,8 +46,7 @@ jobs:
                 git add .
                 git commit -m "Automatic translation"
             
-            - name: Push changes to 3.7 branch
-              uses: ad-m/github-push-action@master
-              with:
-                branch: py-3.7
-                github_token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Create pull request
+              run: gh pr create --base py-3.7 --head master --title "Translate to 3.7" --body "Automatic update for the 3.7 branch following a successfull pytest run."
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
