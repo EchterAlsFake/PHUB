@@ -44,6 +44,7 @@ jobs:
               run: |
                 git config --local user.email "action@github.com"
                 git config --local user.name "GitHub Action"
+                git checkout -b py-3.7
                 git add .
                 git commit -m "Automatic translation"
-                git push origin py-3.7 --force
+                git push -f origin py-3.7
