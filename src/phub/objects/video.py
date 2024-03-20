@@ -437,7 +437,9 @@ class Video:
         The video thumbnail.
         '''
         
-        if url := self.data.get('page@image_url'):
+        url = self.data.get('page@image_url')
+        
+        if url:
             servers = None
         
         else:
