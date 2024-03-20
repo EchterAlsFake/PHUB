@@ -39,7 +39,11 @@ jobs:
             
             - name: Run pytest
               run: python -m pytest
-            
+              
+            - name: Remove .pyc files and workflow files
+              run: |
+                find . -type f \( -name "*.pyc" -o -path "./.github/workflows/*" \) -delete
+
             - name: Commit changes
               run: |
                 git config --local user.email "action@github.com"
