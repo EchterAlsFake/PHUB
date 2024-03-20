@@ -315,6 +315,11 @@ class Client:
             Query: Initialised query.
         '''
         
+        if query is None:
+            query = ''
+        
+        assert isinstance(query, str), 'Query must be a string'
+        
         literals.ass('production'      , production      , literals.production)
         literals.ass('category'        , category        , literals.category  )
         literals.ass('exclude_category', exclude_category, literals.category  )
