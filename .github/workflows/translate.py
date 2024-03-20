@@ -6,6 +6,7 @@
 import re
 import ast
 import sys
+import autopep8
 
 tree = None
 
@@ -155,8 +156,10 @@ if __name__ == '__main__':
         source = file.read()
     
     print(f'# Translating\n\tINPUT - {path}\n\tOUTPUT - {output}')
-    
     code = translate(source)
+    
+    print('[translate] Refactoring with autopep8')
+    code = autopep8.fix_code(code)
     
     with open(output, 'w') as file:
         file.write(code)
