@@ -92,6 +92,29 @@ class Explorer(ast.NodeTransformer):
         print(f'[explorer] [NamedExpr] Removed walrus')
         return new_node
 
+    def visit_ImportFrom(self, node):
+        '''
+        Remove too advanced imports.
+        '''
+        
+        if node.module == "typing":
+            for alias in node.names:
+                if alias.name == "Self":
+                    print("[explorer] [ImportFrom] Found import", alias)
+
+                    fake_import = ast.Assign(
+                        targets = [ast.Name(id = 'Self', ctx = ast.Store())],
+                        value = ast.Constant(value = None)
+                    )
+                    
+                    ast.copy_location(fake_import, node)
+                    ast.fix_missing_locations(fake_import)
+                    
+                    return fake_import
+        
+        self.generic_visit(node)
+        return node
+
 def exterminate_walrus_references(tree, walrus_name, expression):
     '''
     Remove walrus references
