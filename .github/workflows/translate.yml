@@ -28,7 +28,7 @@ jobs:
                 #!/bin/bash
                 find . -type f -name "*.py" | while read -r file; do
                   echo "*** Translating $file ***"
-                  python translate.py "$file"
+                  python .github/workflows/translate.py "$file"
                 done
             
             - name: Run pytest
