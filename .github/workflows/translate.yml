@@ -46,7 +46,8 @@ jobs:
                 git add .
                 git commit -m "Automatic translation"
             
-            - name: Create pull request
-              run: gh pr create -B base_branch -H branch_to_merge --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
-              env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Push changes to 3.7 branch
+              uses: ad-m/github-push-action@master
+              with:
+                branch: py-3.7
+                github_token: ${{ secrets.GITHUB_TOKEN }}
