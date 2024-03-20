@@ -29,6 +29,7 @@ class Explorer(ast.NodeTransformer):
     
     def __init__(self) -> None:
         self.walruses = []
+        self.fake_imports = []
         super().__init__()
     
     def visit_AnnAssign(self, node):
@@ -97,23 +98,24 @@ class Explorer(ast.NodeTransformer):
         Remove too advanced imports.
         '''
         
-        if node.module == "typing":
-            for alias in node.names:
-                if alias.name == "Self":
-                    print("[explorer] [ImportFrom] Found import", alias)
-
-                    fake_import = ast.Assign(
-                        targets = [ast.Name(id = 'Self', ctx = ast.Store())],
-                        value = ast.Constant(value = None)
-                    )
+        if node.module == 'typing':
+            if node.names:
+                new_names = [alias for alias in node.names if alias.name != 'Self']
+                had_self = len(new_names) == len(node.names)
+                
+                if new_names:
+                    node.names = new_names
                     
-                    ast.copy_location(fake_import, node)
-                    ast.fix_missing_locations(fake_import)
+                    if had_self:
+                        self.fake_imports.append('Self')
                     
-                    return fake_import
+                    return node
+                        
+                else:
+                    return None
         
         self.generic_visit(node)
-        return node
+        return node        
 
 def exterminate_walrus_references(tree, walrus_name, expression):
     '''
@@ -128,6 +130,40 @@ def exterminate_walrus_references(tree, walrus_name, expression):
                 return expression
             return node
 
+    transformer = DynamicExplorer()
+    new_tree = transformer.visit(tree)
+    return new_tree
+
+def add_fake_imports(tree, imports):
+    '''
+    Add fake imports.
+    '''
+    
+    class DynamicExplorer(ast.NodeTransformer):
+        def visit_Module(self, node):
+            
+            for idx, item in enumerate(node.body):
+                
+                if isinstance(item, ast.ImportFrom) and item.module == 'typing':
+                    
+                    for j, imp in enumerate(imports):
+                        
+                        ass = ast.Assign(
+                            targets = [ast.Name(id = 'Self', ctx = ast.Store())],
+                            value = ast.Constant(value=None)
+                        )
+                        
+                        ast.copy_location(node, ass)
+                        ast.fix_missing_locations(ass)
+                        ass.lineno = idx + 1 + j
+                        
+                        
+                        node.body.insert(idx + 1 + j, ass)
+                    break
+            
+            self.generic_visit(node)
+            return node
+    
     transformer = DynamicExplorer()
     new_tree = transformer.visit(tree)
     return new_tree
@@ -147,6 +183,9 @@ def translate(source: str) -> str:
             walrus.target.id,
             walrus.value
         )
+
+    print(f'[translate] Adding fake import:', expl.fake_imports)
+    add_fake_imports(tree, ['Self'])
 
     print(f'[translate] Dumping code')
     code = ast.unparse(modd)
