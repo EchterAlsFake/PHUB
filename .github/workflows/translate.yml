@@ -46,8 +46,7 @@ jobs:
                 git add .
                 git commit -m "Automatic translation"
             
-            - name: Create Pull Request
-              run: |
-                gh pr create --base translated --head master --title "[auto] 3.7 translation" --body "Update 3.7 translated branch following a successfull pytest run."
+            - name: Create pull request
+              run: gh pr create -B base_branch -H branch_to_merge --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
