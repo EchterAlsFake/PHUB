@@ -341,7 +341,7 @@ class Client:
         Initializes a Playlist object.
 
         Args:
-            url (str | int | Playlist): The playlist url or id
+            pl (str | int | Playlist): The playlist url or id
 
         Returns:
             Playlist object

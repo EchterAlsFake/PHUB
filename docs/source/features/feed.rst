@@ -26,7 +26,7 @@ You can also specify custom feed filters:
 
     comments_feed = client.account.feed.filter(
         user = 'my-user', # Filter notifications from a specific user name or object
-        section = Section.COMMENTS # Or any other section type
+        section = 'comments' # Or any other section type
     )
 
     # Print the first 10 feed news

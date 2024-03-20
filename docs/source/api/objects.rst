@@ -35,10 +35,6 @@ Here is a list of all API objects.
     :members:
     :private-members:
 
-.. autoclass:: phub.objects.Param
-    :members:
-    :private-members:
-
 .. autoclass:: phub.objects.Query
     :members:
     :private-members:

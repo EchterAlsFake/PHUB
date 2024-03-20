@@ -83,27 +83,6 @@ Here is an example on how to view your account history.
     for i, video in enumerate(client.account.watched):
         print(f'{i}. [{video.key}] "{video.title}"')
 
-.. warning::
-
-    **For PHUB 4.2 and below**,
-    Pornhub videos are not excluded from being deleted by their creators.
-    These videos still exist and have a key and a title, but accessing video data
-    will raise errors. If you are iterating videos (e.g. your history), you
-    can ignore these videos by using ``phub.utils.suppress``. 
-
-    .. code-block:: python
-
-        import phub
-        from phub.utils import suppress
-
-        client = phub.Client('my-username', 'my-password')
-
-        for video in suppress(client.account.watched):
-            # Access data that requires a page load
-            print(video.tags)
-    
-    **For version 4.3 and upper**, the videos are automatically suppressed.
-
 Accessing the feed
 ------------------
 

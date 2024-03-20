@@ -1,7 +1,7 @@
 CLI Usage
 =========
 
-PHUB comes with a built-in CLI with the most useful features.
+PHUB comes with a built-in CLI for downloading videos.
 
 It uses the `click`_ dependency.
 
@@ -13,61 +13,29 @@ It uses the `click`_ dependency.
 
 .. code-block:: bash
 
-    Usage: python -m phub [OPTIONS] COMMAND [ARGS]...
+    Usage: python -m phub [OPTIONS] INPUT
 
     Options:
-    --help  Show this message and exit.
+    --output TEXT      Output file or directory
+    --quality TEXT     Video quality
+    --downloader TEXT  Video downloader (default, FFMPEG or threaded)
+    --help             Show this message and exit.
 
-    Commands:
-    download     Download a specific video.
-    liked        Download the n-last watched videos.
-    search       Search for videos.
-    user-videos  Download the n last videos from a channel/model/etc.
-    watched      Download the n-last watched videos.
+Input
+    can be a video URL or a file containing multiple URLs.
+    quality
 
-Available features
-------------------
+Output
+    Output video file or directory. If you are downloading multiple
+    videos at once, make sure it's a directory.
 
-.. warning:: When downloading multiple videos at the same time, do not input a
-    file path in ``--output``, otherwise videos will overwrite themselves.
+Quality
+    The desired video quality. Usually 'best', 'half' or 'worst'.
+    If an integer is specified, the nearest quality to that number
+    will be picked.
 
-
-- Downloading a single video
-
-    .. code-block:: bash
-        
-        $ python -m phub download <url> --quality <quality> --output <directory>
-
-    ``URL`` can be the video URL/viewkey, or the path of a ``.txt`` file
-    containing a list of URLs/viewkeys.
-
-- Searching for videos
-
-    .. code-block:: bash
-
-        $ python -m phub search <query> --pages <int>
-
-    Will search for videos and display their title, viewkey and duration.
-
-    .. code-block:: bash
-
-        $ python -m phub search cum
-
-        * Fucking My StepCousin (Creampie) After His Cock Got Hard Coz Showered Together - Xreindeers (0:19:27) - 64a52441300f4
-        * A Beautiful Stranger From Paris Lets Me Taste  Her Croissant (0:11:19) - 64d6e71e75f61
-        * my tiny pussy make him cum 3 times and once creampie ♡ (0:10:11) - ph630157542f70f
-        * Кончил в сводную сестрёнку пока дома гости (0:10:02) - 649dc5ca2e7d0
-        [...]
-    
-    You can then copy the video viewkey at the end of each line and use it to download
-    the videos.
-
-- Update PHUB constants
-
-    PHUB uses a constant system that can be updated locally.
-
-    .. code-block:: bash
-
-        $ python -m phub update_locals
-    
-    .. warning:: This will override a section of ``$PHUB/locals.py``
+Downloader
+    The backend used to download the video. Possible values:
+    - default: download segments one by one. Safe but slow.
+    - FFMPEG: Use FFMPEG to download faster.
+    - threaded: Even faster downloader using threads. 

@@ -13,9 +13,7 @@ You can easily perform a research on Pornhub with :meth:`.Client.search`.
 Search filters
 --------------
 
-You can specify search filters by adding :py:class:`.Param` objects.
-There is a list of constant Parameters you can import from ``phub.locals``.
-You can see :doc:`here </api/locals>` a list of possible filters.
+You can specify a lot of parameters to restrict your search.
 
 .. code-block:: python
 
@@ -23,11 +21,9 @@ You can see :doc:`here </api/locals>` a list of possible filters.
     from phub.locals import *
 
     client = phub.Client()
-    query = client.search('my query', Category.FRENCH)
+    query = client.search('my query', category = 'french')
 
 For instance, this query will be restrained to search in the French category.
-
-You can use multiple Parameters objects by adding or subtracting them, e.g.:
 
 .. warning::
   
@@ -36,14 +32,12 @@ You can use multiple Parameters objects by adding or subtracting them, e.g.:
 
 .. code-block:: python
 
-    # Search in the French category for homemade production
-    client.search(..., Category.FRENCH | Production.HOMEMADE)
-
-    # Search for professional production, but exclude all BBW videos
-    client.search(..., Production.PROFESSIONAL - Category.BBW)
-
-    # Search for everything but BBW
-    client.search(..., -Category.BBW)
+    client.search(
+        ...,
+        category = 'french',
+        exclude_category = ('bbw', 'german'),
+        production = 'homemade'
+    )
 
 Using queries
 -------------
@@ -71,26 +65,22 @@ For more in-depth iteration, you can use the sample method.
     # Fetch only non watched
     for video in query.sample(watched = False):
         print(video.title)
+    
+    # Fetch by pages
+    for page in video.pages:
+        print(page)
 
 To exploit video data, see :doc:`here </features/video>`.
 
 Using different Query types while searching
 -------------------------------------------
 
-With searching only, you can choose to use 2 different queries subclasses.
-You should choose which one to use depending on what you want to do.
+Alternatively, you can use the HubTraffic API from Pornhub.
+It is faster and more reliable, but provides less information.
 
 .. code-block:: python
 
-    # Uses a JSONQuery (recommended) - faster and 'pornhub approved', but less data
-    query = client.search(..., use_hubtraffic = True)
-
-    # Uses a VideoQuery - slower, but fetches all of the video data
-    query = client.search(..., use_hubtraffic = False)
-
-.. note::
-
-    To access others properties from a JSONQuery, see the warning on :doc:`Using videos </features/video>`.
+    query = client.search_hubtraffic(...)
 
 Refreshing queries
 ------------------
@@ -104,7 +94,7 @@ to initialise a new query.
 
   args = dict(
     query = 'my query',
-    filter = Category.FRENCH # Or/and any filter you want
+    category = 'french'
     # Other parameters if you want
   )
 

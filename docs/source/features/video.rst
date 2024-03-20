@@ -38,7 +38,7 @@ You can use the following properties on a video:
       - List of video tags. Each tag is represented as a :py:class:`.Tag` object.
 
     * - :literal:`video.like`
-      - Votes representation as a :py:class:`.Like`object.
+      - Votes representation as a :py:class:`.Like` object.
 
     * - :literal:`video.views`
       - The video views (:py:class:`int`).
@@ -53,7 +53,7 @@ You can use the following properties on a video:
       - Pornstars in the video, represented as a list of :py:class:`.User` objects.
 
     * - :literal:`video.categories`
-      - The video categories. Represented as a :py:class:`.Category` generator.
+      - The video categories.
     
     * - :literal:`video.author`
       - The user account that posted the video, as a :py:class:`.User` object.
@@ -62,13 +62,13 @@ You can use the following properties on a video:
       - The video internal id. Most likely to be used in Pornhub's databases.
     
     * - :literal:`video.watched`
-      - Whether the video has been watched by the client.
+      - Whether the video has been watched by the client (Will not work in some cases).
     
     * - :literal:`video.is_free_premium`
-      - Whether the video is part of Pornhub free premium plan.
+      - Whether the video is part of Pornhub free premium plan (Will not work in some cases).
 
     * - :literal:`video.preview`
-      - The small preview you see when hovering a video, as a :py:class:`.Image` object.
+      - The small preview you see when hovering a video, as a :py:class:`.Image` object (Will not work in some cases).
     
     * - :literal:`video.is_favorite`
       - Whether the video is set a favorite by the client.

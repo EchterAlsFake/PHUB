@@ -216,16 +216,13 @@ class Video:
                  path: os.PathLike,
                  quality: Quality | str = 'best',
                  *,
-                 downloader: Callable[[Video,
-                                       Quality,
-                                       Callable[[int, int], None],
-                                       str], None] = download.default,
+                 downloader: Callable = download.default,
                  display: Callable[[int, int], None] = display.default()) -> str:
         '''
         Download the video to a file.
         
         Args:
-            path (str): The download path.
+            path (PathLike): The download path.
             quality (Quality | str | int): The video quality.
             downloader (Callable): The download backend.
             display (Callable): The progress display.

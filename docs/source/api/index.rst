@@ -12,5 +12,4 @@ For more details, you can also have a look at the `source code`_.
 
     objects
     errors
-    locals
     utils

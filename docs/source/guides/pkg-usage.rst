@@ -8,7 +8,7 @@ First thing to do is setting up a client.
 A client represents one connection to PH,
 and you can use multiple at the same time.
 You can also specify a custom language
-locale (``en`` by default). This will
+locale [1]_ (``en`` by default). This will
 affect searching preferences, video titles,
 etc.
 
@@ -16,7 +16,7 @@ etc.
 
     import phub
 
-    client = phub.Client(language = 'en')
+    client = phub.Client(language = 'de')
 
 Fetching a video
 ----------------
@@ -185,7 +185,7 @@ PHUB objects are keys that redirect to a PHUB object.
       - ``url``, ``name``, ``_servers``
       - /
 
-    * - :py:cass:`.Account`
+    * - :py:class:`.Account`
       - ``name``, ``avatar``, ``is_premium``
       - ``user``
     
@@ -208,3 +208,5 @@ you allow repulsiveness with ``object.dictify(recursive = True)``.
 
   Turning on recursion can make PHUB open more requests that you might
   actually need. Make sure you specify only the keys you need when using it.
+
+.. [1] Supported language locales are: ``cn``, ``de``, ``fr``, ``it``, ``pt``, ``pl``, ``rt``, ``nl``, ``cz``, ``jp``
