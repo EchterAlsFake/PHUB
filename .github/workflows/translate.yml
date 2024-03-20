@@ -39,10 +39,13 @@ jobs:
             
             - name: Run pytest
               run: python -m pytest
+            
+            - name: Update Pyproject version
+              run: sed -i 's/requires-python = ">=3.11"/requires-python = ">=3.7"/' pyproject.toml
               
             - name: Remove .pyc files and workflow files
               run: |
-                find . -type f \( -name "*.pyc" -o -path "./.github/workflows/*" \) -delete
+                find . -type f \( -name "*.pyc" -o -path "./.github/workflows/*" -o -path "./docs/*" \) -delete
 
             - name: Commit changes
               run: |
