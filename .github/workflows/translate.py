@@ -1,229 +1,181 @@
-'''
-    Translates modern Python code to bad quality code,
-    without type hints and walruses for compatibility.
-'''
-
 import re
 import ast
 import sys
+import glob
 import autopep8
 
-tree = None
+tree: ast.AST = None
+BLOCK = ast.Module | ast.FunctionDef | ast.ClassDef
 
-# Plausible parent blocks where a walrus could be defined and used
-# I'm not adding if statements because walruses can live longer than them
-# BLOCK = ast.Module | ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef
-BLOCK = ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef | ast.Module
+MSG = '''WARNING - THIS CODE IS AUTOMATICALLY GENERATED. UNSTABILITY MAY OCCUR.
+FOR ADVANCED DOSCTRINGS, COMMENTS AND TYPE HINTS, PLEASE USE THE DEFAULT BRANCH.'''
 
-def get_parent(node):
+FORBIDDEN_IMPORTS = [
+    'typing.Self',
+    'typing.LiteralString'
+]
+
+def get_parent(node: ast.AST) -> ast.AST | None:
+    '''
+    Get an AST node parent.
+    '''
+    
     for parent in ast.walk(tree):
         for child in ast.iter_child_nodes(parent):
             if child is node:
                 return parent
 
-class Explorer(ast.NodeTransformer):
+def get_parent_block(node: ast.AST) -> ast.AST | None:
     '''
-    Code explorer. Will remove type annotations and walruses, and
-    store walrus data to track further walruses references.
+    Get the nearest parent that is a block.
     '''
+    
+    parent = get_parent(node)
+    
+    if parent is None:
+        return None
+    
+    while not isinstance(parent, BLOCK):
+        parent = get_parent(parent)
+        
+    return parent
+
+
+class Transformer(ast.NodeTransformer):
     
     def __init__(self) -> None:
-        self.walruses = []
-        self.fake_imports = []
+        self.walruses: list[tuple[ast.AST]] = []
         super().__init__()
     
-    def visit_AnnAssign(self, node):
-        '''Remove variables type hints.'''
-        print(f'[explorer] [AnnAssign] Found node', type(node).__name__)
+    def visit_AnnAssign(self, node: ast.AnnAssign):
+        # Remove type hints from variables
         
         if isinstance(node.target, ast.Name):
-            value = node.value
-            target = node.target
         
-            # Make sure direct parent is not a dataclass
+            # Make sure parent is not a dataclass
             parent = get_parent(node)
             if isinstance(parent, ast.ClassDef):
                 for decorator in parent.decorator_list:
                     if decorator.id == 'dataclass':
-                        print(f'[explorer] [AnnAssign] Node Parent is dataclass, passing')
+                        node.annotation = ast.Name(id = 'object')
                         return node
             
-            new_node = ast.Assign(targets=[target], value=value)
-            ast.copy_location(new_node, node)
-            ast.fix_missing_locations(new_node)
-            print(f'[explorer] [AnnAssign] Removed annotations')
+            new = ast.Assign(targets = [node.target], value = node.value)
+            ast.copy_location(new, node)
+            ast.fix_missing_locations(new)
         
-            return new_node
-        
+            return new        
         return node
-
+    
     def visit_FunctionDef(self, node):
-        '''Remove function signatures type hints.'''
-        
-        print(f'[explorer] [FunctionDef] Found node', type(node).__name__)
-        
+        # Remove type hints from signatures
+                
         for arg in node.args.args:
             arg.annotation = None
         
         if node.returns:
-            node.returns = None        
+            node.returns = None      
         
-        print(f'[explorer] [AnnAssign] Removed type hints')
         self.generic_visit(node)
         return node
-    
+
     def visit_NamedExpr(self, node: ast.NamedExpr):
-        '''Remove walrus operators.'''
+        # Remove walrus operators
         
-        parent = get_parent(node)
-        print(f'[explorer] [NamedExpr] Found walrus', node.target.id)
+        parent = get_parent_block(node)
         
-        while not isinstance(parent, BLOCK):
-            parent = get_parent(parent)
+        new = node.value
+        ast.copy_location(new, node)
+        ast.fix_missing_locations(new)
+        self.walruses.append((parent, node))
         
-        print(f'[explorer] [NamedExpr] Found node closest block', type(parent).__name__)
-        
-        new_node = node.value
-        ast.copy_location(new_node, node)
-        ast.fix_missing_locations(new_node)
-        
-        self.walruses.append([parent, node])
-        self.generic_visit(node)
-        
-        print(f'[explorer] [NamedExpr] Removed walrus')
-        return new_node
-
-    def visit_ImportFrom(self, node):
-        '''
-        Remove too advanced imports.
-        '''
-        
-        if node.module == 'typing':
-            if node.names:
-                new_names = [alias for alias in node.names if alias.name != 'Self']
-                had_self = len(new_names) == len(node.names)
-                
-                if new_names:
-                    node.names = new_names
-                    
-                    if had_self:
-                        self.fake_imports.append('Self')
-                    
-                    return node
-                        
-                else:
-                    return None
-        
-        self.generic_visit(node)
-        return node        
-
-def exterminate_walrus_references(tree, walrus_name, expression):
-    '''
-    Remove walrus references
-    '''
+        return new
     
-    class DynamicExplorer(ast.NodeTransformer):
-        def visit_Name(self, node):
-                        
-            if isinstance(node.ctx, ast.Load) and node.id == walrus_name:
-                print('[fixer] Changing node', node.id, 'to', node)
-                return expression
-            return node
-
-    transformer = DynamicExplorer()
-    new_tree = transformer.visit(tree)
-    return new_tree
-
-def add_fake_imports(tree, imports):
-    '''
-    Add fake imports.
-    '''
-    
-    class DynamicExplorer(ast.NodeTransformer):
-        def visit_Module(self, node):
+    def visit_ImportFrom(self, node: ast.ImportFrom):
+        # Remove typing.Self imports
+        
+        if node.module and node.names:
+            names = []
+            for alias in node.names:
+                if node.module + '.' + alias.name not in FORBIDDEN_IMPORTS:
+                    names.append(alias)
             
-            for idx, item in enumerate(node.body):
-                
-                if isinstance(item, ast.ImportFrom) and item.module == 'typing':
-                    
-                    for j, imp in enumerate(imports):
-                        
-                        ass = ast.Assign(
-                            targets = [ast.Name(id = 'Self', ctx = ast.Store())],
-                            value = ast.Constant(value=None)
-                        )
-                        
-                        ast.copy_location(node, ass)
-                        ast.fix_missing_locations(ass)
-                        ass.lineno = idx + 1 + j
-                        
-                        
-                        node.body.insert(idx + 1 + j, ass)
-                    break
-            
-            self.generic_visit(node)
-            return node
-    
-    transformer = DynamicExplorer()
-    new_tree = transformer.visit(tree)
-    return new_tree
+            node.names = names
+        
+        if not node.names:
+            return None
+        
+        return node 
 
-def translate(source: str) -> str:
+    def visit_Name(self, node: ast.Name):
+        # Remove walruses references
+        
+        if isinstance(node.ctx, ast.Load):
+            parent = get_parent_block(node)
+            
+            for walrus_parent, walrus in self.walruses:
+                if parent is walrus_parent and node.id == walrus.target.id:
+                    return walrus.value
+        
+        return node
+
+    def visit_BinOp(self, node: ast.BinOp):
+        # Remove unions inside solid calls
+        
+        if isinstance(node.op, ast.BitOr) and isinstance(node.left, ast.Name):
+            new = ast.Name(id = 'object', ctx = ast.Load())
+            ast.copy_location(new, node)
+            ast.fix_missing_locations(new)
+            return new
+        
+        self.generic_visit(node)
+        return node
+
+def translate(code: str, msg: str = None) -> str:
+    '''
+    Translates 3.11ish code to 3.7ish code.
+    '''
+    
     global tree
+
+    tree = ast.parse(code)
     
-    print(f'[translate] Parsing input')
-    tree = ast.parse(source)
-    expl = Explorer()
-    print(f'[translate] Starting explorer')
-    modd = expl.visit(tree)
-    for parent, walrus in expl.walruses:
-        print(f'[translate] [fixer] Fixing', walrus)
-        exterminate_walrus_references(
-            parent,
-            walrus.target.id,
-            walrus.value
-        )
-
-    print(f'[translate] Adding fake import:', expl.fake_imports)
-    add_fake_imports(tree, ['Self'])
-
-    print(f'[translate] Dumping code')
-    code = ast.unparse(modd)
-
-    # Add prevention message
-    msg = 'WARNING - THIS CODE IS AUTO TRANSLATED; PREFER USING THE 3.11 VERSION'
-    code = re.sub(
+    transformer = Transformer()
+    
+    # Execute 2 times to make sure no walrus 
+    # assigned after reference is bypassed
+    transformed = transformer.visit(tree)
+    transformed = transformer.visit(tree)
+    
+    unparsed = ast.unparse(transformed)
+    formated = autopep8.fix_code(unparsed)
+    
+    if msg: formated = re.sub(
         pattern = r"^(\s*?(?:\"|'){3}.*?)((?:\"|'){3}.*)",
         repl = '\\1\n' + msg + '\n\\2',
-        string = code,
+        string = formated,
         flags = re.DOTALL
     )
     
-    return code
+    return formated
 
 if __name__ == '__main__':
-    
-    if len(sys.argv) == 2:
-        path = output = sys.argv[1]
-    
-    elif len(sys.argv) == 3:
-        path = sys.argv[1]
-        output = sys.argv[2]
-    
-    else:
-        print('Usage: script <source> [output]')
+
+    if len(sys.argv) != 2:
+        print('Invalid parameter')
         exit(1)
+
+    path = sys.argv[1]
     
-    with open(path, 'r') as file:
-        source = file.read()
-    
-    print(f'# Translating\n\tINPUT - {path}\n\tOUTPUT - {output}')
-    code = translate(source)
-    
-    print('[translate] Refactoring with autopep8')
-    code = autopep8.fix_code(code)
-    
-    with open(output, 'w') as file:
-        file.write(code)
+    for file in glob.glob(path, recursive = True):
+        print(f'[ translator ] Formating', file)
+        
+        with open(file, 'r') as handle:
+            raw = handle.read()
+        
+        result = translate(raw, msg = MSG)
+        
+        with open(file, 'w') as handle:
+            handle.write(result)
 
 # EOF

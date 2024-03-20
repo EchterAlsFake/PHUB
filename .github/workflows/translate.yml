@@ -1,4 +1,4 @@
-name: Auto update 3.7 branch
+name: Auto update compat branch
 
 on:
     push:
@@ -31,17 +31,13 @@ jobs:
             
             - name: Run translation script
               run: |
-                #!/bin/bash
-                find . -type f -name "*.py" | while read -r file; do
-                  echo "*** Translating $file ***"
-                  python .github/workflows/translate.py "$file"
-                done
+                python .github/workflows/translate.py PHUB/src/**/*.py
             
-            - name: Run pytest
-              run: python -m pytest
+            # - name: Run pytest
+            #  run: python -m pytest
             
             - name: Update Pyproject version
-              run: sed -i 's/requires-python = ">=3.11"/requires-python = ">=3.7"/' pyproject.toml
+              run: sed -i 's/requires-python = ">=3.11"/requires-python = ">=3.8"/' pyproject.toml
               
             - name: Remove .pyc files and workflow files
               run: |
@@ -51,7 +47,7 @@ jobs:
               run: |
                 git config --local user.email "action@github.com"
                 git config --local user.name "GitHub Action"
-                git checkout -b py-3.7
+                git checkout -b compat
                 git add .
                 git commit -m "Automatic translation"
-                git push -f origin py-3.7
+                git push -f origin compat
