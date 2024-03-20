@@ -30,9 +30,14 @@ pip install --upgrade phub
 pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git
 ```
 
-- Or, for python 3.10 and higher. It Could also work for Python 3.6–9, but untested.
+- Or, for python 3.10 and higher. This is 
 ```shell
 pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git@py-3.10
+```
+
+- Or, for even lower python versions, there is automatic branch with several features removed (might be unstable).
+```shell
+pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git@compat
 ```
 
 ## Usage from command line
