@@ -30,7 +30,7 @@ pip install --upgrade phub
 pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git
 ```
 
-- Or, for python 3.10 and higher. This is 
+- Or, for python 3.10 and higher.
 ```shell
 pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git@py-3.10
 ```
