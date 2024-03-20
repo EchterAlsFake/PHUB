@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - master
+        paths: ['src/phub/**']
     
     workflow_dispatch:
 
