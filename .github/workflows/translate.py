@@ -72,6 +72,12 @@ class Transformer(ast.NodeTransformer):
                 
         for arg in node.args.args:
             arg.annotation = None
+
+        for kwarg in node.args.kwonlyargs:
+            kwarg.annotation = None
+        
+        if node.args.vararg:
+            node.args.vararg.annotation = None
         
         if node.returns:
             node.returns = None      
