@@ -161,13 +161,9 @@ def translate(code: str, msg: str = None) -> str:
 
 if __name__ == '__main__':
 
-    if len(sys.argv) != 2:
-        print('Invalid parameter')
-        exit(1)
-
-    path = sys.argv[1]
+    magic = './src/**/*.py'
     
-    for file in glob.glob(path, recursive = True):
+    for file in glob.glob(magic, recursive = True):
         print(f'[ translator ] Formating', file)
         
         with open(file, 'r') as handle:
