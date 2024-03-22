@@ -315,10 +315,9 @@ class Client:
             Query: Initialised query.
         '''
         
-        if query is None:
-            query = ''
+        query = query.strip()
         
-        assert isinstance(query, str), 'Query must be a string'
+        assert query, 'Query must be a non-empty string'
         
         literals.ass('production'      , production      , literals.production)
         literals.ass('category'        , category        , literals.category  )
