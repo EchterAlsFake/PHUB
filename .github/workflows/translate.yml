@@ -31,7 +31,7 @@ jobs:
             
             - name: Run translation script
               run: |
-                python .github/workflows/translate.py PHUB/src/**/*.py
+                python .github/workflows/translate.py ./src/**/*.py
             
             # - name: Run pytest
             #  run: python -m pytest
