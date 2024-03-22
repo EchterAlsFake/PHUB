@@ -215,7 +215,7 @@ class re:
     eval_video               = find( engine.DOTALL,              r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.'
                                                                  r'*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div'               ) # Parse video data
     user_avatar              = find( engine.DOTALL,              r'previewAvatarPicture\">.*?src=\"(.*?)\"'                                    ) # get the user avatar
-    query_counter            = find( engine.DOTALL,              r'showing(?>Counter|Info).*?\">.*?(\d+)\s*<\/'                                ) # Get a query's video amount
+    query_counter            = find( engine.DOTALL,              r'showing(?:Counter|Info).*?\">.*?(\d+)\s*<\/'                                ) # Get a query's video amount
     user_bio                 = find( engine.DOTALL,              r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'                           ) # Get the user bio
     container                = find( engine.DOTALL,              r'class=\"container(.*)'                                                      ) # Get the page container
     document                 = find( engine.DOTALL,              r'.*'                                                                         ) # Match a whole document
