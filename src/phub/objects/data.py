@@ -150,8 +150,6 @@ class FeedItem:
         Item type.
         '''
         
-        from .. import locals
-        
         raw = consts.re.get_feed_type(self.raw)
         
         return consts.FEED_CLASS_TO_CONST.get(raw)
