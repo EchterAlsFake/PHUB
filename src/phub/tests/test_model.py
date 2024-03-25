@@ -1,11 +1,9 @@
 try:
     from phub import Client
-
 except (ModuleNotFoundError, ImportError):
     from ...phub import Client
-
-url = "https://de.pornhub.com/pornstar/nancy-a"
-client = Client(delay=2, language="en")  # Make a delay, so that PornHub isn't stressed too much
+url = 'https://de.pornhub.com/pornstar/nancy-a'
+client = Client(delay=2, language='en')
 model = client.get_user(url)
 
 
@@ -27,10 +25,8 @@ def test_uploads():
     try:
         for video in uploads:
             total_uploads.append(video)
-
     except Exception:
-        pass # Means, that user has no uploads, so I don't care
-
+        pass
     if len(total_uploads) >= 1:
         for upload in model.uploads:
             assert isinstance(upload.title, str) and len(upload.title) > 3
