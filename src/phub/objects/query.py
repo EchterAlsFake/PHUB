@@ -44,13 +44,24 @@ class Pages:
             return self.query._iter_page(items)
         
         def wrap():
-            for i in range(index.start or 0,
-                           index.stop or 0,
-                           index.step or 1):
-                
-                yield self[i]
+            try:
+                # Implementation of a slice range
+                i = index.start or 0
+                while not index.stop or i < index.stop:
+                    yield self[i]
+                    i += index.step or 1
+            
+            except errors.NoResult:
+                return
         
         return wrap()
+    
+    def __iter__(self) -> Iterator[Iterator[QueryItem]]:
+        '''
+        Iterate each page.
+        '''
+                
+        return self[:]
 
 class Query:
     '''
