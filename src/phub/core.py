@@ -107,7 +107,7 @@ class Client:
             requests.Response: The fetched response.
         '''
 
-        logger.log(logging.DEBUG if silent else logging.INFO, 'Making call %s', func or '/')
+        logger.log(logging.DEBUG if silent else logging.INFO, 'Fetching %s', func or '/')
 
         # Delay mechanism
         if self.last_request_time:
@@ -122,11 +122,11 @@ class Client:
         for i in range(consts.MAX_CALL_RETRIES):
             try:
                 response = self.session.request(
-                    method=method,
-                    url=url,
-                    headers=headers,
-                    data=data,
-                    timeout=timeout,
+                    method = method,
+                    url = url,
+                    headers = headers,
+                    data = data,
+                    timeout = timeout,
                 )
 
                 # Silent 429 errors
@@ -135,9 +135,10 @@ class Client:
 
                 # Attempt to resolve the challenge if needed
                 if challenge := consts.re.get_challenge(response.text, False):
-                    logger.info('\n\nChallenge found, attempting to resolve\n\n')
+                    logger.info('Challenge found, attempting to resolve')
                     parser.challenge(self, *challenge)
-                    logging.info(f"Sleeping for {consts.CHALLENGE_TIMEOUT} seconds")
+                    
+                    logger.info(f"Sleeping for {consts.CHALLENGE_TIMEOUT} seconds")
                     time.sleep(consts.CHALLENGE_TIMEOUT)
                     continue  # Reload page
 
