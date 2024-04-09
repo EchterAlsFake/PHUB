@@ -211,9 +211,9 @@ class re:
     get_user_type            = find(                             r'\/(model|pornstar|channels|user|users)\/.*?'                                ) # Get a user type
     get_thumb_id             = find(                             r'\/([a-z0-9]+?)\/(?=original|thumb)'                                         ) # Get video id from its thumbnail 
     remove_host              = subc(                             _raw_root, ''                                                                 ) # Remove the HOST root from a URL
-    is_favorite              = find(                             r'<div class=\".*?js-favoriteBtn.*?active\"'                                  ) # Check if is favorite
-    eval_video               = find( engine.DOTALL,              r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.'
-                                                                 r'*?)\".*?-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)</div'               ) # Parse video data
+    is_favorite              = find(                             r'<div class=\".*?js-favoriteBtn.*?active\"'                                  ) # Check if is favorite    
+    eval_video               = find( engine.DOTALL,              r'id=\"(.*?)\".*?-vkey=\"(.*?)\".*?title=\"(.*?)\".*?src=\"(.*?)\".*?</div'   ) # Parse video data
+    eval_public_video        = find( engine.DOTALL,              r'-mediabook=\"(.*?)\".*?marker-overlays.*?>(.*?)'                            ) # Parse public-only video data
     user_avatar              = find( engine.DOTALL,              r'previewAvatarPicture\">.*?src=\"(.*?)\"'                                    ) # get the user avatar
     query_counter            = find( engine.DOTALL,              r'showing(?:Counter|Info).*?\">.*?(\d+)\s*<\/'                                ) # Get a query's video amount
     user_bio                 = find( engine.DOTALL,              r'\"aboutMeSection.*?\"title.*?<div>\s*(.*?)\s*<\/'                           ) # Get the user bio

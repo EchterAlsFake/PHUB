@@ -444,7 +444,7 @@ class Video:
         
         else:
             url = self.fetch('data@thumb')
-            servers = self.fetch('data@thumbs')
+            servers = self.data.get('data@thumbs') or [] # TODO - Use cache on prop Image.servers
         
         return Image(client = self.client,
                      url = url,

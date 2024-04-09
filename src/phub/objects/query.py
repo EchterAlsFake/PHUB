@@ -293,10 +293,13 @@ class queries:
             # Evaluate video data.
             # Can be used externally from this query
             
-            keys = ('id', 'key', 'title', 'image', 'preview', 'markers')
-            data = {k: v for k, v in zip(keys, consts.re.eval_video(raw))} | {'raw': raw}
+            html_entries = consts.re.eval_video(raw)
+            html_public_entries = consts.re.eval_public_video(raw, False) or ()
             
-            return data
+            data =        {k: v for v, k in zip(html_entries, ('id', 'key', 'title', 'image'))}
+            public_data = {k: v for v, k in zip(html_public_entries, ('preview', 'markers'))}
+            
+            return {'mediabook': None, 'markers': ''} | data | public_data | {'raw': raw}
         
         def _parse_item(self, raw: str) -> Video:
             
