@@ -54,7 +54,7 @@ class Client:
         
         self.proxies = proxies
         self.language = {'Accept-Language': language}
-        self.credentials = {'username': username,
+        self.credentials = {'email': username,
                             'password': password}
         
         self.delay = delay
