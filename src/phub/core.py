@@ -59,6 +59,7 @@ class Client:
         
         self.delay = delay
         self.start_delay = False
+        self.last_request_time = None
         
         # Connect account
         self.logged = False
@@ -81,7 +82,7 @@ class Client:
         
         # Insert cookies
         self.session.cookies.update(consts.COOKIES)
-        
+
     def call(self,
              func: str,
              method: str = 'GET',
@@ -92,7 +93,7 @@ class Client:
              silent: bool = False) -> requests.Response:
         '''
         Send a request.
-        
+
         Args:
             func      (str): URL or PH function to call.
             method    (str): Request method.
@@ -101,60 +102,59 @@ class Client:
             timeout (float): Request maximum response time.
             throw    (bool): Whether to raise an error when a request explicitly fails.
             silent   (bool): Make the call logging one level deeper.
-        
+
         Returns:
             requests.Response: The fetched response.
         '''
-        
+
         logger.log(logging.DEBUG if silent else logging.INFO, 'Making call %s', func or '/')
-        
-        # Delay
-        if self.start_delay:
-            time.sleep(self.delay)
-        else:
-            self.start_delay = True
+
+        # Delay mechanism
+        if self.last_request_time:
+            elapsed_time = time.time() - self.last_request_time
+            if elapsed_time < self.delay:
+                time.sleep(self.delay - elapsed_time)
+
+        self.last_request_time = time.time()  # Update the time of the last request
 
         url = func if 'http' in func else utils.concat(consts.HOST, func)
-        
+
         for i in range(consts.MAX_CALL_RETRIES):
-            
             try:
-                # Send request
                 response = self.session.request(
-                    method = method,
-                    url = url,
-                    headers = consts.HEADERS | headers | self.language,
-                    data = data,
-                    timeout = timeout,
-                    proxies = self.proxies
+                    method=method,
+                    url=url,
+                    headers=headers,
+                    data=data,
+                    timeout=timeout,
                 )
-                
+
                 # Silent 429 errors
                 if b'429</title>' in response.content:
                     raise ConnectionError('Pornhub raised error 429: too many requests')
-                
+
                 # Attempt to resolve the challenge if needed
                 if challenge := consts.re.get_challenge(response.text, False):
                     logger.info('\n\nChallenge found, attempting to resolve\n\n')
                     parser.challenge(self, *challenge)
                     logging.info(f"Sleeping for {consts.CHALLENGE_TIMEOUT} seconds")
                     time.sleep(consts.CHALLENGE_TIMEOUT)
-                    continue # Reload page
-                
+                    continue  # Reload page
+
                 break
-            
+
             except Exception as err:
                 logger.log(logging.DEBUG if silent else logging.WARNING,
                            f'Call failed: {repr(err)}. Retrying (attempt {i + 1}/{consts.MAX_CALL_RETRIES})')
                 time.sleep(consts.MAX_CALL_TIMEOUT)
                 continue
-        
+
         else:
             raise ConnectionError(f'Call failed after {i + 1} retries. Aborting.')
 
         if throw: response.raise_for_status()
         return response
-    
+
     def login(self,
               force: bool = False,
               throw: bool = True) -> bool:
