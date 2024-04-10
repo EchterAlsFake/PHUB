@@ -38,8 +38,8 @@ class User:
         
         Args:
             client (Client): The client parent.
-            name      (str): The username.
-            url       (str): The user page URL.
+            name (str): The username.
+            url (str): The user page URL.
         '''
         
         self.client = client
@@ -122,7 +122,7 @@ class User:
         
         Args:
             client (Client): The parent client.
-            user      (str): Username or URL.
+            user (str): Username or URL.
         '''
         
         if consts.re.is_url(user):

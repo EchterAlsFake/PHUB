@@ -4,6 +4,9 @@ PHUB Literals.
 
 from typing import Literal, Iterable, Type
 
+# Language locales
+language = Literal['en', 'cn', 'de', 'fr', 'it', 'pt', 'pl', 'rt', 'nl', 'cz', 'jp']
+
 # Production type
 production = Literal['homemade', 'professional']
 
@@ -79,7 +82,7 @@ category = Literal[
 
 class map:
     '''
-    Map literals values to Pornhub arg representation.
+    This object maps PHUB literals to their Pornhub URL value.
     '''
 
     sort = {
@@ -179,9 +182,15 @@ class map:
         'month': 'monthly'
     }
 
-def _craft_list(args: Iterable[category]) -> str:
+def _craft_list(args: Iterable[str]) -> str:
     '''
     Craft an item list list into a url-valid list.
+    
+    Args:
+        args (Iterable[str]): A list of items.
+    
+    Returns:
+        str: A dash separated URL-valid list. 
     '''
     
     if isinstance(args, str):
@@ -190,9 +199,15 @@ def _craft_list(args: Iterable[category]) -> str:
     if args:
         return '-'.join(list(args))
 
-def _craft_boolean(b: bool | None) -> str:
+def _craft_boolean(b: bool | None) -> int | None:
     '''
     Craft a boolean into a url-valid int.
+    
+    Args:
+        b (bool): Initial boolean value.
+    
+    Returns:
+        int: URL-valid representation of b.
     '''
     
     if b is not None:
@@ -201,6 +216,14 @@ def _craft_boolean(b: bool | None) -> str:
 def ass(name: str, item: str | list[str], literal: Type) -> None:
     '''
     Assert one or multiple items are part of a literal.
+    
+    Args:
+        name (str): The literal name, used for error bodies.
+        item (str | list[str]): The object(s) to assert.
+        literal (Type): The literal that should match the item(s).
+    
+    Raises:
+        AssertionError: If the item is invalid.
     '''
     
     if not item: return

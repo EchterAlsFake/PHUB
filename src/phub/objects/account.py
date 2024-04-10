@@ -34,7 +34,6 @@ class Account:
         '''
         
         if all(client.credentials.values()):
-            logger.info('Creating new account object')
             return object.__new__(cls)
     
     def __init__(self, client: Client) -> None:
@@ -55,9 +54,7 @@ class Account:
         # Save data keys so far, so we can make a difference with the
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
-        
-        logger.info('Account object %s created', self)
-        
+            
     def __repr__(self) -> str:
         
         status = 'logged-out' if self.name is None else f'name={self.name}' 

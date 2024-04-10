@@ -29,7 +29,7 @@ class Playlist(queries.VideoQuery):
         
         Args:
             client (Client): Parent client to use.
-            pid       (str): The playlist id.
+            pid (str): The playlist id.
         '''
         
         # Initialise 

@@ -80,11 +80,11 @@ class Query:
         Initialise a new query.
         
         Args:
-            client           (Client): The parent client.
-            func                (str): The URL function.
-            args               (dict): Arguments.
+            client (Client): The parent client.
+            func (str): The URL function.
+            args (dict): Arguments.
             container_hint (Callable): An hint function to help determine where should the target container be.
-            query_repr          (str): Indication for the query representation.
+            query_repr (str): Indication for the query representation.
         '''
 
         self.client = client
@@ -143,9 +143,9 @@ class Query:
         Get a sample of the query.
         
         Args:
-            max           (int): Maximum amount of items to fetch.
-            filter   (Callable): A filter function that decides whether to keep each QueryItems.
-            watched      (bool): Whether videos should have been watched by the account or not.
+            max (int): Maximum amount of items to fetch.
+            filter (Callable): A filter function that decides whether to keep each QueryItems.
+            watched (bool): Whether videos should have been watched by the account or not.
             free_premium (bool): Whether videos should be free premium or not.
         
         Returns:

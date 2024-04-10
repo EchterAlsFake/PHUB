@@ -28,10 +28,10 @@ class Image:
         Initialise a new image object.
         
         Args:
-            client    (Client): Parent client.
-            url          (str): The image URL.
+            client (Client): Parent client.
+            url (str): The image URL.
             sizes (list[dict]): Image sizes/resolutions/servers.
-            name         (str): Image name.
+            name (str): Image name.
         '''
 
         self.url = url

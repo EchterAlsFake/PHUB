@@ -36,7 +36,7 @@ class Video:
         
         Args:
             client (Client): The parent client.
-            url       (str): The video URL.
+            url (str): The video URL.
         '''
         
         if not consts.re.is_video_url(url):

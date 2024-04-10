@@ -34,7 +34,7 @@ def concat(*args) -> str:
     Concatenate multiple URL or file path parts.
 
     Args:
-        *args: A variable number of arguments, each can be a str or a pathlib.Path object.
+        args: A variable number of arguments, each can be a str or a pathlib.Path object.
 
     Returns:
         str: The concatenated path as a string.
@@ -100,7 +100,7 @@ def serialize(object_: object, recursive: bool = False) -> object:
     Simple serializer for PHUB objects.
     
     Args:
-        object_    (Any): The object to serialize.
+        object_ (Any): The object to serialize.
         recursive (bool): Whether to allow serializing PHUB objects inside the object.
     
     Returns:
@@ -140,10 +140,10 @@ def dictify(object_: object,
     Dictify an object.
     
     Args:
-        object_     (Any): The object to serialize.
-        keys  (list[str]): A list of keys to dictify.
-        all_  (list[str]): The total list of serializeable object keys.
-        recursive  (bool): Whether to allow serializing PHUB objects inside the object.
+        object_ (Any): The object to serialize.
+        keys (list[str]): A list of keys to dictify.
+        all_ (list[str]): The total list of serializeable object keys.
+        recursive (bool): Whether to allow serializing PHUB objects inside the object.
     
     Returns:
         dict: The object dictified.
@@ -160,7 +160,7 @@ def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoErr
     Set up a generator to bypass items that throw errors.
     
     Args:
-        gen   (Iterable): The iterable to suppress.
+        gen (Iterable): The iterable to suppress.
         errs (Exception): The errors that fall under the suppression rule.
     
     Returns
@@ -228,7 +228,7 @@ def head(client: object, url: str) -> str | bool:
     
     Args:
         client (Client): A client containing an initialised session.
-        url       (str): The url of the request.
+        url (str): The url of the request.
     
     Returns:
         str | bool: The redirect URL if success, False otherwise.
