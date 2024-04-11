@@ -621,16 +621,17 @@ class Video:
         
         assert self.client.logged, 'Client must be logged in to use this property'
         
-        # If we fetched the video page while logged in, PH consider we have watched it
-        if self.page:
+        # Use query sortcut if possible
+        if self.data.get('query@watched'):
             return True
         
-        if 'watchedVideo' in self._as_query['markers']:
-            return True
-        
-        # For some reason the watched text is different in playlists
+        # Search in markers
         if 'class="watchedVideoText' in self._as_query['raw']:
             return True
+        
+        # Evaluate on page (TODO)
+        if self.page:
+            ...
         
         return False
     

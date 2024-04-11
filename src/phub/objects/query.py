@@ -319,7 +319,8 @@ class queries:
                 'page@id': id,
                 
                 # Custom query properties
-                'query@parent': self
+                'query@parent': self,
+                'query@watched': 'video/recent' in self.url
             }
             
             return obj
