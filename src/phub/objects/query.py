@@ -320,7 +320,7 @@ class queries:
                 
                 # Custom query properties
                 'query@parent': self,
-                'query@watched': 'video/recent' in self.url
+                'query@watched': 'videos/recent' in self.url
             }
             
             return obj
