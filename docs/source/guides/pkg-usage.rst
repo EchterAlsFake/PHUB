@@ -164,7 +164,7 @@ Each ``dictify`` method can take as argument a :py:class:`list[str]` of keys,
 if you want to avoid fetching specific things.
 
 Below is a list of all serializable PHUB objects, along with their keys.
-PHUB objects are keys that redirect to a PHUB object.
+"PHUB objects" are keys that redirect to a PHUB object.
 
 .. list-table:: Serializable objects
     :header-rows: 1
@@ -201,8 +201,8 @@ PHUB objects are keys that redirect to a PHUB object.
       - ``user``, ``header``, ``item_type``
       - /
 
-By default, recursive keys will appear as ``repr`` strings, unless
-you allow repulsiveness with ``object.dictify(recursive = True)``.
+By default, PHUB object keys will appear as ``repr`` strings, unless
+you allow it with ``object.dictify(recursive = True)``.
 
 .. warning::
 

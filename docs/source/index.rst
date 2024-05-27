@@ -1,10 +1,8 @@
 PHUB documentation
 ==================
 
-PHUB is an hybrid API for Pornhub. It is able to communicate with Pornhub
-using both web-scraping and wrapping the Pornhub's HubTraffic API. It is
-able to access most used or useful PH features, like video searching,
-accessing account features, and more like video downloading.
+PHUB is an easy-to-use API wrapper for Pornhub. It can access most used or useful
+PH features, such as video searching, account features, video downloading, and more.
 
 .. image:: assets/logo.svg
    :align: center

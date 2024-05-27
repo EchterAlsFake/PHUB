@@ -36,7 +36,8 @@ For instance, this query will be restrained to search in the French category.
         ...,
         category = 'french',
         exclude_category = ('bbw', 'german'),
-        production = 'homemade'
+        production = 'homemade',
+        ...
     )
 
 Using queries
@@ -85,8 +86,7 @@ It is faster and more reliable, but provides less information.
 Refreshing queries
 ------------------
 
-As of right now, queries cannot be refreshed. Instead, you need
-to initialise a new query.
+Queries cannot be refreshed. Instead, you need to initialise a new query.
 
 .. code-block:: python
 
@@ -94,8 +94,8 @@ to initialise a new query.
 
   args = dict(
     query = 'my query',
-    category = 'french'
-    # Other parameters if you want
+    category = 'french',
+    ...
   )
 
   while 1:

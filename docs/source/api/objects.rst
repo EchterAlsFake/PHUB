@@ -8,7 +8,6 @@ Here is a list of all API objects.
 .. autoclass:: phub.core.Client
     :members:
     :private-members:
-    :special-members: __new__
 
 .. autoclass:: phub.objects.Account
     :members:
@@ -21,7 +20,6 @@ Here is a list of all API objects.
 .. autoclass:: phub.objects.Like
     :members:
     :private-members:
-    :special-members: __len__, __getitem__
 
 .. autoclass:: phub.objects.FeedItem
     :members:

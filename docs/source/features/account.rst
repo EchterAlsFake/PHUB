@@ -80,8 +80,8 @@ Here is an example on how to view your account history.
 
     history_length = 40
 
-    for i, video in enumerate(client.account.watched):
-        print(f'{i}. [{video.key}] "{video.title}"')
+    for video in client.account.watched:
+        print(f'Video {video.key} - "{video.title}"')
 
 Accessing the feed
 ------------------

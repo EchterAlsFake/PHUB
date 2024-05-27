@@ -15,19 +15,17 @@ objects.
 
 .. code-block:: python
 
-    user = ...
+    user = client.get(...)
 
-    user.name   # The username
-    user.url    # The link to the user page
-    user.bio    # The user public biography (or None)
-    user.info   # User data (relationship, orientation, etc.)
-                # Warning: Changing the client language affect this.
-    user.avatar # The user avatar as an phub.Image object.
-    user.videos # Query containing the videos posted by the user.
-    user.type   # The type of the user (model, channels, pornstar, users, etc.)
-
-    # Only if the user is a pornstar
-    user.uploads # Pornstar personnal uploads
+    user.name    # The username
+    user.url     # The link to the user page
+    user.bio     # The user public biography (or None)
+    user.info    # User data (relationship, orientation, etc.)
+                 # Warning: Changing the client language affect this.
+    user.avatar  # The user avatar as an phub.Image object.
+    user.videos  # Query containing the videos posted by the user.
+    user.type    # The type of the user (model, channels, pornstar, users, etc.)
+    user.uploads # if user is a Pornstar, stores the personal uploads
 
 Refreshing User data
 --------------------
