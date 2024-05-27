@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="300" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
+  <img width="200" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
 </p>
 
 <div align="center">
@@ -9,18 +9,15 @@
 </div>
 
 <br>
-<br>
-PHUB is a hybrid API for Pornhub. It is able to communicate with Pornhub
-using both web-scraping and Pornhub's HubTraffic API. It is
-able to access most used or useful PH features, such as video searching,
-accessing account features, video downloading, and a lot more.
+PHUB is an easy-to-use API wrapper for Pornhub. It can access most used or useful
+PH features, such as video searching, account features, video downloading, and more.
 
 > [!WARNING]
 > This project is probably against Pornhub TOS. Use at your own risks.
 
-## Installation
+# Installation
 
-- Install using `pip` (python `3.11` or higher required, recommended version): 
+- Install using `pip` (python `3.9` or higher required): 
 ```shell
 pip install --upgrade phub
 ```
@@ -30,26 +27,15 @@ pip install --upgrade phub
 pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git
 ```
 
-- Or, for python 3.10 and higher.
-```shell
-pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git@py-3.10
-```
-
-- Or, for even lower python versions, there is automatic branch with several features removed (might be unstable).
-```shell
-pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git@compat
-```
-
-## Usage from command line
+# Usage from command line
 ```shell
 # Download a single video
 py -m phub https://www.pornhub.com/view_video.php?viewkey=abcdef
 # Download multiple videos from a text file
 py -m phub path/to/file.txt --quality best --downloader threaded --output video.mp4
 ```
-###### Note: It does not matter how the URLs in the files are aranged, preferably one per line.
 
-## Quickstart
+# Quickstart
 
 > [!NOTE]
 > You can find the docs on this project [here](https://phub.readthedocs.io).
@@ -83,17 +69,15 @@ client.account.liked
 client.account.recommended
 ```
 
-# Note
-<strong>This repository was initiated and maintained by [Egsagon](https://github.com/Egsagon)
-He doesn't have any time to maintain this and transferred me the ownership.
-I'll do my best to maintain this repository functional.</strong>
-
-
-## License
+# License
 
 PHUB uses GPLv3. See the `LICENSE` file.
 
-## Contributing
+This repository was initiated and maintained by [Egsagon](https://github.com/Egsagon)
+He doesn't have any time to maintain this and transferred me the ownership.
+I'll do my best to maintain this repository functional.
+
+# Contributing
 
 Feel free to contribute to this project by submitting
 feature requests, issues, bugs, or whatever.

@@ -6,7 +6,7 @@ import time
 import logging
 
 import requests
-from typing import Iterable
+from typing import Iterable, Union
 from functools import cached_property
 
 from . import utils
@@ -32,7 +32,7 @@ class Client:
                  password: str = None,
                  *,
                  language: literals.language = 'en,en-US',
-                 delay: int | float = 0,
+                 delay: Union[int, float] = 0,
                  proxies: dict = None,
                  login: bool = True) -> None:
         '''
@@ -143,7 +143,8 @@ class Client:
                     raise ConnectionError('Pornhub raised error 429: too many requests')
 
                 # Attempt to resolve the challenge if needed
-                if challenge := consts.re.get_challenge(response.text, False):
+                challenge = consts.re.get_challenge(response.text, False)
+                if challenge:
                     logger.info('Challenge found, attempting to resolve')
                     parser.challenge(self, *challenge)
                     
@@ -214,7 +215,7 @@ class Client:
         self.logged = bool(success)
         return self.logged
     
-    def get(self, video: str | Video) -> Video:
+    def get(self, video: Union[str, Video]) -> Video:
         '''
         Get a Pornhub video.
         
@@ -249,7 +250,7 @@ class Client:
         
         return Video(self, url)
 
-    def get_user(self, user: str | User) -> User:
+    def get_user(self, user: Union[str, User]) -> User:
         '''
         Get a Pornhub user.
         
@@ -270,7 +271,7 @@ class Client:
                query: str,
                *,
                category: literals.category = None,
-               tags: str | list[str] = None,
+               tags: Union[str, list[str]] = None,
                sort: literals.ht_sort = None,
                period: literals.ht_period = None) -> Query:
         '''
@@ -312,7 +313,7 @@ class Client:
                *,
                production: literals.production = None,
                category: literals.category = None,
-               exclude_category: literals.category | Iterable[literals.category] = None,
+               exclude_category: Union[literals.category, Iterable[literals.category]] = None,
                hd: bool = None,
                sort: literals.sort = None,
                period: literals.period = None) -> Query:
@@ -361,7 +362,7 @@ class Client:
             query_repr = query
         )
     
-    def get_playlist(self, playlist: str | int | Playlist) -> Playlist:
+    def get_playlist(self, playlist: Union[str, int, Playlist]) -> Playlist:
         '''
         Get a Pornhub playlist.
 
@@ -375,7 +376,7 @@ class Client:
             TypeError: If the playlist argument is invalid.
         '''
         
-        if not isinstance(playlist, str | int | Playlist):
+        if not isinstance(playlist, (str, int, Playlist)):
             raise TypeError(f'Invalid type: {type(playlist)} should be str, int or Playlist.')
         
         if isinstance(playlist, Playlist):

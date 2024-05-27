@@ -2,7 +2,7 @@
 PHUB Literals.
 '''
 
-from typing import Literal, Iterable, Type
+from typing import Literal, Iterable, Type, Union
 
 # Language locales
 language = Literal['en', 'cn', 'de', 'fr', 'it', 'pt', 'pl', 'rt', 'nl', 'cz', 'jp']
@@ -199,7 +199,7 @@ def _craft_list(args: Iterable[str]) -> str:
     if args:
         return '-'.join(list(args))
 
-def _craft_boolean(b: bool | None) -> int | None:
+def _craft_boolean(b: Union[bool, None]) -> Union[int, None]:
     '''
     Craft a boolean into a url-valid int.
     
@@ -213,7 +213,7 @@ def _craft_boolean(b: bool | None) -> int | None:
     if b is not None:
         return int(bool(b))
 
-def ass(name: str, item: str | list[str], literal: Type) -> None:
+def ass(name: str, item: Union[str, list[str]], literal: Type) -> None:
     '''
     Assert one or multiple items are part of a literal.
     

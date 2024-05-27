@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import logging
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Union
 
 from .. import utils
 
@@ -91,7 +91,7 @@ class Image:
                 self.download(path)
 
     def dictify(self,
-                keys: Literal['all'] | list[str] = 'all',
+                keys: Union[Literal['all'], list[str]] = 'all',
                 recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionary.

@@ -1,9 +1,9 @@
 [project]
 name = "phub"
-version = "4.6"
+version = "4.7"
 description = "An API for Pornhub"
 authors = [
-  {name = 'Egsagon', email = "egsagon12@gmail.com"},
+  {name = 'Egsagon', email = "egsagon.git@gmail.com"},
   {name = "EchterAlsFake", email = "EchterAlsFake@proton.me"}
 ]
 license = {file = "LICENSE"}
@@ -14,7 +14,7 @@ classifiers = [
   "Programming Language :: Python"
 ]
 dependencies = ["requests", "ffmpeg-progress-yield"]
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 
 [project.optional-dependencies]
 cli = ["click"]

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from functools import cached_property
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Self, Literal
+from typing import TYPE_CHECKING, Literal, Union
 
 from .. import utils
 from .. import consts
@@ -74,7 +74,7 @@ class User:
                 delattr(self, key)
 
     def dictify(self,
-                keys: Literal['all'] | list[str] = 'all',
+                keys: Union[Literal['all'], list[str]] = 'all',
                 recursive: bool = False) -> dict:
             '''
             Convert the object to a dictionary.
@@ -127,7 +127,8 @@ class User:
         
         if consts.re.is_url(user):
             url = user
-            user_type = (path := url.split('/'))[-2]
+            path = url.split('/')
+            user_type = path[-2]
             name = path[-1]
         
         else:
@@ -137,8 +138,9 @@ class User:
             for type_ in ('model', 'pornstar', 'channels'):            
                 
                 guess = utils.concat(type_, name)
+                response = utils.head(client, guess)
                 
-                if response := utils.head(client, guess):
+                if response:
                     logger.info('Guessing type of %s is %s', user, type_)
                     url = response
                     user_type = type_
@@ -162,8 +164,9 @@ class User:
         if utils.head(self.client, videos_url):
             index.videos = videos_url
         
-        if self.type == 'pornstar' and \
-           utils.head(self.client, upload_url := utils.concat(videos_url, 'upload')):
+        upload_url = utils.concat(videos_url, 'upload')
+        
+        if self.type == 'pornstar' and utils.head(self.client, upload_url):
             index.upload = upload_url
         
         return index
@@ -214,7 +217,7 @@ class User:
         return self.client.call(self.url).text
 
     @cached_property
-    def bio(self) -> str | None:
+    def bio(self) -> Union[str, None]:
         '''
         The user bio.
         '''

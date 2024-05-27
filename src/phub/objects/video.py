@@ -6,8 +6,7 @@ import random
 import logging
 from functools import cached_property
 from datetime import datetime, timedelta
-from typing import (TYPE_CHECKING, Iterator, Literal,
-                    LiteralString, Callable, Any)
+from typing import TYPE_CHECKING, Iterator, Literal, Callable, Any
 
 from . import Tag, Like, User, Image
 from .. import utils
@@ -545,7 +544,7 @@ class Video:
         return [item['category'] for item in self.fetch('data@categories')]
         
     @cached_property
-    def orientation(self) -> LiteralString:
+    def orientation(self) -> str:
         '''
         Video sexual orientation (e.g. straight).
         '''

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import TYPE_CHECKING, Self, Literal, Iterator
+from typing import TYPE_CHECKING, Literal, Iterator, Union
 
 from .. import utils
 from .. import consts
@@ -22,7 +22,7 @@ class Account:
     If the login fails, there will be None.
     '''
     
-    def __new__(cls, client: Client) -> Self | None:
+    def __new__(cls, client: Client) -> Union[object, None]:
         '''
         Check if the object creation is needed.
         
@@ -177,7 +177,7 @@ class Account:
         return Feed(self.client)
     
     def dictify(self,
-                keys: Literal['all'] | list[str] = 'all',
+                keys: Union[Literal['all'], list[str]] = 'all',
                 recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionary.

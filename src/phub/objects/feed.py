@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
-from typing import TYPE_CHECKING, Callable, Iterator
+from typing import TYPE_CHECKING, Callable, Iterator, Union
 
 from .. import literals
 from . import User, FeedItem
@@ -37,7 +37,7 @@ class Feed:
     
     def filter(self,
                section: literals.section = None,
-               user: User | str = None) -> queries.FeedQuery:
+               user: Union[User, str] = None) -> queries.FeedQuery:
         '''
         Creates a Feed Query with specific filters.
         

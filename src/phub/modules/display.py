@@ -1,9 +1,9 @@
 import os
 import sys
 import time
-from typing import Callable
+from typing import Callable, Union
 
-def progress(color: dict  | None = dict(c1=30, c2=33, c3=34, c4=36), desc: str = 'Downloading') -> Callable:
+def progress(color: Union[dict, None] = dict(c1=30, c2=33, c3=34, c4=36), desc: str = 'Downloading') -> Callable:
     '''
     Simple progress display, with segment, percentage and speed display.
     

@@ -4,9 +4,10 @@ import time
 import logging
 import requests.adapters
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable
-from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
 from ffmpeg_progress_yield import FfmpegProgress
+from typing import TYPE_CHECKING, Callable, Union
+from concurrent.futures import ThreadPoolExecutor as Pool, as_completed
+
 from .. import consts
 
 if TYPE_CHECKING:
@@ -17,7 +18,6 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 CallbackType = Callable[[int, int], None]
-
 
 
 def default(video: Video,
@@ -72,7 +72,7 @@ def default(video: Video,
     
     logger.info('Downloading successful.')
 
-def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: str | Path, start: int = 0) -> None:
+def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: Union[str, Path], start: int = 0) -> None:
     '''
     Download using FFMPEG with real-time progress reporting.
     FFMPEG must be installed on your system.
@@ -115,7 +115,6 @@ def FFMPEG(video: Video, quality: Quality, callback: CallbackType, path: str | P
     except Exception as err:
         logger.error('Error while downloading: %s', err)
 
-
 def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
     Download a single segment using the client's call method.
@@ -129,7 +128,6 @@ def _thread(client: Client, url: str, timeout: int) -> bytes:
     except Exception as e:
         logging.warning(f"Failed to download segment {url}: {e}")
         return (url, b'', False)
-
 
 # Modify _base_threaded to use ThreadPoolExecutor
 def _base_threaded(client: Client, segments: list[str], callback: CallbackType, max_workers: int = 20,
@@ -161,7 +159,6 @@ def _base_threaded(client: Client, segments: list[str], callback: CallbackType, 
 
     client.session.mount('https://', old_adapter)
     return buffer
-
 
 def threaded(max_workers: int = 20,
              timeout: int = 10) -> Callable:

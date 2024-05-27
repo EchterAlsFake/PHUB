@@ -5,7 +5,7 @@ PHUB constants.
 import logging
 import re as engine
 from re import Pattern as p
-from typing	import Callable
+from typing	import Callable, Union
 
 from . import errors
 
@@ -63,7 +63,7 @@ FEED_CLASS_TO_CONST = {
 
 # Regex wrappers
 
-WrappedRegex = Callable[[str, bool | None], str | list[str]]
+WrappedRegex = Callable[[str, Union[bool, None]], Union[str, list[str]]]
 
 def _throw_re_error(pattern: str) -> None:
     '''

@@ -4,7 +4,7 @@ PHUB utilities.
 
 import math
 import logging
-from typing import Generator, Iterable, Iterator
+from typing import Generator, Iterable, Iterator, Union
 
 from . import errors
 
@@ -108,7 +108,7 @@ def serialize(object_: object, recursive: bool = False) -> object:
     '''
     
     # if an object is a built-in
-    if isinstance(object_, str | int | float | bool):
+    if isinstance(object_, (str, int, float, bool)):
         ser = object_
     
     # If an object is a PHUB object
@@ -124,7 +124,7 @@ def serialize(object_: object, recursive: bool = False) -> object:
         ser = {k: (serialize(v, True)) for k, v in object_.items()}
     
     # If an object is a list or a generator
-    elif isinstance(object_, list | tuple | Generator | Iterator | map):
+    elif isinstance(object_, (list, tuple, Generator, Iterator, map)):
         ser = [serialize(value, True) for value in object_]
     
     else:
@@ -133,7 +133,7 @@ def serialize(object_: object, recursive: bool = False) -> object:
     return ser
 
 def dictify(object_: object,
-            keys: str | list[str],
+            keys: Union[str, list[str]],
             all_: list[str],
             recursive: bool) -> dict:
     '''
@@ -155,7 +155,7 @@ def dictify(object_: object,
     return {key: serialize(getattr(object_, key), recursive)
             for key in keys}
 
-def suppress(gen: Iterable, errs: Exception | tuple[Exception] = errors.VideoError) -> Iterator:
+def suppress(gen: Iterable, errs: Union[Exception, tuple[Exception]] = errors.VideoError) -> Iterator:
     '''
     Set up a generator to bypass items that throw errors.
     
@@ -221,7 +221,7 @@ def least_factors(n: int) -> int:
 
     return n
 
-def head(client: object, url: str) -> str | bool:
+def head(client: object, url: str) -> Union[str, bool]:
     '''
     Performs a silent HEAD request to check if a page is available
     without fetching its content.

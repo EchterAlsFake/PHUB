@@ -1,30 +1,11 @@
 <p align="center">
-  <img width="300" src="https://raw.githubusercontent.com/Egsagon/PHUB/master/assets/logo.svg">
+  <img width="200" src="https://raw.githubusercontent.com/Egsagon/PHUB/master/assets/logo.svg">
 </p>
 
 # PHUB - An API wrapper for PornHub.
 
-PHUB is a hybrid API for Pornhub. It is able to communicate with Pornhub
-using both web-scraping and Pornhub's HubTraffic API. It is
-able to access most used or useful PH features, such as video searching,
-accessing account features, video downloading, and a lot more.
+PHUB is an easy-to-use API wrapper for Pornhub. It can access most used or useful
+PH features, such as video searching, account features, video downloading, and more.
 
-Learn more on the project [documentation](https://phub.readthedocs.io) and
-[GitHub page](https://github.com/EchterAlsFake/PHUB).
-
-## Installation
-
-```sh
-pip install --upgrade phub
-```
-
-## Quickstart
-
-```python
-import phub
-
-client = phub.Client()
-
-video = client.get(url = '...')
-video.download('my-video.mp4', quality = 'best')
-```
+- Project documentation: [phub.readthedocs.io](https://phub.readthedocs.io)
+- Project repository: [EchterAlsFake/PHUB](https://github.com/EchterAlsFake/PHUB)

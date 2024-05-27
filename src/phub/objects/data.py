@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import cached_property
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Literal, Self
+from typing import TYPE_CHECKING, Literal, Union
 
 from .. import utils
 from .. import consts
@@ -28,7 +28,7 @@ class Tag:
         return self.name == __value.name
     
     def dictify(self,
-                keys: Literal['all'] | list[str] = 'all',
+                keys: Union[Literal['all'], list[str]] = 'all',
                 recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionary.
@@ -54,7 +54,7 @@ class Like:
     ratings: float = field(repr = False)
     
     def dictify(self,
-                keys: Literal['all'] | list[str] = 'all',
+                keys: Union[Literal['all'], list[str]] = 'all',
                 recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionary.
@@ -83,7 +83,7 @@ class FeedItem:
         return f'FeedItem(type={self.item_type})'
     
     def dictify(self,
-                keys: Literal['all'] | list[str] = 'all',
+                keys: Union[Literal['all'], list[str]] = 'all',
                 recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionary.
@@ -160,7 +160,7 @@ class _BaseQuality:
     itself among a list of qualities.
     '''
     
-    def __init__(self, value: Literal['best', 'half', 'worst'] | int | Self) -> None:
+    def __init__(self, value: Union[Literal['best', 'half', 'worst'], int, object]) -> None:
         '''
         Initialize a new quality object.
         
@@ -211,7 +211,8 @@ class _BaseQuality:
         elif isinstance(self.value, int):
             # Get exact quality or nearest
             
-            if (s:= str(self.value)) in keys: return qualities[s]
+            raw = str(self.value)
+            if raw in keys: return qualities[raw]
             else: return qualities[utils.closest(keys, self.value)]
         
         # This should not happen

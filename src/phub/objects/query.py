@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import logging
 from functools import cache, cached_property
-from typing import TYPE_CHECKING, Iterator, Any, Callable
+from typing import TYPE_CHECKING, Iterator, Any, Callable, Union
 
 from . import Video, User, FeedItem
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-QueryItem = Video | FeedItem | User
+QueryItem = Union[Video, FeedItem, User]
 
 class Pages:
     '''
@@ -34,7 +34,7 @@ class Pages:
         
         return f'phub.Pages(query={self.query})'
     
-    def __getitem__(self, index: int | slice) -> Iterator[QueryItem] | Iterator[Iterator[QueryItem]]:
+    def __getitem__(self, index: Union[int, slice]) -> Union[Iterator[QueryItem], Iterator[Iterator[QueryItem]]]:
         '''
         Get a single, or slice of pages.
         '''
@@ -74,7 +74,7 @@ class Query:
                  client: Client,
                  func: str,
                  args: dict[str] = {},
-                 container_hint: consts.WrappedRegex | Callable = None,
+                 container_hint: Union[consts.WrappedRegex, Callable] = None,
                  query_repr: str = None) -> None:
         '''
         Initialise a new query.
@@ -137,8 +137,8 @@ class Query:
     def sample(self,
                max: int = 0,
                filter: Callable[[QueryItem], bool] = None,
-               watched: bool | None = None,
-               free_premium: bool | None = None) -> Iterator[QueryItem]:
+               watched: Union[bool, None] = None,
+               free_premium: Union[bool, None] = None) -> Iterator[QueryItem]:
         '''
         Get a sample of the query.
         
