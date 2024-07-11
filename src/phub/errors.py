@@ -69,4 +69,11 @@ class VideoError(Exception):
     is not available).
     '''
 
+
+class RegionBlocked(Exception):
+    """
+    Sometimes videos can be blocked in your region.
+    In this case PHUB can't fetch data.
+    """
+
 # EOF
