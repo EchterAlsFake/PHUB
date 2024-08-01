@@ -83,6 +83,7 @@ class Client:
         
         # Initialise session
         self.session = requests.Session()
+        self.session.headers = consts.HEADERS
         self._clear_granted_token()
         
         # Insert cookies
