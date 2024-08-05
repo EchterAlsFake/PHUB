@@ -10,7 +10,7 @@ Using a client to login
     It only sends your credentials to the official Pornhub
     servers. Fore more information, have a look at the source `code`_.
 
-.. _code: https://github.com/Egsagon/PHUB 
+.. _code: https://github.com/EchterAlsFake/PHUB 
 
 You can use the :py:class:`.Client` object to login
 to some Pornhub account:

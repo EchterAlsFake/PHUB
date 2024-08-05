@@ -37,7 +37,7 @@ class MaxRetriesExceeded(Exception):
 
 class UserNotFound(Exception):
     '''
-    User could not be foundn either because
+    User could not be found either because
     it does not exists, or its name/URL is wrong.
     '''
 
@@ -50,16 +50,7 @@ class NoResult(Exception):
 
 class InvalidCategory(Exception):
     '''
-    The category is invalid. This happens
-    while trying to make Temporary
-    categories behave like normal categories.
-    This can usually be fixed by updating
-    PHUB constants:
-    
-    .. code-block:: bash
-    
-        python -m phub update_locals
-    
+    The category is invalid.
     '''
 
 class VideoError(Exception):
@@ -68,7 +59,6 @@ class VideoError(Exception):
     of some internal error (mostly because the video
     is not available).
     '''
-
 
 class RegionBlocked(Exception):
     """

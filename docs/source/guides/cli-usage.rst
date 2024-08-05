@@ -23,7 +23,6 @@ It uses the `click`_ dependency.
 
 Input
     can be a video URL or a file containing multiple URLs.
-    quality
 
 Output
     Output video file or directory. If you are downloading multiple

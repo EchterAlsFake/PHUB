@@ -24,7 +24,7 @@ PHUB uses the following dependencies:
 
 .. code-block:: bash
 
-    pip install --upgrade git+https://github.com/Egsagon/PHUB.git
+    pip install --upgrade git+https://github.com/EctherAlsFake/PHUB.git
 
 You can use PHUB as a :doc:`CLI </guides/cli-usage>`,
 a :doc:`GUI </guides/gui-usage>` or a :doc:`Python package </guides/pkg-usage>`. 

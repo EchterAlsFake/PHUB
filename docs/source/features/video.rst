@@ -17,72 +17,91 @@ You can use the following properties on a video:
     :header-rows: 1
 
     * - Property
+      - Type
       - Description
     
     * - :literal:`video.title`
+      - :py:class:`str`
       - Video title. Might depend on client language.
     
     * - :literal:`video.image`
-      - Video thumbnail, as a :py:class:`.Image` object.
+      - :py:class:`.Image`
+      - The video thumbnail.
 
     * - :literal:`video.is_vertical`
-      - Whether the video is in vertical (phone) mode, as a :py:class:`bool`.
+      - :py:class:`bool`
+      - Whether the video is in vertical (phone) mode.
 
     * - :literal:`video.orientation`
+      - :py:class:`str`
       - The sexual orientation of the video (straight, gay, etc.).
     
     * - :literal:`video.duration`
-      - The length of the video, as a :py:class:`datetime.timedelta` object.
+      - :py:class:`datetime.timedelta`
+      - The length of the video.
 
     * - :literal:`video.tags`
-      - List of video tags. Each tag is represented as a :py:class:`.Tag` object.
+      - :py:class:`list[.Tag]`
+      - List of video tags.
 
     * - :literal:`video.like`
-      - Votes representation as a :py:class:`.Like` object.
+      - :py:class:`int`
+      - Likes amount of the video.
 
     * - :literal:`video.views`
-      - The video views (:py:class:`int`).
+      - :py:class:`int`
+      - Number of views of the video.
 
     * - :literal:`video.hotspots`
-      - Video hotspots. Used by Pornhub player to display hot moments. Represented as an :py:class:`int` generator.
+      - :py:class:`list[int]`
+      - Timestamps of the video hotspots. Used by Pornhub player to display hot moments.
 
     * - :literal:`video.date`
-      - The video release date, as a :py:class:`datetime.datetime` object.
+      - :py:class:`datetime.datetime`
+      - The video publication date.
 
     * - :literal:`video.pornstars`
+      - :py:class:`.User`
       - Pornstars in the video, represented as a list of :py:class:`.User` objects.
 
     * - :literal:`video.categories`
+      - :py:class:`list[str]`
       - The video categories.
     
     * - :literal:`video.author`
-      - The user account that posted the video, as a :py:class:`.User` object.
+      - :py:class:`.User`
+      - The user account that posted the video.
 
     * - :literal:`video.id`
-      - The video internal id. Most likely to be used in Pornhub's databases.
+      - :py:class:`int`
+      - The video ID, used internally by Pornhub. Not to be confused with the video viewkey.
     
     * - :literal:`video.watched`
-      - Whether the video has been watched by the client (Will not work in some cases).
+      - :py:class:`bool`
+      - Whether the video has been watched by the client (will not work in some cases).
     
     * - :literal:`video.is_free_premium`
-      - Whether the video is part of Pornhub free premium plan (Will not work in some cases).
+      - :py:class:`bool`
+      - Whether the video is part of Pornhub free premium plan (will not work in some cases).
 
     * - :literal:`video.preview`
-      - The small preview you see when hovering a video, as a :py:class:`.Image` object (Will not work in some cases).
+      - :py:class:`.Image`
+      - The small preview you see when hovering a video (will not work in some cases).
     
     * - :literal:`video.is_favorite`
+      - :py:class:`bool`
       - Whether the video is set a favorite by the client.
 
     * - :literal:`video.is_HD`
+      - :py:class:`bool`
       - Whether the video is available in a High Definition quality.
     
     * - :literal:`video.is_VR`
+      - :py:class:`bool`
       - Whether the video is available in VR.
 
-    * - :literal:`video.id`
-      - The internal video ID, used for API calls (different than the viewkey).
-    
     * - :literal:`video.embed`
+      - :py:class:`str`
       - The video embed URL, if you want to integrate it into a website.
 
 .. warning::
@@ -127,7 +146,7 @@ As of version 4.3, some interactions are available with the video:
 Refreshing data
 ---------------
 
-Refreshing `.Video` objects is done through the :meth:`.Video.refresh` method.
+Refreshing :py:class:`.Video` objects is done through the :meth:`.Video.refresh` method.
 
 .. code-block:: python
 
