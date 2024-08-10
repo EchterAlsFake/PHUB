@@ -258,7 +258,7 @@ class Client:
             Video: The corresponding video object.
         '''
         
-        logger.debug('Fetching video at', video)
+        logger.debug(f'Fetching video at {video}')
 
         if isinstance(video, Video):
             # User might want to re-init a video,
