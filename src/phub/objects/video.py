@@ -8,8 +8,6 @@ from functools import cached_property
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Iterator, Literal, Callable, Any
 
-import requests
-
 from . import Tag, Like, User, Image
 from .. import utils
 from .. import errors
@@ -50,14 +48,13 @@ class Video:
         self.use_webmaster_api = use_webmaster_api
         self.url = url
         self.key = consts.re.get_viewkey(url)
-
-        if self.use_webmaster_api:
-            self.page = self.fetch("page@")
-            if not self.page:
-                logger.error("Error fetching video page, using webmasters instead!")
-                self.page: str = None  # The video page content
-
         self.data: dict = {}  # The video webmasters data
+
+        if self.use_webmaster_api is False:
+            self.page = self.fetch("page@")
+
+        else:
+            self.page: str = None  # The video page content
 
         # Save data keys so far, so we can make a difference with the
         # cached property ones.
@@ -113,7 +110,7 @@ class Video:
         if '|' in key:
             datakey, pagekey = key.split('|')
 
-            if self.page and not self.use_webmaster_api:
+            if self.page and self.use_webmaster_api is False:
                 key = 'page@' + pagekey
 
             else:
@@ -126,8 +123,7 @@ class Video:
         logger.debug('Fetching %s key %s', self, key)
 
         # Fetch only webmasters data
-        if key.startswith('data@') and not self.use_webmaster_api:
-
+        if key.startswith('data@'):
             url = utils.concat(consts.API_ROOT, 'video_by_id?id=' + self.key)
             data = self.client.call(url).json()
 
@@ -147,7 +143,6 @@ class Video:
             self.page = self.client.call(self.url).text
             data = parser.resolve(self)
             self.data |= {f'page@{k}': v for k, v in data.items()}
-            print(self.data)
 
         return self.data.get(key)
 
