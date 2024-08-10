@@ -17,7 +17,6 @@ API_ROOT = HOST + 'webmasters/'
 
 HEADERS = {
     'Accept': '*/*',
-    'Accept-Encoding': 'gzip, deflate, br',
     'Accept-Language': 'en,en-US',
     'Connection': 'keep-alive',
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0'
@@ -53,6 +52,26 @@ IFRAME = '<iframe src="https://www.pornhub.com/embed/{key}" frameborder="0" widt
 
 # Supported languages
 LANGUAGES = [ 'en', 'cn', 'de', 'fr', 'it', 'pt', 'pl', 'rt', 'nl', 'cz', 'jp' ]
+LANGUAGE_MAPPING = {
+    "en": "www.pornhub.com",
+    "cn": "www.cn.pornhub.com",
+    "de": "www.de.pornhub.org",
+    "fr": "www.fr.pornhub.com",
+    "it": "www.it.pornhub.com",
+    "pt": "www.pt.pornhub.com",
+    "pl": "www.pl.pornhub.com",
+    "rt": "www.rt.pornhub.com",
+    "nl": "www.nl.pornhub.com",
+    "cz": "www.cz.pornhub.com",
+    "jp": "www.jp.pornhub.com"}
+
+GEO_BYPASS_IPs = [
+    "185.238.219.36",
+    "185.238.219.57",
+    "185.238.219.18",
+    "185.238.219.57",
+    "185.238.219.18"  # French IPs from ProtonVPN Plus servers
+]
 
 FEED_CLASS_TO_CONST = {
     'stream_videos_uploaded': 'Section.VIDEO',
@@ -243,6 +262,7 @@ class re:
     is_video_url             = comp(                p.fullmatch, _raw_root + r'view_video\.php\?viewkey=(?:ph)?[a-z\d]{3,}(&pkey=\d+)?'        ) # Check if a video URL is valid
     is_quality               = comp(                p.fullmatch, r'\d+p?'                                                                      ) # Check if is a video quality
     is_playlist              = comp(                p.fullmatch, r'^https?:\/\/(?:www\.)?(?:[a-z]{2}\.)?pornhub\.[a-z]{2,3}\/playlist\/\d+$'   )  # Checks if it's a playlist
+    fixed_title = find(engine.DOTALL, r'(?<="name": ")[^"]+')
 
 # Attach regex names representation to their wrapper for error display purposes
 _REGEXES_NAMES = {v.__doc__: k for k, v in vars(re).items() if v.__doc__}

@@ -4,6 +4,7 @@ PHUB core module.
 
 import time
 import logging
+import random
 
 import requests
 from typing import Iterable, Union
@@ -21,6 +22,7 @@ from .objects import (Video, User,
 
 logger = logging.getLogger(__name__)
 
+
 class Client:
     '''
     Represents a client capable of handling requests
@@ -31,10 +33,13 @@ class Client:
                  email: str = None,
                  password: str = None,
                  *,
-                 language: literals.language = 'en,en-US',
+                 language: literals.language = 'en',
                  delay: Union[int, float] = 0,
                  proxies: dict = None,
-                 login: bool = True) -> None:
+                 login: bool = True,
+                 bypass_geo_blocking: bool = False,
+                 change_title_language: bool = True,
+                 use_webmaster_api: bool = True) -> None:
         '''
         Initialises a new client.
         
@@ -45,19 +50,26 @@ class Client:
             delay (int | float): Minimum delay between requests.
             proxies (dict): Dictionary of proxies for the requests.
             login (bool): Whether to directly log in after initialization.
-        
+            bypass_geo_blocking (bool): Whether to bypass geo-blocking.
+            change_title_language (bool): Whether to change title language into your language based on the input URL
+            use_webmaster_api (bool): Whether to use the webmaster API or HTML content extraction
         Raises:
             LoginFailed: If Pornhub refuses the authentification.
                 The reason will be passed as the error body.
         '''
         
         logger.debug('Initialised new Client %s', self)
-        
+
         # Initialise session
+        self.language = language
+        self.change_title_language = change_title_language
+        self.bypass_geo_blocking = bypass_geo_blocking
+        self.use_webmaster_api = use_webmaster_api
+
         self.reset()
-        
+
+        self.session.headers.update({"Accept-Language": language})
         self.proxies = proxies
-        self.language = {'Accept-Language': language}
         self.credentials = {'email': email,
                             'password': password}
         
@@ -80,20 +92,32 @@ class Client:
         This is useful if you are keeping the client running
         for a long time and can help with Pornhub rate limit.
         '''
-        
+
         # Initialise session
         self.session = requests.Session()
-        self.session.headers = consts.HEADERS
         self._clear_granted_token()
         
-        # Insert cookies
+        # Insert cookies & headers
+        self.session.headers = consts.HEADERS
         self.session.cookies.update(consts.COOKIES)
+
+        if self.bypass_geo_blocking:
+            ip = random.choice(consts.GEO_BYPASS_IPs)
+            language_code = "fr"
+
+            # Faking the X-Forwarded-For header (Fake IP source)
+            self.session.headers.update({"X-Forwarded-For": f"{ip}"})
+            # Setting the Accept-Language tag to French, because the faked IP comes from france
+            self.session.headers.update({"Accept-Language": f"{language_code}"})
+            # Setting the country code also to french
+            self.session.headers.update({"CF-IPCountry": f"{language_code}"})
+            logging.debug(f"Using faked headers for geo-bypass: {self.session.headers}")
 
     def call(self,
              func: str,
              method: str = 'GET',
              data: dict = None,
-             headers: dict = {},
+             headers: dict = None,
              timeout: float = consts.CALL_TIMEOUT,
              throw: bool = True,
              silent: bool = False) -> requests.Response:
@@ -127,7 +151,14 @@ class Client:
 
         self.last_request_time = time.time()  # Update the time of the last request
 
-        url = func if 'http' in func else utils.concat(consts.HOST, func)
+        if not self.language == "en":
+            host = consts.LANGUAGE_MAPPING.get(self.language)
+            logging.debug(f"Changed PornHub root host to: {host}")
+
+        else:
+            host = consts.HOST
+
+        url = func if 'http' in func else utils.concat(host, func)
 
         for i in range(consts.MAX_CALL_RETRIES):
             try:
@@ -249,7 +280,8 @@ class Client:
             
             url = utils.concat(consts.HOST, 'view_video.php?viewkey=' + key)
         
-        return Video(self, url)
+        return Video(self, url, change_title_language=self.change_title_language,
+                     use_webmaster_api=self.use_webmaster_api)
 
     def get_user(self, user: Union[str, User]) -> User:
         '''

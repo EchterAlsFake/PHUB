@@ -36,7 +36,7 @@ def resolve(video: Video) -> dict:
         obj = json.loads(ctx)
         return obj
     
-    except:
+    except Exception:
         logger.error('Failed to parse flash %s for video %s', flash, video)
         raise errors.ParsingError('Failed to resolve page for', video)
 
