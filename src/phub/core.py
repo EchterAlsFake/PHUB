@@ -6,7 +6,7 @@ import time
 import logging
 import random
 
-import requests
+import httpx
 from typing import Iterable, Union
 from functools import cached_property
 
@@ -94,12 +94,13 @@ class Client:
         '''
 
         # Initialise session
-        self.session = requests.Session()
-        self._clear_granted_token()
+        self.session = httpx.Client(
+            headers = consts.HEADERS,
+            cookies = consts.COOKIES,
+            follow_redirects = True
+        )
         
-        # Insert cookies & headers
-        self.session.headers = consts.HEADERS
-        self.session.cookies.update(consts.COOKIES)
+        self._clear_granted_token()
 
         if self.bypass_geo_blocking:
             ip = random.choice(consts.GEO_BYPASS_IPs)
@@ -120,7 +121,7 @@ class Client:
              headers: dict = None,
              timeout: float = consts.CALL_TIMEOUT,
              throw: bool = True,
-             silent: bool = False) -> requests.Response:
+             silent: bool = False) -> httpx.Response:
         '''
         Used internally to send a request or an API call.
 
@@ -167,7 +168,7 @@ class Client:
                     url = url,
                     headers = headers,
                     data = data,
-                    timeout = timeout,
+                    timeout = timeout
                 )
 
                 # Silent 429 errors
