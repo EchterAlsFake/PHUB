@@ -49,7 +49,7 @@ def default(video: Video,
             try:
                 segment = video.client.call(url, throw = False, timeout = 4, silent = True)
                 
-                if segment.ok:
+                if segment.is_success:
                     buffer += segment.content
                     callback(i + 1, length)
                     break

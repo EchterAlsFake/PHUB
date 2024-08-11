@@ -3,6 +3,7 @@ PHUB utilities.
 '''
 
 import math
+import httpx
 import logging
 from typing import Generator, Iterable, Iterator, Union
 
@@ -234,10 +235,10 @@ def head(client: object, url: str) -> Union[str, bool]:
         str | bool: The redirect URL if success, False otherwise.
     '''
     
-    res = client.call(url, 'HEAD', throw = False, silent = True)
+    res: httpx.Response = client.call(url, 'HEAD', throw = False, silent = True)
     
     # Make sure we were not redirected
-    if res.ok and res.url.endswith(url):
+    if res.is_success and not res.has_redirect_location:
         return res.url
     return False
 
