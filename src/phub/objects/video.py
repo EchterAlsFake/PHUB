@@ -39,6 +39,7 @@ class Video:
             url (str): The video URL.
         '''
 
+        url = utils.fix_url(url)
         if not consts.re.is_video_url(url):
             raise errors.URLError('Invalid video URL:', url)
 
