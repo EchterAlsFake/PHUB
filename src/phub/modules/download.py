@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import time
 import logging
-import requests.adapters
 from pathlib import Path
 from ffmpeg_progress_yield import FfmpegProgress
 from typing import TYPE_CHECKING, Callable, Union
@@ -50,7 +49,7 @@ def default(video: Video,
             try:
                 segment = video.client.call(url, throw = False, timeout = 4, silent = True)
                 
-                if segment.ok:
+                if segment.is_success:
                     buffer += segment.content
                     callback(i + 1, length)
                     break
@@ -122,7 +121,7 @@ def _thread(client: Client, url: str, timeout: int) -> bytes:
     '''
     try:
         response = client.call(url, timeout=timeout, silent=True)
-        response.raise_for_status()  # Assuming client.call returns an object with a similar interface to requests.Response
+        response.raise_for_status()
         return (url, response.content, True)
 
     except Exception as e:
@@ -138,11 +137,7 @@ def _base_threaded(client: Client, segments: list[str], callback: CallbackType, 
     logging.info('Threaded download initiated')
     buffer = {}
     length = len(segments)
-    logger.info('Mounting download adapter')
-    old_adapter = client.session.adapters.get('https://')
-    adapter = requests.adapters.HTTPAdapter(pool_maxsize = max_workers)
-    client.session.mount('https://', adapter)
-
+    
     with Pool(max_workers=max_workers) as executor:
         future_to_url = {executor.submit(_thread, client, url, timeout): url for url in segments}
 
@@ -157,7 +152,6 @@ def _base_threaded(client: Client, segments: list[str], callback: CallbackType, 
             except Exception as e:
                 logging.warning(f"Error processing segment {url}: {e}")
 
-    client.session.mount('https://', old_adapter)
     return buffer
 
 def threaded(max_workers: int = 20,

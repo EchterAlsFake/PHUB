@@ -27,3 +27,5 @@ def test_playlist_objects():
     assert isinstance(playlist.author, User)
     assert isinstance(playlist.title, str) and len(playlist.title) >= 1
     assert isinstance(playlist.tags, list)
+
+# EOF
