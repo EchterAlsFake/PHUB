@@ -91,7 +91,7 @@ class User:
                                               'bio', 'info', 'avatar'], recursive)
 
     @classmethod
-    def from_video(cls, video: Video) -> Self:
+    def from_video(cls, video: Video) -> 'User':
         '''
         Find the author of a video.
         
@@ -113,7 +113,7 @@ class User:
                    url = utils.concat(consts.HOST, guess[0]))
     
     @classmethod
-    def get(cls, client: Client, user: str) -> Self:
+    def get(cls, client: Client, user: str) -> 'User':
         '''
         Fetch a user knowing its name or URL.
         Note - Using only a username makes the fetch between

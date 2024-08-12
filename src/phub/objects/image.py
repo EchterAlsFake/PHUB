@@ -37,12 +37,12 @@ class Image:
         self.url = url
         self.name = name
         self.client = client
-        self._servers = servers
+        self._servers = servers or []
         
         logger.debug('Generated new image object: %s', self)
         
         # Check server image sizes
-        sizes = [s.get('size') for s in servers]
+        sizes = [s.get('size') for s in self._servers]
         
         if len(set(sizes)) > 1:
             logger.warning('Detected different image sizes on alt servers: %s', sizes)

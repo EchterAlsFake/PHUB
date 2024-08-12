@@ -34,3 +34,5 @@ def test_uploads():
     if len(total_uploads) >= 1:
         for upload in model.uploads:
             assert isinstance(upload.title, str) and len(upload.title) > 3
+
+# EOF
