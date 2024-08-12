@@ -8,6 +8,7 @@ import logging
 from typing import Generator, Iterable, Iterator, Union
 
 from . import errors
+from . import consts
 
 logger = logging.getLogger(__name__)
 
@@ -242,4 +243,22 @@ def head(client: object, url: str) -> Union[str, bool]:
         return res.url
     return False
 
-# EOF
+
+def fix_url(url: str):
+    """
+    Changes a URL which includes the specific language site of PornHub to the default www.pornhub.com/org format,
+    so that PornHub respects the accept-language header, so that we can apply our own custom language into the Client.
+
+    Args:
+        url: (str): The video URL to be changed
+
+    Returns:
+        str: The video URL without the language site.
+    """
+
+    for language, root_url in consts.LANGUAGE_MAPPING.items():
+        if f"{language}.pornhub" in url:
+            url = url.replace(language, "www", 1)
+            return url
+
+    return url  # Sometimes URL doesn't need to be changed. In this case, just return it.

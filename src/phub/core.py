@@ -141,7 +141,7 @@ class Client:
             ConnectionError: If the request was blocked by Pornhub.
             HTTPError: If the request failed, for any reason.
         '''
-
+        func = utils.fix_url(func)
         logger.log(logging.DEBUG if silent else logging.INFO, 'Fetching %s', func or '/')
 
         # Delay mechanism
