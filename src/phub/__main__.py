@@ -2,8 +2,15 @@
 PHUB built-in CLI.
 '''
 import os
-import click
 import phub
+
+try:
+    import click
+
+except (ModuleNotFoundError, ImportError):
+    print("The CLI needs 'click' in order to work. Please do: 'pip install click'")
+    exit()
+
 
 @click.command()
 @click.argument('input')
