@@ -20,7 +20,7 @@ requires-python = ">=3.9"
 cli = ["click"]
 
 [project.scripts]
-phub-cli = "phub.__main__:main"
+phub = "phub.__main__:main"
 
 [project.urls]
 Documentation = "https://phub.readthedocs.io"
