@@ -19,6 +19,9 @@ requires-python = ">=3.9"
 [project.optional-dependencies]
 cli = ["click"]
 
+[project.scripts]
+phub-cli = "phub.__main__:main"
+
 [project.urls]
 Documentation = "https://phub.readthedocs.io"
 Repository = "https://github.com/EchterAlsFake/PHUB"
