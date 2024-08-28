@@ -9,7 +9,7 @@ See https://github.com/EchterAlsFake/PHUB for code.
 __author__ = 'Egsagon, EchterAlsFake'
 __copyright__ = 'Copyright 2024, PHUB'
 __license__ = 'GPLv3'
-__version__  = '4.7'
+__version__  = '4.7.2'
 
 __all__ = ['Client', 'Quality', 'core', 'utils',
            'consts', 'errors', 'objects', 'modules']
