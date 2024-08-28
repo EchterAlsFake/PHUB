@@ -9,11 +9,11 @@ It uses the `click`_ dependency.
 
 .. code-block:: bash
 
-    $ python -m phub
+    $ phub
 
 .. code-block:: bash
 
-    Usage: python -m phub [OPTIONS] INPUT
+    Usage: phub [OPTIONS] INPUT
 
     Options:
     --output TEXT      Output file or directory

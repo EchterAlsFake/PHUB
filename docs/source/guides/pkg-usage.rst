@@ -12,6 +12,24 @@ locale [1]_ (``en`` by default). This will
 affect searching preferences, video titles,
 etc.
 
+Titles will by default be forced to change.
+You can disable this behaviour, by setting
+`change_title_language = off`.
+
+
+You can also do a geo-bypass, although this hasn't
+been tested well, so no guarantee.
+
+set `bypass_geo_blocking = True`, this will fake your
+IP and country, similar how youtube-dl does.
+
+Aside from that, you can also switch between
+webmaster and HTML parsing. Webmaster is the official
+PornHub API, while HTML parsing fetches the
+regular HTML page to extract data.
+
+You can switch with: `use_webmaster_api = True` or False.
+
 .. code-block:: python
 
     import phub
