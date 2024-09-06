@@ -6,19 +6,13 @@ try:
 except (ModuleNotFoundError, ImportError):
     from ...phub import Client
 
-client = Client(
-    email = os.getenv('EMAIL'),
-    password = os.getenv('PASSWORD'),
-    login = False
-)
-
 def test_auth():
     
-    # client.login()
+    client = Client(
+        email = os.getenv('EMAIL'),
+        password = os.getenv('PASSWORD')
+    )
     
-    # assert client.account
-    
-    pass
-
+    assert client.account
 
 # EOF
