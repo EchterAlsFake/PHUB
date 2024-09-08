@@ -10,9 +10,12 @@ def test_auth():
     
     client = Client(
         email = os.getenv('EMAIL'),
-        password = os.getenv('PASSWORD')
+        password = os.getenv('PASSWORD'),
+        login = False
     )
     
-    assert client.account
+    client.login()
+    
+    assert client.logged
 
 # EOF
