@@ -25,5 +25,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest httpx[brotli,socks] ffmpeg-progress-yield
     - name: Test with pytest
+      env:
+        EMAIL: ${{ secrets.EMAIL }}
+        PASSWORD: ${{ secrets.PASSWORD }}
       run: |
         pytest

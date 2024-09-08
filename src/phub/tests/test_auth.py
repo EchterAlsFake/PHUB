@@ -8,12 +8,12 @@ except (ModuleNotFoundError, ImportError):
 
 def test_auth():
     
-    client = Client(
-        email = os.getenv('EMAIL'),
-        password = os.getenv('PASSWORD'),
-        login = False
-    )
+    email = os.getenv('EMAIL')
+    password = os.getenv('PASSWORD')
     
+    assert email and password
+    
+    client = Client(email, password, login = False)
     client.login()
     
     assert client.logged
