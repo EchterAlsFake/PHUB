@@ -9,6 +9,13 @@
 </div>
 
 <br>
+
+> [!WARNING]
+> This branch was made to support PHUB on Android for my Porn Fetch project. 
+> It will only be officially compatible with Python 3.11 and may miss certain features,
+> such as asynchronous programming!
+
+
 PHUB is an easy-to-use API wrapper for Pornhub. It can access most used or useful
 PH features, such as video searching, account features, video downloading, and more.
 

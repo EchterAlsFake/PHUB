@@ -5,8 +5,8 @@ PHUB core module.
 import time
 import logging
 import random
+import requests
 
-import httpx
 from typing import Iterable, Union
 from functools import cached_property
 
@@ -94,12 +94,9 @@ class Client:
         '''
 
         # Initialise session
-        self.session = httpx.Client(
-            headers = consts.HEADERS,
-            cookies = consts.COOKIES,
-            follow_redirects = True
-        )
-        
+        self.session = requests.Session()
+        self.session.headers = consts.HEADERS
+        self.session.cookies = consts.COOKIES
         self._clear_granted_token()
 
         if self.bypass_geo_blocking:
@@ -121,7 +118,7 @@ class Client:
              headers: dict = None,
              timeout: float = consts.CALL_TIMEOUT,
              throw: bool = True,
-             silent: bool = False) -> httpx.Response:
+             silent: bool = False) -> requests.Response:
         '''
         Used internally to send a request or an API call.
 
