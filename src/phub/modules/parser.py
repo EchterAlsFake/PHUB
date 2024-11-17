@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 import json
 import logging
 from typing import TYPE_CHECKING
@@ -30,6 +32,10 @@ def resolve(video: Video) -> dict:
     # more obfuscation stuff
     
     logger.info('Resolving %s page', video)
+    region_blocked_regex = re.compile(r'<div\s+id=["\']js-player["\']\s+class=["\']videoGeoUnavailable["\']\s*>')
+    if re.search(region_blocked_regex, video.page):
+        raise errors.RegionBlocked
+
     flash, ctx = consts.re.get_flash(video.page)
     
     try:
