@@ -53,17 +53,17 @@ IFRAME = '<iframe src="https://www.pornhub.com/embed/{key}" frameborder="0" widt
 # Supported languages
 LANGUAGES = [ 'en', 'cn', 'de', 'fr', 'it', 'pt', 'pl', 'rt', 'nl', 'cz', 'jp' ]
 LANGUAGE_MAPPING = {
-    "en": "www.pornhub.com",
-    "cn": "www.cn.pornhub.com",
-    "de": "www.de.pornhub.org",
-    "fr": "www.fr.pornhub.com",
-    "it": "www.it.pornhub.com",
-    "pt": "www.pt.pornhub.com",
-    "pl": "www.pl.pornhub.com",
-    "rt": "www.rt.pornhub.com",
-    "nl": "www.nl.pornhub.com",
-    "cz": "www.cz.pornhub.com",
-    "jp": "www.jp.pornhub.com"}
+    "en": "https://pornhub.com",
+    "cn": "https://cn.pornhub.com",
+    "de": "https://de.pornhub.org",
+    "fr": "https://fr.pornhub.com",
+    "it": "https://it.pornhub.com",
+    "pt": "https://pt.pornhub.com",
+    "pl": "https://pl.pornhub.com",
+    "rt": "https://rt.pornhub.com",
+    "nl": "https://nl.pornhub.com",
+    "cz": "https://cz.pornhub.com",
+    "jp": "https://jp.pornhub.com"}
 
 GEO_BYPASS_IPs = [
     "185.238.219.36",

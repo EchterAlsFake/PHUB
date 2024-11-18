@@ -266,9 +266,7 @@ class queries:
         def _parse_page(self, raw: str) -> list[dict]:
             
             data = json.loads(raw)
-            
             videos = data.get('videos')
-            
             if data.get('code') == '2001':
                 raise errors.NoResult()
 

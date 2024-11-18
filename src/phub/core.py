@@ -28,7 +28,8 @@ class Client:
     Represents a client capable of handling requests
     with Pornhub.
     '''
-    
+    use_webmaster_api = True
+
     def __init__(self,
                  email: str = None,
                  password: str = None,
@@ -61,10 +62,10 @@ class Client:
         logger.debug('Initialised new Client %s', self)
 
         # Initialise session
+        Client.use_webmaster_api = use_webmaster_api
         self.language = language
         self.change_title_language = change_title_language
         self.bypass_geo_blocking = bypass_geo_blocking
-        self.use_webmaster_api = use_webmaster_api
 
         self.reset()
 
@@ -160,7 +161,6 @@ class Client:
             host = consts.HOST
 
         url = func if 'http' in func else utils.concat(host, func)
-
         for i in range(consts.MAX_CALL_RETRIES):
             try:
                 response = self.session.request(
@@ -281,8 +281,7 @@ class Client:
             
             url = utils.concat(consts.HOST, 'view_video.php?viewkey=' + key)
         
-        return Video(self, url, change_title_language=self.change_title_language,
-                     use_webmaster_api=self.use_webmaster_api)
+        return Video(self, url, change_title_language=self.change_title_language)
 
     def get_user(self, user: Union[str, User]) -> User:
         '''

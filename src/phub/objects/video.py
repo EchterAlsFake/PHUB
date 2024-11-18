@@ -29,8 +29,7 @@ class Video:
 
     # === Base methods === #
 
-    def __init__(self, client: Client, url: str, change_title_language: bool = True,
-                 use_webmaster_api: bool = True) -> None:
+    def __init__(self, client: Client, url: str, change_title_language: bool = False) -> None:
         '''
         Initialise a new video object.
         
@@ -44,9 +43,8 @@ class Video:
             raise errors.URLError('Invalid video URL:', url)
 
         self.client = client
-
         self.change_titles = change_title_language
-        self.use_webmaster_api = use_webmaster_api
+        self.use_webmaster_api = self.client.use_webmaster_api
         self.url = url
         self.key = consts.re.get_viewkey(url)
         self.data: dict = {}  # The video webmasters data
@@ -64,6 +62,7 @@ class Video:
         self.ALLOW_QUERY_SIMULATION = False
 
         logger.debug('Initialised new video object %s', self)
+        logger.debug(f"Video data: {self.data}")
 
     def __repr__(self) -> str:
 
@@ -454,9 +453,7 @@ class Video:
         '''
         The video thumbnail.
         '''
-
-        url = self.data.get('page@image_url')
-
+        url = self.data.get('page@image_url') or self.data.get('data@thumb')
         if url:
             servers = None
 
