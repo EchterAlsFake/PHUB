@@ -64,6 +64,9 @@ class RegionBlocked(Exception):
     """
     Sometimes videos can be blocked in your region.
     In this case PHUB can't fetch data.
+
+    Note: This could also be a private video. You only see this Information if you are logged in.
+    This is a problem of PornHub itself and not related to PHUb!
     """
 
 # EOF
