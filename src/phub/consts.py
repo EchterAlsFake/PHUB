@@ -46,7 +46,6 @@ DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 DOWNLOAD_SEGMENT_ERROR_DELAY = .5
 
 FFMPEG_EXECUTABLE = 'ffmpeg' # Use from PATH by default
-FFMPEG_COMMAND = FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output}'
 
 IFRAME = '<iframe src="https://www.pornhub.com/embed/{key}" frameborder="0" width="{width}" height="{height}" scrolling="no" allowfullscreen></iframe>'
 

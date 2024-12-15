@@ -94,6 +94,33 @@ and the total segment to process.
 
     video.download(..., display = show_progress)
 
+
+^^^^^^^^^^^
+FFmpeg converting
+^^^^^^^^^^^
+
+Videos are downloaded using HLS streaming. Basically we use smaller segments and put them into one file. This file
+can usually be played by any video player except for a few exceptions. However, you won't be able to add metadata to it.
+Although it has a .mp4 extension it actually is a .ts file. If you want to convert a video to a valid mp4 file and assign
+the needed headers to it, you can use FFmpeg for that.
+
+When downloading a video, use `convert = True` as an argument in there.
+For example:
+
+..  code-block:: python
+    import phub
+    video = phub.Client().get_video("some_url")
+    video.download(quality="best", path="./", convert=True) # This converts the video
+
+
+You can define the location for ffmpeg using:
+
+.. code-block:: python
+    import consts
+    consts.FFMPEG_EXECUTABLE = "<your_path_to_ffmpeg>
+
+By default, phub will search for it in your system's path
+
 ^^^^^^^^^^^
 Downloaders
 ^^^^^^^^^^^

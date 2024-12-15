@@ -228,7 +228,8 @@ class Video:
                  quality: Quality | str = 'best',
                  *,
                  downloader: Callable = download.default,
-                 display: Callable[[int, int], None] = display.default()) -> str:
+                 display: Callable[[int, int], None] = display.default(),
+                 convert: bool = False) -> str:
         '''
         Download the video to a file.
         
@@ -237,7 +238,8 @@ class Video:
             quality (Quality | str | int): The video quality.
             downloader (Callable): The download backend.
             display (Callable): The progress display.
-        
+            convert (bool): Whether to convert the video to a valid .mp4 file using FFmpeg
+
         Returns:
             str: The downloader video path.
         '''
@@ -255,6 +257,13 @@ class Video:
             callback=display,
             path=path
         )
+        print(f"Using path: {path}")
+        if convert:
+            FFMPEG_COMMAND = consts.FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output} -quiet'
+            os.rename(path, path + ".tmp")
+            os.system(FFMPEG_COMMAND.format(input=path + ".tmp", output=path))
+            os.remove(path + ".tmp")
+            logger.info(f"Video was converted to: {path}")
 
         return path
 
@@ -458,7 +467,6 @@ class Video:
             servers = None
 
         else:
-            logger.error("Couldn't fetch the Image using HTML scraping")
             url = self.fetch('data@thumb')
             servers = self.data.get('data@thumbs') or []  # TODO - Use cache on prop Image.servers
 
