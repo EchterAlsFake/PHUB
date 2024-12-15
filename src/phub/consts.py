@@ -261,7 +261,9 @@ class re:
     is_video_url             = comp(                p.fullmatch, _raw_root + r'view_video\.php\?viewkey=(?:ph)?[a-z\d]{3,}(&pkey=\d+)?'        ) # Check if a video URL is valid
     is_quality               = comp(                p.fullmatch, r'\d+p?'                                                                      ) # Check if is a video quality
     is_playlist              = comp(                p.fullmatch, r'^https?:\/\/(?:www\.)?(?:[a-z]{2}\.)?pornhub\.[a-z]{2,3}\/playlist\/\d+$'   )  # Checks if it's a playlist
+    is_premium               = comp(p.fullmatch, r'<span class="premium-logo bg-premium-logo straightLogo"')
     fixed_title = find(engine.DOTALL, r'(?<="name": ")[^"]+')
+
 
 # Attach regex names representation to their wrapper for error display purposes
 _REGEXES_NAMES = {v.__doc__: k for k, v in vars(re).items() if v.__doc__}

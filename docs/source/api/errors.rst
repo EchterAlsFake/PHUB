@@ -26,3 +26,5 @@ PHUB can raise the following expressions.
 .. autoexception:: phub.errors.VideoError
 
 .. autoexception:: phub.errors.RegionBlocked
+
+.. autoexception:: phub.errors.PremiumVideo

@@ -69,4 +69,8 @@ class RegionBlocked(Exception):
     This is a problem of PornHub itself and not related to PHUb!
     """
 
+class PremiumVideo(Exception):
+    """
+    Raises when a video is a PornHub premium video.
+    """
 # EOF

@@ -33,8 +33,13 @@ def resolve(video: Video) -> dict:
     
     logger.info('Resolving %s page', video)
     region_blocked_regex = re.compile(r'<div\s+id=["\']js-player["\']\s+class=["\']videoGeoUnavailable["\']\s*>')
+    is_premium = re.compile(r'class="premium-logo bg-premium-logo straightLogo"')
+
     if re.search(region_blocked_regex, video.page):
         raise errors.RegionBlocked
+
+    if re.search(is_premium, video.page):
+        raise errors.PremiumVideo("This video is premium only")
 
     flash, ctx = consts.re.get_flash(video.page)
     
