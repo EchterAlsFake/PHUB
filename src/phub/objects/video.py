@@ -6,7 +6,7 @@ import random
 import logging
 from functools import cached_property
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Iterator, Literal, Callable, Any
+from typing import TYPE_CHECKING, Iterator, Literal, Callable, Any, Union
 
 from . import Tag, Like, User, Image
 from .. import utils
@@ -224,7 +224,7 @@ class Video:
                 yield dns + line
 
     def download(self,
-                 path: os.PathLike,
+                 path: Union[str, os.PathLike],
                  quality: Quality | str = 'best',
                  *,
                  downloader: Callable = download.default,
@@ -257,7 +257,6 @@ class Video:
             callback=display,
             path=path
         )
-        print(f"Using path: {path}")
         if convert:
             FFMPEG_COMMAND = consts.FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output} -quiet'
             os.rename(path, path + ".tmp")
