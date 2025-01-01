@@ -32,7 +32,7 @@ class Video:
     def __init__(self, client: Client, url: str, change_title_language: bool = False) -> None:
         '''
         Initialise a new video object.
-        
+
         Args:
             client (Client): The parent client.
             url (str): The video URL.
@@ -71,7 +71,7 @@ class Video:
     def refresh(self, page: bool = True, data: bool = True) -> None:
         '''
         Refresh video data.
-        
+
         Args:
             page (bool): Whether to refresh the video page.
             data (bool): Whether to refresh the video data.
@@ -79,7 +79,7 @@ class Video:
 
         logger.info('Refreshing %s cache', self)
 
-        # Clear saved video page and data 
+        # Clear saved video page and data
         if page: self.page = None
         if data: self.data.clear()
 
@@ -92,18 +92,18 @@ class Video:
     def fetch(self, key: str) -> Any:
         '''
         Lazily fetch some data.
-        
+
         key format:
-            data@<dkey>   => Get key from API 
+            data@<dkey>   => Get key from API
             page@<pkey>   => Scrape key from page
             <dkey>|<pkey> => Choose considering cache
-        
+
         Args:
             key (str): The key to fetch.
-        
+
         Returns:
             Any: The fetched or cached object.
-        
+
         '''
 
         # Multiple keys handle
@@ -116,7 +116,7 @@ class Video:
             else:
                 key = 'data@' + datakey
 
-        # If key is already cached 
+        # If key is already cached
         if key in self.data:
             return self.data.get(key)
 
@@ -151,11 +151,11 @@ class Video:
                 recursive: bool = False) -> dict:
         '''
         Convert the object to a dictionary.
-        
+
         Args:
             keys (str): The data keys to include.
             recursive (bool): Whether to allow other PHUB objects to dictify.
-        
+
         Returns:
             dict: A dict version of the object.
         '''
@@ -171,10 +171,10 @@ class Video:
     def get_M3U_URL(self, quality: Quality) -> str:
         '''
         The URL of the master M3U file.
-        
+
         Args:
             quality (Quality): The video quality.
-        
+
         Returns:
             str: The M3U url.
         '''
@@ -193,10 +193,10 @@ class Video:
     def get_segments(self, quality: Quality) -> Iterator[str]:
         '''
         Get the video segment URLs.
-        
+
         Args:
             quality (Quality): The video quality.
-        
+
         Returns:
             Iterator: A segment URL iterator.
         '''
@@ -227,12 +227,12 @@ class Video:
                  path: Union[str, os.PathLike],
                  quality: Quality | str = 'best',
                  *,
-                 downloader: Callable = download.default,
+                 downloader: Union[Callable, str] = download.default,
                  display: Callable[[int, int], None] = display.default(),
                  convert: bool = False) -> str:
         '''
         Download the video to a file.
-        
+
         Args:
             path (PathLike): The download path.
             quality (Quality | str | int): The video quality.
@@ -250,13 +250,26 @@ class Video:
 
         logger.info('Starting download for %s at %s', self, path)
 
-        # Call the backend
-        downloader(
-            video=self,
-            quality=quality,
-            callback=display,
-            path=path
-        )
+        if isinstance(downloader, str):
+            if downloader == "default":
+                download.default(video=self, quality=quality, path=path, callback=display)
+
+            elif downloader == "threaded":
+                threaded_download = download.threaded(max_workers=20, timeout=10)
+                threaded_download(video=self, quality=quality, path=path, callback=display)
+
+            elif downloader == "FFMPEG":
+                download.FFMPEG(video=self, quality=quality, path=path, callback=display)
+
+        else:
+            # Call the backend
+            downloader(
+                video=self,
+                quality=quality,
+                callback=display,
+                path=path
+            )
+
         if convert:
             FFMPEG_COMMAND = consts.FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output} -quiet'
             os.rename(path, path + ".tmp")
@@ -269,10 +282,10 @@ class Video:
     def get_direct_url(self, quality: Quality) -> str:
         '''
         Get the direct video URL given a specific quality.
-        
+
         Args:
             quality (Quality): The video quality.
-        
+
         Returns:
             str: The direct url.
         '''
@@ -280,7 +293,7 @@ class Video:
         from ..utils import Quality
         qual = Quality(quality)
 
-        # Get remote    
+        # Get remote
         sources = self.fetch('page@mediaDefinitions')
         remote = [s for s in sources if 'remote' in s][0]['videoUrl']
 
@@ -297,7 +310,7 @@ class Video:
         Assert an internal response has succeeded.
 
         Args:
-            res (dict): The rerquest json response. 
+            res (dict): The rerquest json response.
         '''
 
         if 'success' in res and not res['success']:
@@ -309,13 +322,13 @@ class Video:
         Simulate a query to gain access to more data.
         If the video object is yielded by a query, this property
         will be overriden by the query data.
-        
+
         Warning - This will make a lot of requests and can fake
                    some properties (like watched).
         '''
 
         # Now I really don't want people to use this without knowing what it
-        # really does 
+        # really does
         if not self.ALLOW_QUERY_SIMULATION:
 
             # Personnalised error for the JSONQuery
@@ -379,7 +392,7 @@ class Video:
     def like(self, toggle: bool = True) -> None:
         '''
         Set the video like value.
-        
+
         Args:
             toggle (bool): The toggle value.
         '''
@@ -394,7 +407,7 @@ class Video:
     def favorite(self, toggle: bool = True) -> None:
         '''
         Set video as favorite or not.
-        
+
         Args:
             toggle (bool): The toggle value.
         '''
@@ -410,7 +423,7 @@ class Video:
     def watch_later(self, toggle: bool = True) -> None:
         '''
         Add or remove the video to the watch later playlist.
-        
+
         Args:
             toggle (bool): The toggle value.
         '''
@@ -438,7 +451,7 @@ class Video:
         if pt := self.data.get('page@playbackTracking'):
             return pt.get('video_id')
 
-        # Use thumbnail URL 
+        # Use thumbnail URL
         return consts.re.get_thumb_id(self.image.url)
 
     @cached_property
