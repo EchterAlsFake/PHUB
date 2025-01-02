@@ -36,7 +36,6 @@ class Client:
                  *,
                  language: literals.language = 'en',
                  delay: Union[int, float] = 0,
-                 proxies: dict = None,
                  login: bool = True,
                  bypass_geo_blocking: bool = False,
                  change_title_language: bool = True,
@@ -49,13 +48,12 @@ class Client:
             password (str): Account password.
             language (str): Client language (fr, en, ru, etc.)
             delay (int | float): Minimum delay between requests.
-            proxies (dict): Dictionary of proxies for the requests.
             login (bool): Whether to directly log in after initialization.
             bypass_geo_blocking (bool): Whether to bypass geo-blocking.
             change_title_language (bool): Whether to change title language into your language based on the input URL
             use_webmaster_api (bool): Whether to use the webmaster API or HTML content extraction
         Raises:
-            LoginFailed: If Pornhub refuses the authentification.
+            LoginFailed: If Pornhub refuses the authentication.
                 The reason will be passed as the error body.
         '''
         
@@ -70,7 +68,6 @@ class Client:
         self.reset()
 
         self.session.headers.update({"Accept-Language": language})
-        self.proxies = proxies
         self.credentials = {'email': email,
                             'password': password}
         
@@ -98,9 +95,9 @@ class Client:
         self.session = httpx.Client(
             headers = consts.HEADERS,
             cookies = consts.COOKIES,
-            follow_redirects = True
-        )
-        
+            follow_redirects = True,
+            proxies = consts.PROXY)
+
         self._clear_granted_token()
 
         if self.bypass_geo_blocking:
