@@ -36,6 +36,21 @@ You can switch with: `use_webmaster_api = True` or False.
 
     client = phub.Client(language = 'de')
 
+
+
+
+Proxy support is also possible, but only SOCKS5 protocol is supported. You need to apply the proxy in the
+format "socks5://<ip>:<port>" and set it in the consts file. Here's an example:
+
+.. code-block:: python
+    import phub
+    phub.consts.PROXY = "socks5://187.133.7.42:420"
+    client = phub.Client() # This client has proxies enabled
+
+NOTE:
+
+There absolutely NO guarantee that this feature is perfectly functional. Your IP could always be leaked.
+
 Fetching a video
 ----------------
 

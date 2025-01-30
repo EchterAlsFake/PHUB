@@ -38,14 +38,14 @@ LOGIN_PAYLOAD = {
 RSS = 'https://www.pornhub.com/video/webmasterss'
 
 PROXY = None
-# Example Proxy dictionary:
-# {"http://": "http://4.20.69.42:1337"}
+# Needs to be a SOCKS5 in the format: "socks5://<host>:<port>"
 
 
 MAX_CALL_RETRIES = 4 # Maximum times a HTTPError can be reproduced
 MAX_CALL_TIMEOUT = .4 # Time to wait before retrying basic calls
 CALL_TIMEOUT = 30 # Time to wait before retrying calls (in case no error happens)
 CHALLENGE_TIMEOUT = 2 # Time to wait before injecting the new cookie for resolving the challenge (needs to be at least 1)
+DELAY = 0 # Minimum time between requests
 
 DOWNLOAD_SEGMENT_MAX_ATTEMPS = 5
 DOWNLOAD_SEGMENT_ERROR_DELAY = .5

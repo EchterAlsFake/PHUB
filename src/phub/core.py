@@ -35,7 +35,6 @@ class Client:
                  password: str = None,
                  *,
                  language: literals.language = 'en',
-                 delay: Union[int, float] = 0,
                  login: bool = True,
                  bypass_geo_blocking: bool = False,
                  change_title_language: bool = True,
@@ -47,7 +46,6 @@ class Client:
             email (str): Account email address.
             password (str): Account password.
             language (str): Client language (fr, en, ru, etc.)
-            delay (int | float): Minimum delay between requests.
             login (bool): Whether to directly log in after initialization.
             bypass_geo_blocking (bool): Whether to bypass geo-blocking.
             change_title_language (bool): Whether to change title language into your language based on the input URL
@@ -71,7 +69,7 @@ class Client:
         self.credentials = {'email': email,
                             'password': password}
         
-        self.delay = delay
+        self.delay = consts.DELAY
         self.start_delay = False
         self.last_request_time = None
         
@@ -90,13 +88,17 @@ class Client:
         This is useful if you are keeping the client running
         for a long time and can help with Pornhub rate limit.
         '''
+        verify = True
+        if consts.PROXY is not None:
+            verify = False
 
         # Initialise session
         self.session = httpx.Client(
             headers = consts.HEADERS,
             cookies = consts.COOKIES,
             follow_redirects = True,
-            proxies = consts.PROXY)
+            proxy = consts.PROXY,
+            verify = verify)
 
         self._clear_granted_token()
 
