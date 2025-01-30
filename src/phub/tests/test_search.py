@@ -6,7 +6,7 @@ except (ModuleNotFoundError, ImportError):
     from ...phub import Client
     from ...phub import literals
 
-client = Client(delay=2, language="en")
+client = Client(language="en")
 
 
 def test_basic_search():

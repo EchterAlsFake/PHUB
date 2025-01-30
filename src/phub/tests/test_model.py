@@ -5,7 +5,7 @@ except (ModuleNotFoundError, ImportError):
     from ...phub import Client
 
 url = "https://de.pornhub.com/pornstar/nancy-a"
-client = Client(delay=2, language="en")  # Make a delay, so that PornHub isn't stressed too much
+client = Client(language="en")  # Make a delay, so that PornHub isn't stressed too much
 model = client.get_user(url)
 
 

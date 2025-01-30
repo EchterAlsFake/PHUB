@@ -5,7 +5,7 @@ except (ImportError, ModuleNotFoundError):
     from ...phub import Client, Like, User
 
 url = "https://de.pornhub.com/playlist/113348141"
-client = Client(delay=2, language="en")
+client = Client(language="en")
 playlist = client.get_playlist(url)
 
 
