@@ -34,6 +34,14 @@ def resolve(video: Video) -> dict:
     logger.info('Resolving %s page', video)
     region_blocked_regex = re.compile(r'<div\s+id=["\']js-player["\']\s+class=["\']videoGeoUnavailable["\']\s*>')
     is_premium = re.compile(r'class="premium-logo bg-premium-logo straightLogo"')
+    is_disabled = re.compile(r'<span>This video has been disabled')
+    is_pending_review = re.compile(r'Video is unavailable pending review.')
+
+    if re.search(is_pending_review, video.page):
+        raise errors.VideoPendingReview
+
+    if re.search(is_disabled, video.page):
+        raise errors.VideoDisabled
 
     if re.search(region_blocked_regex, video.page):
         raise errors.RegionBlocked

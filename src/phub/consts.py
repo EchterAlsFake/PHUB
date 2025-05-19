@@ -38,7 +38,7 @@ LOGIN_PAYLOAD = {
 RSS = 'https://www.pornhub.com/video/webmasterss'
 
 PROXY = None
-# Needs to be a SOCKS5 in the format: "socks5://<host>:<port>"
+# Can be any http or socks proxy
 
 
 MAX_CALL_RETRIES = 4 # Maximum times a HTTPError can be reproduced

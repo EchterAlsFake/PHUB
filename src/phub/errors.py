@@ -73,4 +73,15 @@ class PremiumVideo(Exception):
     """
     Raises when a video is a PornHub premium video.
     """
+
+class VideoDisabled(Exception):
+    """
+    Raises when a video is disabled.
+    """
+
+class VideoPendingReview(Exception):
+    """
+    Raises when a video is pending review.
+    """
 # EOF
+
