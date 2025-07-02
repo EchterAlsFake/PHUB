@@ -4,6 +4,7 @@ PHUB built-in CLI.
 
 import os
 import argparse
+import re
 
 from phub import Client, Video
 from phub.modules.download import threaded, FFMPEG, default
