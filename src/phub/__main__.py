@@ -4,6 +4,7 @@ PHUB built-in CLI.
 
 import os
 import argparse
+import re
 
 from phub import Client, Video
 from phub.modules.download import threaded, FFMPEG, default
@@ -33,7 +34,7 @@ def download_video(client: Client, url: [str, Video], output: str, quality: str,
     else:
         raise "Some error happened here, please report on GitHub, thank you :) "
 
-    title = video.title
+    title =  re.sub(r'[<>:"/\\|?*]', '', video.title)
     final_output_path = os.path.join(output, title + ".mp4")
 
     print(f"Downloading: {title} to: {final_output_path}")
