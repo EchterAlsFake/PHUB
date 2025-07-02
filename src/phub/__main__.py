@@ -4,6 +4,7 @@ PHUB built-in CLI.
 
 import os
 import argparse
+import re
 
 from phub import Client, Video
 from phub.modules.download import threaded, FFMPEG, default
@@ -22,7 +23,7 @@ def text_progress_bar(downloaded, total, title=False):
         print(f"\r | {title} | -->: [{bar}] {percents}%", end='')
 
 
-def download_video(client: Client, url: [str, Video], output: str, quality: str, downloader: str):
+def download_video(client: Client, url: [str, Video], channel:str, output: str, quality: str, downloader: str):
     if not isinstance(url, Video):
         video = client.get(url)
 
@@ -33,8 +34,10 @@ def download_video(client: Client, url: [str, Video], output: str, quality: str,
     else:
         raise "Some error happened here, please report on GitHub, thank you :) "
 
-    title = video.title
-    final_output_path = os.path.join(output, title + ".mp4")
+    origtitle = video.title
+    title =  re.sub(r'[<>:"/\\|?*]', '', video.title)
+    if channel: channel+=" - "
+    final_output_path = os.path.join(output, channel + title + " - pornhub.mp4")
 
     print(f"Downloading: {title} to: {final_output_path}")
     video.download(path=final_output_path, quality=quality, downloader=downloader, display=text_progress_bar)
@@ -63,10 +66,12 @@ def main():
                       default="best")
 
     parser.add_argument("-output", type=str, help="The output path", default="./")
+    parser.add_argument("-channel", type=str, help="Name of Pornhub channel", default="")
 
     args = parser.parse_args()
     quality = args.quality
     output = args.output
+    channel = args.channel
     downloader = resolve_threading_mode(mode=args.downloader)
     url = args.url
     model = args.model
@@ -76,7 +81,7 @@ def main():
     client = Client()
 
     if len(url) >= 3:  # Comparison with not == "" doesn't work, don't ask me why I have no fucking idea...
-        download_video(client=client, url=url, output=output, quality=quality, downloader=downloader)
+        download_video(client=client, url=url, channel=channel, output=output, quality=quality, downloader=downloader)
 
     elif len(model) >= 3:
         model_videos = client.get_user(model).videos
