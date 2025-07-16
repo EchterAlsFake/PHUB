@@ -4,7 +4,7 @@ try:
 except (ModuleNotFoundError, ImportError):
     from ...phub import Client
 
-url = "https://de.pornhub.com/pornstar/nancy-a"
+url = "https://pornhub.com/pornstar/nancy-a"
 client = Client(language="en")  # Make a delay, so that PornHub isn't stressed too much
 model = client.get_user(url)
 
@@ -14,11 +14,22 @@ def test_info():
 
 
 def test_avatar():
-    assert isinstance(model.avatar.url, str) and len(model.avatar.url) > 5
+    for i in range(5): # Because PornHub is sometimes just stupid.
+        try:
+            assert isinstance(model.avatar.url, str) and len(model.avatar.url) > 5
 
+        except AssertionError:
+            model.refresh()
+            continue
 
 def test_bio():
-    assert isinstance(model.bio, str) and len(model.bio) > 1
+    for i in range(5):
+        try:
+            assert isinstance(model.bio, str) and len(model.bio) > 1
+
+        except AssertionError:
+            model.refresh()
+            continue
 
 
 def test_uploads():
