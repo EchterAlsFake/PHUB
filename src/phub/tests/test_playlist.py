@@ -1,8 +1,11 @@
 try:
     from phub import Client, Like, User
-
-except (ImportError, ModuleNotFoundError):
+    from base_api.modules.config import config
+    from base_api.base import BaseCore
+except (ModuleNotFoundError, ImportError):
     from ...phub import Client, Like, User
+    from base_api.modules.config import config
+    from base_api.base import BaseCore
 
 url = "https://de.pornhub.com/playlist/113348141"
 client = Client(language="en")

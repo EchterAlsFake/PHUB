@@ -1,13 +1,18 @@
 try:
     from phub import Client
-
+    from base_api.modules.config import config
+    from base_api.base import BaseCore
 except (ModuleNotFoundError, ImportError):
     from ...phub import Client
+    from base_api.modules.config import config
+    from base_api.base import BaseCore
+
+config.request_delay = 10
+core = BaseCore(config=config)
+client = Client(language="en", core=core)  # Make a delay, so that PornHub isn't stressed too much
 
 url = "https://pornhub.com/pornstar/nancy-a"
-client = Client(language="en")  # Make a delay, so that PornHub isn't stressed too much
 model = client.get_user(url)
-
 
 def test_info():
     assert isinstance(model.info, dict)
