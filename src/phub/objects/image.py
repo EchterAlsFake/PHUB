@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import os
 import logging
+from base_api.base import setup_logger
 from typing import TYPE_CHECKING, Literal, Union
 
 from .. import utils
 
 if TYPE_CHECKING:
     from ..core import Client
-
-
-logger = logging.getLogger(__name__)
 
 
 class Image:
@@ -34,19 +32,24 @@ class Image:
             name (str): Image name.
         '''
 
+        self.logger = setup_logger(name="PHUB API - [Image]", log_file=None, level=logging.ERROR)
         self.url = url
         self.name = name
         self.client = client
         self._servers = servers or []
         
-        logger.debug('Generated new image object: %s', self)
+        self.logger.debug('Generated new image object: %s', self)
         
         # Check server image sizes
         sizes = [s.get('size') for s in self._servers]
         
         if len(set(sizes)) > 1:
-            logger.warning('Detected different image sizes on alt servers: %s', sizes)
-    
+            self.logger.warning('Detected different image sizes on alt servers: %s', sizes)
+
+    def enable_logging(self, log_file: str = None, level=None, log_ip=None, log_port=None):
+        self.logger = setup_logger(name="PHUB API - [Image]", log_file=log_file, level=level, http_ip=log_ip,
+                                   http_port=log_port)
+
     def __repr__(self) -> str:
         
         return f'phub.Image(name={self.name})'
@@ -70,7 +73,7 @@ class Image:
         if os.path.isdir(path):
             path = utils.concat(path, self.name + ext)
         
-        logger.info('Saving %s at %s', self, path)
+        self.logger.info('Saving %s at %s', self, path)
         
         with open(path, 'wb') as file:
             
@@ -81,12 +84,12 @@ class Image:
                 
             except Exception as err:
                 
-                logger.warning('Failed to get image `%s`', url)
+                self.logger.warning('Failed to get image `%s`', url)
                 if not self._servers: raise err
                 
                 # Pop server and retry
                 server = self._servers.pop(0)
-                logger.info('Retrying download with server %s', server)
+                self.logger.info('Retrying download with server %s', server)
                 self.url = server['src']
                 self.download(path)
 

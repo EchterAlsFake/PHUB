@@ -1,8 +1,9 @@
 from __future__ import annotations
-
 import logging
+
 from dataclasses import dataclass
 from functools import cached_property
+from base_api.base import setup_logger
 from typing import TYPE_CHECKING, Literal, Union
 
 from .. import utils
@@ -13,8 +14,6 @@ if TYPE_CHECKING:
     from ..core import Client
     from . import Video, Image
     from . import queries
-
-logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -41,17 +40,19 @@ class User:
             name (str): The username.
             url (str): The user page URL.
         '''
-        
+
+        self.logger = setup_logger(name="PHUB API - [User]", log_file=None, level=logging.ERROR)
         self.client = client
         self.name = name
         self.url = consts.re.remove_host(url)
         self.type = type or consts.re.get_user_type(url)
+
         
         # Save data keys so far, so we can make a difference with the
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
         
-        logger.debug('Initialized new user object %s', self)
+        self.logger.debug('Initialized new user object %s', self)
         
         # This attribute will be deleted if a refresh is triggered
         self._cached_avatar_url: str = None
@@ -60,17 +61,21 @@ class User:
         
         return f'phub.{self.type.capitalize()}({self.name})'
 
+    def enable_logging(self, log_file: str = None, level=None, log_ip=None, log_port=None):
+        self.logger = setup_logger(name="PHUB API - [User]", log_file=log_file, level=level, http_ip=log_ip,
+                                   http_port=log_port)
+
     def refresh(self) -> None:
         '''
         Refresh this instance cache.
         '''
         
-        logger.info('Refreshing %s object', self)
+        self.logger.info('Refreshing %s object', self)
         
         # Clear properties cache
         for key in list(self.__dict__.keys()):
             if not key in self.loaded_keys:
-                logger.debug('Deleting key %s', key)
+                self.logger.debug('Deleting key %s', key)
                 delattr(self, key)
 
     def dictify(self,
@@ -106,7 +111,6 @@ class User:
                 consts.re.video_channel(video.page, throw = False)
         
         if not guess:
-            logger.error('Author of %s not found', video)
             raise errors.RegexError('Could not find user for video', video)
         
         return cls(client = video.client, name = guess[1],
@@ -141,13 +145,11 @@ class User:
                 response = utils.head(client, guess)
                 
                 if response:
-                    logger.info('Guessing type of %s is %s', user, type_)
                     url = response
                     user_type = type_
                     break
             
             else:
-                logger.error('Could not guess type of %s', user)
                 raise errors.UserNotFound(f'User {user} not found.')
         
         return cls(client = client, name = name, type = user_type, url = url)
@@ -203,7 +205,7 @@ class User:
         # If the user does not supports uploads, we just return an empty query.
         query = queries.VideoQuery
         if not url:
-            logger.info('User %s does not support uploads', self)
+            self.logger.info('User %s does not support uploads', self)
             query = queries.EmptyQuery
         
         return query(self.client, func = url)

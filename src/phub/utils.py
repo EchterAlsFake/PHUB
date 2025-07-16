@@ -5,30 +5,23 @@ PHUB utilities.
 import math
 import httpx
 import logging
+from base_api.base import setup_logger
 from typing import Generator, Iterable, Iterator, Union
 
 from . import errors
 from . import consts
 
-logger = logging.getLogger(__name__)
-
 # Named constants for least_factors
 INCREMENT = 30
 KNOWN_PRIME_FACTORS = [2, 3, 5]
 
+logger = setup_logger(name="PHUB API - [utils]", log_file=None, level=logging.ERROR)
 
-from .objects import _BaseQuality
 
-class Quality(_BaseQuality):
-    '''
-    Represents a video quality.
-    Can also be represented as an int
-    or string.
-    '''
-    
-    BEST  = _BaseQuality('best' )
-    HALF  = _BaseQuality('half' )
-    WORST = _BaseQuality('worst')
+def enable_logging(log_file: str = None, level=None, log_ip=None, log_port=None):
+    global logger
+    logger = setup_logger(name="PHUB API - [utils]", log_file=log_file, level=level, http_ip=log_ip,
+                               http_port=log_port)
 
 
 def concat(*args) -> str:

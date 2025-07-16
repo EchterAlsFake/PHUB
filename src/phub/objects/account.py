@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
+from base_api.base import setup_logger
 from typing import TYPE_CHECKING, Literal, Iterator, Union
 
 from .. import utils
@@ -11,8 +12,6 @@ from . import User, Image
 if TYPE_CHECKING:
     from ..core import Client
     from . import Feed, queries, User
-
-logger = logging.getLogger(__name__)
 
 
 class Account:
@@ -45,6 +44,7 @@ class Account:
         '''
         
         self.client = client
+        self.logger = setup_logger(name="PHUB API - [Account]", log_file=None, level=logging.ERROR)
         
         self.name: str = None
         self.avatar: Image = None
@@ -54,9 +54,12 @@ class Account:
         # Save data keys so far, so we can make a difference with the
         # cached property ones.
         self.loaded_keys = list(self.__dict__.keys()) + ['loaded_keys']
-            
+
+    def enable_logging(self, log_file: str = None, level=None, log_ip=None, log_port=None):
+        self.logger = setup_logger(name="PHUB API - [Account]", log_file=log_file, level=level, http_ip=log_ip,
+                                   http_port=log_port)
+
     def __repr__(self) -> str:
-        
         status = 'logged-out' if self.name is None else f'name={self.name}' 
         return f'phub.Account({status})'
 
@@ -77,7 +80,7 @@ class Account:
         
         # We assert that the account is from a normal user (not model, etc.)
         if not 'users/' in self.user.url:
-            logger.error('Invalid user type: %s', url)
+            self.logger.error('Invalid user type: %s', url)
             raise NotImplementedError('Non-user account are not supported.')
     
     def refresh(self, refresh_login: bool = False) -> None:
@@ -88,25 +91,25 @@ class Account:
             refresh_login (bool): Whether to also attempt to re-log in.
         '''
         
-        logger.info('Refreshing account %s', self)
+        self.logger.info('Refreshing account %s', self)
         
         if refresh_login:
-            logger.info('Forcing login refresh')
+            self.logger.info('Forcing login refresh')
             self.client.login(force = True)
         
         # Clear properties cache
         for key in list(self.__dict__.keys()):
             if not key in self.loaded_keys:
                 
-                logger.debug('Deleting key %s', key)
+                self.logger.debug('Deleting key %s', key)
                 delattr(self, key)
     
     def fix_recommendations(self) -> None:
         '''
-        Allow recommandations cookies.
+        Allow recommendations cookies.
         '''
         
-        logger.info('Fixing account recommendations')
+        self.logger.info('Fixing account recommendations')
         
         payload = utils.urlify({
             'token': self.client._granted_token,

@@ -1,10 +1,8 @@
 try:
     from phub import Client
-    from phub import Quality
 
 except (ImportError, ModuleNotFoundError):
     from ...phub import Client
-    from ...phub import Quality
 
 client = Client(language="en")
 url = "https://de.pornhub.com/view_video.php?viewkey=ph60f99fa4b5cd7"

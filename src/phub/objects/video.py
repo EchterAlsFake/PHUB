@@ -5,6 +5,7 @@ import os
 import random
 import logging
 from functools import cached_property
+from base_api.base import setup_logger
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Iterator, Literal, Callable, Any, Union
 
@@ -18,8 +19,6 @@ from ..modules import parser, display
 if TYPE_CHECKING:
     from ..core import Client
     from ..utils import Quality
-
-logger = logging.getLogger(__name__)
 
 
 class Video:
@@ -42,6 +41,7 @@ class Video:
         if not consts.re.is_video_url(url):
             raise errors.URLError('Invalid video URL:', url)
 
+        self.logger = setup_logger(name="PHUB API - [Video]", log_file=None, level=logging.ERROR)
         self.client = client
         self.change_titles = change_title_language
         self.use_webmaster_api = self.client.use_webmaster_api
@@ -61,12 +61,16 @@ class Video:
 
         self.ALLOW_QUERY_SIMULATION = False
 
-        logger.debug('Initialised new video object %s', self)
-        logger.debug(f"Video data: {self.data}")
+        self.logger.debug('Initialised new video object %s', self)
+        self.logger.debug(f"Video data: {self.data}")
 
     def __repr__(self) -> str:
 
         return f'phub.Video(key={self.key})'
+
+    def enable_logging(self, log_file: str = None, level=None, log_ip=None, log_port=None):
+        self.logger = setup_logger(name="PHUB API - [Video]", log_file=log_file, level=level, http_ip=log_ip,
+                                   http_port=log_port)
 
     def refresh(self, page: bool = True, data: bool = True) -> None:
         '''
@@ -77,7 +81,7 @@ class Video:
             data (bool): Whether to refresh the video data.
         '''
 
-        logger.info('Refreshing %s cache', self)
+        self.logger.info('Refreshing %s cache', self)
 
         # Clear saved video page and data
         if page: self.page = None
@@ -86,7 +90,7 @@ class Video:
         # Clear properties cache
         for key in list(self.__dict__.keys()):
             if not key in self.loaded_keys:
-                logger.debug('Deleting key %s', key)
+                self.logger.debug('Deleting key %s', key)
                 delattr(self, key)
 
     def fetch(self, key: str) -> Any:
@@ -120,7 +124,7 @@ class Video:
         if key in self.data:
             return self.data.get(key)
 
-        logger.debug('Fetching %s key %s', self, key)
+        self.logger.debug('Fetching %s key %s', self, key)
 
         # Fetch only webmasters data
         if key.startswith('data@'):
@@ -128,7 +132,7 @@ class Video:
             data = self.client.call(url).json()
 
             if 'message' in data:
-                logger.warning('Video %s is not available. Error code: %s', self, data.get('code'))
+                self.logger.warning('Video %s is not available. Error code: %s', self, data.get('code'))
 
                 if data.get('code') == "2002":
                     raise errors.RegionBlocked("The video is not available in your country.")
@@ -213,7 +217,7 @@ class Video:
                 quality_urls[(width, height)] = url
 
             except Exception as e:
-                logger.warning(f"Skipping invalid quality entry: {q}")
+                self.logger.warning(f"Skipping invalid quality entry: {q}, {e}")
                 continue
 
         return quality_urls
@@ -242,14 +246,13 @@ class Video:
         if os.path.isdir(path):
             path = utils.concat(path, self.key + '.mp4')
 
-        logger.info('Starting download for %s at %s', self, path)
+        self.logger.info('Starting download for %s at %s', self, path)
 
         try:
-            print("Tring")
             self.client.core.download(video=self, quality=quality, path=path, callback=display, downloader=downloader)
-            print("Tried")
+
         except Exception as e:
-            print(f"Some error occured lol: {e}")
+            self.logger.error(f"An error occured while downloading video {e}")
 
         return path
 
@@ -320,11 +323,11 @@ class Video:
                 'Be advised this method is not recommended and requires user logging.'
             )
 
-        logger.warning('Attempting query simulation')
+        self.logger.warning('Attempting query simulation')
 
         # 1. Create playlist
         name = f'temp-{random.randint(0, 100)}'
-        logger.info('Creating temporary playlist %s', name)
+        self.logger.info('Creating temporary playlist %s', name)
         res = self.client.call('playlist/create', 'POST', dict(
             title=name,
             tags='["porn"]',
@@ -354,7 +357,7 @@ class Video:
         data = {k: v for k, v in zip(keys, consts.re.eval_video(raw))} | {'raw': raw}
 
         # 4. Delete playlist
-        logger.info('Deleting playlist %s', name)
+        self.logger.info('Deleting playlist %s', name)
         res = self.client.call('playlist/delete', 'POST', dict(
             pid=playlist_id,
             token=self._token,

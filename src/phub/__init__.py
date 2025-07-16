@@ -11,12 +11,11 @@ __copyright__ = 'Copyright 2024, PHUB'
 __license__ = 'GPLv3'
 __version__  = '4.7.2'
 
-__all__ = ['Client', 'Quality', 'core', 'utils',
+__all__ = ['Client', 'core', 'utils',
            'consts', 'errors', 'objects', 'modules']
 
 # Shortcuts
 from .core import Client
-from .utils import Quality
 
 # Sub modules
 from . import core

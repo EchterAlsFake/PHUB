@@ -9,7 +9,7 @@ import httpx
 
 from typing import Iterable, Union
 from functools import cached_property
-from base_api.base import BaseCore
+from base_api.base import BaseCore, setup_logger
 
 from . import utils
 from . import consts
@@ -21,8 +21,6 @@ from .modules import parser
 
 from .objects import (Video, User,
                       Account, Query, queries, Playlist)
-
-logger = logging.getLogger(__name__)
 
 
 class Client:
@@ -58,11 +56,12 @@ class Client:
                 The reason will be passed as the error body.
         '''
 
+        self.logger = setup_logger(name="PHUB API - [Client]", log_file=None, level=logging.ERROR)
         self.core = core or BaseCore()
         self.core.config.cookies = consts.COOKIES
         self.core.config.headers = consts.HEADERS
         # Applying PornHub specific cookies and headers to base API
-        logger.debug('Initialised new Client %s', self)
+        self.logger.debug('Initialised new Client %s', self)
 
         # Initialise session
         Client.use_webmaster_api = use_webmaster_api
@@ -81,12 +80,15 @@ class Client:
         # Connect account
         self.logged = False
         self.account = Account(self)
-        logger.debug('Connected account to client %s', self.account)
+        self.logger.debug('Connected account to client %s', self.account)
         
         # Automatic login
         if login and self.account:
             self.login()
-    
+
+    def enable_logging(self, log_file: str = None, level = None, log_ip=None, log_port=None):
+        self.logger = setup_logger(name="PHUB API - [Client]", log_file=log_file, level=level, http_ip=log_ip, http_port=log_port)
+
     def reset(self) -> None:
         '''
         Reset the client requests session.
@@ -134,7 +136,7 @@ class Client:
             HTTPError: If the request failed, for any reason.
         '''
         func = utils.fix_url(func)
-        logger.log(logging.DEBUG if silent else logging.INFO, 'Fetching %s', func or '/')
+        self.logger.log(logging.DEBUG if silent else logging.INFO, 'Fetching %s', func or '/')
 
         if headers:
             self.core.config.headers = headers
@@ -162,17 +164,17 @@ class Client:
                 # Attempt to resolve the challenge if needed
                 challenge = consts.re.get_challenge(response.text, False)
                 if challenge:
-                    logger.info('Challenge found, attempting to resolve')
+                    self.logger.info('Challenge found, attempting to resolve')
                     parser.challenge(self, *challenge)
                     
-                    logger.info(f"Sleeping for 1.5 seconds")
+                    self.logger.info(f"Sleeping for 1.5 seconds")
                     time.sleep(1.5) # Yes, we need to sleep that amount, otherwise PornHub refuses the challenge.
                     continue  # Reload page
 
                 break
 
             except Exception as err:
-                logger.log(logging.DEBUG if silent else logging.WARNING,
+                self.logger.log(logging.DEBUG if silent else logging.WARNING,
                            f'Call failed: {repr(err)}. Retrying (attempt {i + 1}/{self.core.config.max_retries})')
                 continue
 
@@ -200,10 +202,10 @@ class Client:
             LoginFailed: If the login failed, for a reason passed in the error body.
         '''
         
-        logger.debug('Attempting login')
+        self.logger.debug('Attempting login')
         
         if not force and self.logged:
-            logger.error('Client is already logged in')
+            self.logger.error('Client is already logged in')
             raise errors.ClientAlreadyLogged()
     
         # Get token
@@ -224,7 +226,7 @@ class Client:
         message = data.get('message')
         
         if throw and not success:
-            logger.error('Login failed: Received error: %s', message)
+            self.logger.error('Login failed: Received error: %s', message)
             raise errors.LoginFailed(message)
         
         # Reset token
@@ -246,7 +248,7 @@ class Client:
             Video: The corresponding video object.
         '''
         
-        logger.debug(f'Fetching video at {video}')
+        self.logger.debug(f'Fetching video at {video}')
 
         if isinstance(video, Video):
             # User might want to re-init a video,
@@ -284,7 +286,7 @@ class Client:
         if isinstance(user, User):
             user = user.url
         
-        logger.debug('Fetching user %s', user)
+        self.logger.debug('Fetching user %s', user)
         return User.get(self, user)
 
     def search_hubtraffic(self,
@@ -296,7 +298,7 @@ class Client:
                period: literals.ht_period = None) -> Query:
         '''
         Perform searching on Pornhub using the HubTraffic API.
-        It is condidered to be much faster but has less filters.
+        It is considered to be much faster but has less filters.
         
         Args:
             query (str): The query to search.

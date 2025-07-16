@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from functools import cached_property
+from base_api.base import setup_logger
 from typing import TYPE_CHECKING, Callable, Iterator, Union
 
 from .. import literals
@@ -10,8 +11,6 @@ from . import User, FeedItem
 if TYPE_CHECKING:
     from . import queries
     from ..core import Client
-
-logger = logging.getLogger(__name__)
 
 
 class Feed:
@@ -28,9 +27,13 @@ class Feed:
         '''
         
         self.client = client
-        
-        logger.debug('Initialised account feed: %s', self)
-    
+        self.logger = setup_logger(name="PHUB API - [Feed]", log_file=None, level=logging.ERROR)
+        self.logger.debug('Initialised account feed: %s', self)
+
+    def enable_logging(self, log_file: str = None, level=None, log_ip=None, log_port=None):
+        self.logger = setup_logger(name="PHUB API - [Feed]", log_file=log_file, level=level, http_ip=log_ip,
+                                   http_port=log_port)
+
     def __repr__(self) -> str:
         
         return f'phub.FeedCreator(for={self.client.account.name})'
@@ -51,7 +54,7 @@ class Feed:
         # Generate args
         username = user.name if isinstance(user, User) else user
         
-        logger.info('Generating new filter feed using args', )
+        self.logger.info('Generating new filter feed using args', )
         
         return queries.FeedQuery(
             client = self.client,

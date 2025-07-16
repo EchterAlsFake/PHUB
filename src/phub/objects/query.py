@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+from base_api.base import setup_logger
 from functools import cache, cached_property
 from typing import TYPE_CHECKING, Iterator, Any, Callable, Union
 
@@ -14,7 +15,6 @@ from .. import errors
 if TYPE_CHECKING:
     from ..core import Client
 
-logger = logging.getLogger(__name__)
 
 QueryItem = Union[Video, FeedItem, User]
 
@@ -87,6 +87,7 @@ class Query:
             query_repr (str): Indication for the query representation.
         '''
 
+        self.logger = setup_logger(name="PHUB API - [Query]", log_file=None, level=logging.ERROR)
         self.client = client
         self.hint = container_hint
         self._query_repr = query_repr
@@ -97,13 +98,17 @@ class Query:
         
         self.suppress_spicevids = True
         
-        logger.debug('Initialised new query %s', self)
+        self.logger.debug('Initialised new query %s', self)
     
     def __repr__(self) -> str:
         
         s = f'"{self._query_repr}"' if self._query_repr else f'url="{self.url}"'
         return f'phub.Query({s})'
-    
+
+    def enable_logging(self, log_file: str = None, level=None, log_ip=None, log_port=None):
+        self.logger = setup_logger(name="PHUB API - [Query]", log_file=log_file, level=level, http_ip=log_ip,
+                                   http_port=log_port)
+
     def __len__(self) -> int:
         '''
         Attempts to fetch the query length.
@@ -271,7 +276,6 @@ class queries:
 
             elif videos is None:
                 print(raw)
-                logger.error('Invalid API response from `%s`', self.url)
                 raise errors.ParsingError('Invalid API response')
 
             return videos
@@ -337,7 +341,7 @@ class queries:
                     yield wrapped
                 
                 else:
-                    logger.info('Bypassed spicevid video: %s', wrapped)
+                    pass # Don't ask.
 
     class UserQuery(VideoQuery):
         '''
