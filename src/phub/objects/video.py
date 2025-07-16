@@ -224,8 +224,7 @@ class Video:
                  downloader: Union[Callable, str] = "threaded",
                  quality: Quality | str = 'best',
                  *,
-                 display: Callable[[int, int], None] = display.default(),
-                 convert: bool = False) -> str:
+                 display: Callable[[int, int], None] = display.default()) -> str:
         '''
         Download the video to a file.
 
@@ -234,7 +233,6 @@ class Video:
             quality (Quality | str | int): The video quality.
             downloader (Callable): The download backend.
             display (Callable): The progress display.
-            convert (bool): Whether to convert the video to a valid .mp4 file using FFmpeg
 
         Returns:
             str: The downloader video path.
@@ -252,13 +250,6 @@ class Video:
             print("Tried")
         except Exception as e:
             print(f"Some error occured lol: {e}")
-
-        if convert:
-            FFMPEG_COMMAND = consts.FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output} -quiet'
-            os.rename(path, path + ".tmp")
-            os.system(FFMPEG_COMMAND.format(input=path + ".tmp", output=path))
-            os.remove(path + ".tmp")
-            logger.info(f"Video was converted to: {path}")
 
         return path
 

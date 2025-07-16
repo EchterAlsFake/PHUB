@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest httpx[brotli,socks] ffmpeg-progress-yield
+        pip install pytest httpx[brotli,socks] ffmpeg-progress-yield git+https://github.com/EchterAlsFake/eaf_base_api
     - name: Test with pytest
       env:
         EMAIL: ${{ secrets.EMAIL }}

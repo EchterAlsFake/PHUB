@@ -79,7 +79,8 @@ def challenge(client: Client, challenge: str, token: str) -> None:
     
     # Build and inject cookie
     cookie = f'{n}*{p // n}:{s}:{token}:1'
-    client.session.cookies.set('KEY', cookie)
+    client.core.config.cookies = {'KEY', cookie}
+    client.core.update_cookies()
     logger.info('Injected cookie %s', cookie)
-
+    print("Injected cookie for authentication")
 # EOF

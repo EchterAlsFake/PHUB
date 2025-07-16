@@ -76,11 +76,8 @@ class Client:
         self.core.update_headers({"Accept-Language": language})
         self.credentials = {'email': email,
                             'password': password}
-        
-        self.delay = consts.DELAY
-        self.start_delay = False
-        self.last_request_time = None
-        
+
+
         # Connect account
         self.logged = False
         self.account = Account(self)
@@ -96,10 +93,6 @@ class Client:
         This is useful if you are keeping the client running
         for a long time and can help with Pornhub rate limit.
         '''
-        verify = True
-        if consts.PROXY is not None:
-            verify = False
-
         self._clear_granted_token()
 
         if self.bypass_geo_blocking:
@@ -119,7 +112,6 @@ class Client:
              method: str = 'GET',
              data: dict = None,
              headers: dict = None,
-             timeout: float = consts.CALL_TIMEOUT,
              throw: bool = True,
              silent: bool = False,
              get_response = True) -> httpx.Response:
@@ -131,7 +123,6 @@ class Client:
             method (str): Request method (GET, POST, PUT, ...).
             data (dict): Optional data to send to the server.
             headers (dict): Additional request headers.
-            timeout (float): Request maximum response time.
             throw (bool): Whether to raise an error when a request explicitly fails.
             silent (bool): Whether to supress this call from logs.
 
@@ -147,13 +138,6 @@ class Client:
 
         if headers:
             self.core.config.headers = headers
-        # Delay mechanism
-        if self.last_request_time:
-            elapsed_time = time.time() - self.last_request_time
-            if elapsed_time < self.delay:
-                time.sleep(self.delay - elapsed_time)
-
-        self.last_request_time = time.time()  # Update the time of the last request
 
         if not self.language == "en":
             host = consts.LANGUAGE_MAPPING.get(self.language)
@@ -163,13 +147,12 @@ class Client:
             host = consts.HOST
 
         url = func if 'http' in func else utils.concat(host, func)
-        for i in range(consts.MAX_CALL_RETRIES):
+        for i in range(self.core.config.max_retries):
             try:
                 response = self.core.fetch(
                     method = method,
                     url = url,
                     data = data,
-                    timeout = timeout,
                     get_response=get_response)
 
                 # Silent 429 errors
@@ -182,16 +165,15 @@ class Client:
                     logger.info('Challenge found, attempting to resolve')
                     parser.challenge(self, *challenge)
                     
-                    logger.info(f"Sleeping for {consts.CHALLENGE_TIMEOUT} seconds")
-                    time.sleep(consts.CHALLENGE_TIMEOUT)
+                    logger.info(f"Sleeping for 1.5 seconds")
+                    time.sleep(1.5) # Yes, we need to sleep that amount, otherwise PornHub refuses the challenge.
                     continue  # Reload page
 
                 break
 
             except Exception as err:
                 logger.log(logging.DEBUG if silent else logging.WARNING,
-                           f'Call failed: {repr(err)}. Retrying (attempt {i + 1}/{consts.MAX_CALL_RETRIES})')
-                time.sleep(consts.MAX_CALL_TIMEOUT)
+                           f'Call failed: {repr(err)}. Retrying (attempt {i + 1}/{self.core.config.max_retries})')
                 continue
 
         else:
