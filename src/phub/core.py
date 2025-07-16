@@ -5,15 +5,17 @@ PHUB core module.
 import time
 import logging
 import random
-
 import httpx
+
 from typing import Iterable, Union
 from functools import cached_property
+from base_api.base import BaseCore
 
 from . import utils
 from . import consts
 from . import errors
 from . import literals
+from .errors import LoginFailed
 
 from .modules import parser
 
@@ -38,7 +40,8 @@ class Client:
                  login: bool = True,
                  bypass_geo_blocking: bool = False,
                  change_title_language: bool = True,
-                 use_webmaster_api: bool = True) -> None:
+                 use_webmaster_api: bool = True,
+                 core=None) -> None:
         '''
         Initialises a new client.
         
@@ -54,7 +57,11 @@ class Client:
             LoginFailed: If Pornhub refuses the authentication.
                 The reason will be passed as the error body.
         '''
-        
+
+        self.core = core or BaseCore()
+        self.core.config.cookies = consts.COOKIES
+        self.core.config.headers = consts.HEADERS
+        # Applying PornHub specific cookies and headers to base API
         logger.debug('Initialised new Client %s', self)
 
         # Initialise session
@@ -65,7 +72,8 @@ class Client:
 
         self.reset()
 
-        self.session.headers.update({"Accept-Language": language})
+        self.core.config.headers.update({"Accept-Language": language})
+        self.core.update_headers({"Accept-Language": language})
         self.credentials = {'email': email,
                             'password': password}
         
@@ -92,14 +100,6 @@ class Client:
         if consts.PROXY is not None:
             verify = False
 
-        # Initialise session
-        self.session = httpx.Client(
-            headers = consts.HEADERS,
-            cookies = consts.COOKIES,
-            follow_redirects = True,
-            proxy = consts.PROXY,
-            verify = verify)
-
         self._clear_granted_token()
 
         if self.bypass_geo_blocking:
@@ -107,12 +107,12 @@ class Client:
             language_code = "fr"
 
             # Faking the X-Forwarded-For header (Fake IP source)
-            self.session.headers.update({"X-Forwarded-For": f"{ip}"})
+            self.core.config.headers.update({"X-Forwarded-For": f"{ip}"})
             # Setting the Accept-Language tag to French, because the faked IP comes from france
-            self.session.headers.update({"Accept-Language": f"{language_code}"})
+            self.core.config.headers.update({"Accept-Language": f"{language_code}"})
             # Setting the country code also to french
-            self.session.headers.update({"CF-IPCountry": f"{language_code}"})
-            logging.debug(f"Using faked headers for geo-bypass: {self.session.headers}")
+            self.core.config.headers.update({"CF-IPCountry": f"{language_code}"})
+            logging.debug(f"Using faked headers for geo-bypass: {self.core.config.session.headers}")
 
     def call(self,
              func: str,
@@ -121,7 +121,8 @@ class Client:
              headers: dict = None,
              timeout: float = consts.CALL_TIMEOUT,
              throw: bool = True,
-             silent: bool = False) -> httpx.Response:
+             silent: bool = False,
+             get_response = True) -> httpx.Response:
         '''
         Used internally to send a request or an API call.
 
@@ -144,6 +145,8 @@ class Client:
         func = utils.fix_url(func)
         logger.log(logging.DEBUG if silent else logging.INFO, 'Fetching %s', func or '/')
 
+        if headers:
+            self.core.config.headers = headers
         # Delay mechanism
         if self.last_request_time:
             elapsed_time = time.time() - self.last_request_time
@@ -162,13 +165,12 @@ class Client:
         url = func if 'http' in func else utils.concat(host, func)
         for i in range(consts.MAX_CALL_RETRIES):
             try:
-                response = self.session.request(
+                response = self.core.fetch(
                     method = method,
                     url = url,
-                    headers = headers,
                     data = data,
-                    timeout = timeout
-                )
+                    timeout = timeout,
+                    get_response=get_response)
 
                 # Silent 429 errors
                 if b'429</title>' in response.content:
@@ -224,8 +226,12 @@ class Client:
     
         # Get token
         page = self.call('').text
-        base_token = consts.re.get_token(page)
-        
+        try:
+            base_token = consts.re.get_token(page)
+
+        except errors.RegexError:
+            raise LoginFailed("(Probably) invalid credentials. If you are sure they are correct, please report this issue.")
+
         # Send credentials
         payload = consts.LOGIN_PAYLOAD | self.credentials | {'token': base_token}
         response = self.call('front/authenticate', method = 'POST', data = payload)

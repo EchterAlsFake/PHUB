@@ -13,7 +13,9 @@ PHUB is an easy-to-use API wrapper for Pornhub. It can access most used or usefu
 PH features, such as video searching, account features, video downloading, and more.
 
 > [!WARNING]
-> This project is probably against Pornhub TOS. Use at your own risks.
+> This project is against PornHub's Terms of Services. Redistributing copyright protected content is a crime under DMCA. 
+> Usage of this API is intended for **PRIVATE** non-commercial purposes only. We are not responsible for damages caused by
+> this project. Please use it responsibly to ensure the continued development for everyone!
 
 # Installation
 
@@ -38,7 +40,8 @@ py -m phub path/to/file.txt --quality best --downloader threaded --output video.
 # Quickstart
 
 > [!NOTE]
-> You can find the docs on this project [here](https://phub.readthedocs.io).
+> You can find the beautiful outdated docs on this project [here](https://phub.readthedocs.io).
+> <br>Or use the ugly but **UPDATED** docs (xD) [here](https://github.com/EchterAlsFake/API_Docs/)
 
 ```python
 import phub
@@ -49,7 +52,7 @@ client = phub.Client()
 
 # Fetch and download a video
 video = client.get('https://...')
-video.download('my-video.mp4', Quality.BEST)
+video.download('my-video.mp4', quality="best") # See docs for more options
 
 # Fetch user videos
 user = client.get_user('this-user')
@@ -61,7 +64,7 @@ for video in client.search('my-query'):
     print(video.title)
 
 # Connect to an account
-client = phub.Client('my-username', 'my-password')
+client = phub.Client('my-email', 'my-password')
 
 # Access account history, liked and recommended stuff
 client.account.watched
@@ -75,6 +78,12 @@ PHUB uses GPLv3. See the `LICENSE` file.
 This repository was initiated and maintained by [Egsagon](https://github.com/Egsagon)
 He doesn't have any time to maintain this and transferred me the ownership.
 I'll do my best to maintain this repository functional.
+
+# Donations
+If you want to donate, I and Egsagon will gladly appreciate it. Donations will be split 50/50 between us. 
+Please use PayPal for donating, as it makes it easier. Thanks a lot! 
+
+- https://paypal.me/EchterAlsFake
 
 # Contributing
 Feel free to contribute to this project by submitting

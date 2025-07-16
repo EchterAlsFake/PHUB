@@ -13,7 +13,7 @@ from .. import utils
 from .. import errors
 from .. import consts
 from .. import literals
-from ..modules import download, parser, display
+from ..modules import parser, display
 
 if TYPE_CHECKING:
     from ..core import Client
@@ -168,7 +168,27 @@ class Video:
 
     # === Download methods === #
 
-    def get_M3U_URL(self, quality: Quality) -> str:
+    @cached_property
+    def m3u8_base_url(self) -> str:
+        """Builds a fake master.m3u8 playlist from quality-specific m3u8 URLs."""
+        # I know that this is not a URL, but this will be handled specifically in eaf_base_api
+
+        """
+        Yo, if you are my future boss inspecting this code right now, and you search for the sense or logic here and why
+        I did this, please immediately stop. Call an ambulance for yourself, because you will definitely get a brain
+        damage, or just invite me directly into a call and I explain why I did it. 
+        
+        I am not responsible for any deaths, damages, or other losses caused by reading this code infrastructure lmao.
+        """
+
+        playlist_lines = ['#EXTM3U']
+        for (width, height), uri in self.get_m3u8_urls.items():
+            playlist_lines.append(f'#EXT-X-STREAM-INF:BANDWIDTH=8000000,RESOLUTION={width}x{height}')
+            playlist_lines.append(uri)
+        return '\n'.join(playlist_lines)
+
+    @cached_property
+    def get_m3u8_urls(self) -> dict:
         '''
         The URL of the master M3U file.
 
@@ -179,55 +199,31 @@ class Video:
             str: The M3U url.
         '''
 
-        from ..utils import Quality
+        raw_qualities = self.fetch('page@mediaDefinitions')
+        quality_urls = {}
 
-        # Get qualities
-        qualities = {int(v): q['videoUrl']
-                     for q in self.fetch('page@mediaDefinitions')
-                     if str(v := q['quality']).isdigit()}
+        for q in raw_qualities:
+            if q.get('format') != 'hls' or not q.get('videoUrl'):
+                continue
 
-        logger.info('Extracted %s qualities from %s', len(qualities), self)
+            try:
+                width = int(q.get('width', 0))
+                height = int(q.get('height', 0))
+                url = q['videoUrl']
+                quality_urls[(width, height)] = url
 
-        return Quality(quality).select(qualities)
+            except Exception as e:
+                logger.warning(f"Skipping invalid quality entry: {q}")
+                continue
 
-    def get_segments(self, quality: Quality) -> Iterator[str]:
-        '''
-        Get the video segment URLs.
+        return quality_urls
 
-        Args:
-            quality (Quality): The video quality.
-
-        Returns:
-            Iterator: A segment URL iterator.
-        '''
-
-        # Fetch the master file
-        master_url = self.get_M3U_URL(quality)
-        master_src = self.client.call(master_url).text
-
-        urls = [l for l in master_src.split('\n')
-                if l and not l.startswith('#')]
-
-        if len(urls) != 1:
-            raise errors.ParsingError('Multiple index files found.')
-
-        # Get DNS address
-        dns = master_url.split('master.m3u8')[0]
-
-        # Fetch the index file
-        url = urls[0]
-        raw = self.client.call(dns + url).text
-
-        # Parse files
-        for line in raw.split('\n'):
-            if line.strip() and not line.startswith('#'):
-                yield dns + line
 
     def download(self,
                  path: Union[str, os.PathLike],
+                 downloader: Union[Callable, str] = "threaded",
                  quality: Quality | str = 'best',
                  *,
-                 downloader: Union[Callable, str] = download.default,
                  display: Callable[[int, int], None] = display.default(),
                  convert: bool = False) -> str:
         '''
@@ -250,25 +246,12 @@ class Video:
 
         logger.info('Starting download for %s at %s', self, path)
 
-        if isinstance(downloader, str):
-            if downloader == "default":
-                download.default(video=self, quality=quality, path=path, callback=display)
-
-            elif downloader == "threaded":
-                threaded_download = download.threaded(max_workers=20, timeout=10)
-                threaded_download(video=self, quality=quality, path=path, callback=display)
-
-            elif downloader == "FFMPEG":
-                download.FFMPEG(video=self, quality=quality, path=path, callback=display)
-
-        else:
-            # Call the backend
-            downloader(
-                video=self,
-                quality=quality,
-                callback=display,
-                path=path
-            )
+        try:
+            print("Tring")
+            self.client.core.download(video=self, quality=quality, path=path, callback=display, downloader=downloader)
+            print("Tried")
+        except Exception as e:
+            print(f"Some error occured lol: {e}")
 
         if convert:
             FFMPEG_COMMAND = consts.FFMPEG_EXECUTABLE + ' -i "{input}" -bsf:a aac_adtstoasc -y -c copy {output} -quiet'

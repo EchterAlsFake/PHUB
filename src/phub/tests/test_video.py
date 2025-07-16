@@ -33,15 +33,3 @@ def test_video_information():
     assert isinstance(embed, str) and len(embed) >= 3
     assert isinstance(image, str) and len(image) >= 3
     assert isinstance(id, (str, int))
-
-
-def test_video_segments():
-    segments_1 = list(video.get_segments(Quality.BEST))
-    segments_2 = list(video.get_segments(Quality.HALF))
-    segments_3 = list(video.get_segments(Quality.WORST))
-
-    assert isinstance(segments_1, list) and len(segments_1) >= 5
-    assert isinstance(segments_2, list) and len(segments_2) >= 5
-    assert isinstance(segments_3, list) and len(segments_3) >= 5
-
-# EOF
