@@ -7,7 +7,6 @@ import argparse
 import re
 
 from phub import Client, Video
-from phub.modules.download import threaded, FFMPEG, default
 
 
 def text_progress_bar(downloaded, total, title=False):
@@ -41,14 +40,6 @@ def download_video(client: Client, url: [str, Video], output: str, quality: str,
     video.download(path=final_output_path, quality=quality, downloader=downloader, display=text_progress_bar)
     print(f"Successfully downloaded: {title}")
 
-def resolve_threading_mode(mode, workers=10, timeout=10):
-    """Resolve the appropriate threading mode based on input."""
-    return {
-        "threaded": threaded(max_workers=workers, timeout=timeout),
-        "ffmpeg": FFMPEG,
-        "default": default
-    }.get(mode, default)
-
 
 def main():
     parser = argparse.ArgumentParser(description="PHUB built-in CLI")
@@ -68,7 +59,7 @@ def main():
     args = parser.parse_args()
     quality = args.quality
     output = args.output
-    downloader = resolve_threading_mode(mode=args.downloader)
+    downloader = args.downloader
     url = args.url
     model = args.model
     video_limit = args.video_limit
