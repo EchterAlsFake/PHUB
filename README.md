@@ -32,20 +32,19 @@ pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git
 # Usage from command line
 ```shell
 # Download a single video
-py -m phub https://www.pornhub.com/view_video.php?viewkey=abcdef
+phub -url https://www.pornhub.com/view_video.php?viewkey=abcdef
 # Download multiple videos from a text file
-py -m phub path/to/file.txt --quality best --downloader threaded --output video.mp4
+phub -file path/to/file.txt --quality best --downloader threaded --output video.mp4
 ```
 
 # Quickstart
 
 > [!NOTE]
 > You can find the beautiful outdated docs on this project [here](https://phub.readthedocs.io).
-> <br>Or use the ugly but **UPDATED** docs (xD) [here](https://github.com/EchterAlsFake/API_Docs/)
+> <br>Or use the ugly but **UPDATED** docs (xD) [here](https://github.com/EchterAlsFake/API_Docs/blob/master/Porn_APIs/PHUB.md)
 
 ```python
 import phub
-from phub.locals import *
 
 # Initialise a client
 client = phub.Client()

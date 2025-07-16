@@ -22,7 +22,7 @@ phub = "phub.__main__:main"
 
 [project.urls]
 Documentation = "https://phub.readthedocs.io"
-Documentation_Updated = "https://github.com/EchterAlsFake/API_Docs"
+Documentation_Updated = "https://github.com/EchterAlsFake/API_Docs/blob/master/Porn_APIs/PHUB.md"
 Repository = "https://github.com/EchterAlsFake/PHUB"
 
 [build-system]
