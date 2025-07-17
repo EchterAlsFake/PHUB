@@ -184,7 +184,7 @@ class Query:
         
         assert isinstance(index, int)
         url = self.url.format(page = index + 1)
-        req = self.client.call(url, get_response=True)
+        req = self.client.call(url, get_response=True, throw=False)
         
         if req.status_code == 404:
             raise errors.NoResult()
