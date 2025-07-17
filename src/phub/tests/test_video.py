@@ -5,7 +5,7 @@ try:
 except (ModuleNotFoundError, ImportError):
     from ...phub import Client
 
-config.request_delay = 10
+config.request_delay = 0
 core = BaseCore(config=config)
 client = Client(language="en", core=core)  # Make a delay, so that PornHub isn't stressed too much
 url = "https://de.pornhub.com/view_video.php?viewkey=ph60f99fa4b5cd7"

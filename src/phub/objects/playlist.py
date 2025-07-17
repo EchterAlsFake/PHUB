@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import TYPE_CHECKING
 from functools import cache, cached_property
 
@@ -34,7 +35,6 @@ class Playlist(queries.VideoQuery):
         
         # Initialise 
         super().__init__(client, func = None)
-        
         # Define both playlist url (first page) and chunked (next pages)
         self.url = 'playlist/' + str(pid)
         self.chunk_url = f'playlist/viewChunked?id={pid}' '&token={token}&page={page}'
@@ -70,10 +70,6 @@ class Playlist(queries.VideoQuery):
             raise errors.NoResult()
         
         return response.text
-    
-    @cached_property
-    def _data(self) -> str:
-        return consts.re.playlist_data(self._page)
 
     def __len__(self) -> int:
         return int(consts.re.get_playlist_size(self._page))
@@ -89,27 +85,27 @@ class Playlist(queries.VideoQuery):
     @cached_property
     def like(self) -> Like:
         return Like(
-            int(consts.re.get_playlist_likes(self._data)),
-            int(consts.re.get_playlist_dislikes(self._data)),
-            float(consts.re.get_playlist_ratings(self._data))
+            int(consts.re.get_playlist_likes(self._page)),
+            int(consts.re.get_playlist_dislikes(self._page)),
+            float(consts.re.get_playlist_ratings(self._page))
         )
 
     @cached_property
     def views(self) -> int:
-        raw: str = consts.re.get_playlist_views(self._data)
+        raw: str = consts.re.get_playlist_views(self._page)
         return int(raw.replace(',', ''))
     
     @cached_property
     def tags(self) -> list[str]:
-        return consts.re.get_playlist_tags(self._data)
+        return consts.re.get_playlist_tags(self._page)
 
     @cached_property
     def author(self) -> User:
-        url = consts.re.get_playlist_author(self._data)
+        url = consts.re.get_playlist_author(self._page)
         return User.get(self.client, consts.HOST + url)
     
     @cached_property
     def title(self) -> str:
-        return consts.re.get_playlist_title(self._data)
+        return consts.re.get_playlist_title(self._page)
 
 # EOF

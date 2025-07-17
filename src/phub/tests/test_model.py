@@ -7,7 +7,7 @@ except (ModuleNotFoundError, ImportError):
     from base_api.modules.config import config
     from base_api.base import BaseCore
 
-config.request_delay = 10
+config.request_delay = 0
 core = BaseCore(config=config)
 client = Client(language="en", core=core)  # Make a delay, so that PornHub isn't stressed too much
 

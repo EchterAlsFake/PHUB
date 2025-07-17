@@ -17,11 +17,10 @@ def test_auth():
     
     assert email and password
 
-    config.request_delay = 10
+    config.request_delay = 0
     core = BaseCore(config=config)
-    client = Client(language="en", core=core)  # Make a delay, so that PornHub isn't stressed too much
-    client.login()
-    
+    client = Client(language="en", core=core, email=email, password=password)
+
     assert client.logged
 
 # EOF

@@ -1,8 +1,11 @@
 from __future__ import annotations
 import logging
+import re
 
 from dataclasses import dataclass
 from functools import cached_property
+from traceback import print_tb
+
 from base_api.base import setup_logger
 from typing import TYPE_CHECKING, Literal, Union
 
@@ -223,8 +226,17 @@ class User:
         '''
         The user bio.
         '''
-        
-        return consts.re.user_bio(self._page, throw = False)
+        try:
+            print(self._page)
+            bio = consts.re.user_bio(self._page, throw = False)
+            assert bio, str
+        except (errors.RegexError, AssertionError):
+            try:
+                bio = re.search(r'<div class="profileReadMoreExcerpt">\s*(.*?)\s*</div>', self._page, re.DOTALL).group(1)
+            except AttributeError:
+                return None # User has no bio probably
+
+        return bio
 
     @cached_property
     def info(self) -> dict[str, str]:
@@ -247,10 +259,15 @@ class User:
         '''
         
         from . import Image
-        
-        url = (getattr(self, '_cached_avatar_url')
+        print(self._page)
+        try:
+            url = (getattr(self, '_cached_avatar_url')
                or consts.re.user_avatar(self._page))
-        
+
+        except errors.RegexError:
+            url = (getattr(self, '_cached_avatar_url')
+                   or re.search("/model/(.*?)/about", string=self._page).group(1))
+
         return Image(client = self.client,
                      url = url,
                      name = f'{self.name}-avatar')

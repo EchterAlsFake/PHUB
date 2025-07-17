@@ -1,7 +1,7 @@
 '''
 PHUB core module.
 '''
-
+import re
 import time
 import logging
 import random
@@ -209,12 +209,13 @@ class Client:
             raise errors.ClientAlreadyLogged()
     
         # Get token
-        page = self.call('').text
+        page = self.call('https://www.pornhub.com').text
         try:
             base_token = consts.re.get_token(page)
 
         except errors.RegexError:
-            raise LoginFailed("(Probably) invalid credentials. If you are sure they are correct, please report this issue.")
+            self.logger.warning("Couldn't get token. Trying alternative method...")
+            base_token = re.search(r'data-token="(.*?)"', string=page).group(1)
 
         # Send credentials
         payload = consts.LOGIN_PAYLOAD | self.credentials | {'token': base_token}
