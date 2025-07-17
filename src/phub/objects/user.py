@@ -4,7 +4,6 @@ import re
 
 from dataclasses import dataclass
 from functools import cached_property
-from traceback import print_tb
 
 from base_api.base import setup_logger
 from typing import TYPE_CHECKING, Literal, Union
@@ -227,7 +226,6 @@ class User:
         The user bio.
         '''
         try:
-            print(self._page)
             bio = consts.re.user_bio(self._page, throw = False)
             assert bio, str
         except (errors.RegexError, AssertionError):
@@ -259,14 +257,13 @@ class User:
         '''
         
         from . import Image
-        print(self._page)
         try:
             url = (getattr(self, '_cached_avatar_url')
                or consts.re.user_avatar(self._page))
 
         except errors.RegexError:
             url = (getattr(self, '_cached_avatar_url')
-                   or re.search("/model/(.*?)/about", string=self._page).group(1))
+                   or re.search(r"/(?:model|pornstar)/(.*?)/about", string=self._page).group(1))
 
         return Image(client = self.client,
                      url = url,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import time
 from typing import TYPE_CHECKING
 from functools import cache, cached_property
@@ -72,7 +73,7 @@ class Playlist(queries.VideoQuery):
         return response.text
 
     def __len__(self) -> int:
-        return int(consts.re.get_playlist_size(self._page))
+        return int(re.search(r'var\s+itemsCount\s*=\s*(\d+)\s*\|\|', string=self._page).group(1))
     
     @cached_property
     def hidden_videos_amount(self) -> int:
