@@ -18,7 +18,6 @@ from ..modules import parser, display
 
 if TYPE_CHECKING:
     from ..core import Client
-    from ..utils import Quality
 
 
 class Video:
@@ -226,7 +225,9 @@ class Video:
     def download(self,
                  path: Union[str, os.PathLike],
                  downloader: Union[Callable, str] = "threaded",
-                 quality: Quality | str = 'best',
+                 quality: str = 'best',
+                 remux: bool = False,
+                 display_remux: Callable[[int, int], None] = None,
                  *,
                  display: Callable[[int, int], None] = display.default()) -> str:
         '''
@@ -237,6 +238,8 @@ class Video:
             quality (Quality | str | int): The video quality.
             downloader (Callable): The download backend.
             display (Callable): The progress display.
+            remux (bool): Whether to remux the video from MPEG-TS to MP4 (h264)
+            display_remux (Callable[[int, int], None], optional): The display backend for remuxing.
 
         Returns:
             str: The downloader video path.
@@ -249,36 +252,13 @@ class Video:
         self.logger.info('Starting download for %s at %s', self, path)
 
         try:
-            self.client.core.download(video=self, quality=quality, path=path, callback=display, downloader=downloader)
+            self.client.core.download(video=self, quality=quality, path=path, callback=display, downloader=downloader,
+                                      remux=remux, callback_remux=display_remux)
 
         except Exception as e:
             self.logger.error(f"An error occured while downloading video {e}")
 
         return path
-
-    def get_direct_url(self, quality: Quality) -> str:
-        '''
-        Get the direct video URL given a specific quality.
-
-        Args:
-            quality (Quality): The video quality.
-
-        Returns:
-            str: The direct url.
-        '''
-
-        from ..utils import Quality
-        qual = Quality(quality)
-
-        # Get remote
-        sources = self.fetch('page@mediaDefinitions')
-        remote = [s for s in sources if 'remote' in s][0]['videoUrl']
-
-        # Parse quality
-        quals = {int(s['quality']): s['videoUrl']
-                 for s in self.client.call(remote).json()}
-
-        return qual.select(quals)
 
     # === Interaction methods === #
 

@@ -23,7 +23,8 @@ def test_video_information():
     embed = video.embed
     image = video.image.url
     id = video.id
-
+    assert isinstance(video.download(path="./", quality="best", remux=True), str)
+    assert isinstance(video.download(path="./", quality="beest"), str)
     assert isinstance(title, str) and len(title) > 3
     assert isinstance(likes, int) and len(str(likes)) >= 1
     assert isinstance(dislikes, int) and len(str(dislikes)) >= 1
