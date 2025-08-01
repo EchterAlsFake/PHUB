@@ -218,9 +218,15 @@ class Video:
             except Exception as e:
                 self.logger.warning(f"Skipping invalid quality entry: {q}, {e}")
                 continue
-
         return quality_urls
 
+    def get_segments(self, quality) -> list:
+        """
+        :param quality: (str) The video quality
+        :return: (list) A list of segments (URLs)
+        """
+        segments = self.client.core.get_segments(m3u8_url_master=self.m3u8_base_url, quality=quality)
+        return segments
 
     def download(self,
                  path: Union[str, os.PathLike],
