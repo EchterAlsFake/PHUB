@@ -20,7 +20,7 @@ def progress(color: Union[dict, None] = dict(c1=30, c2=33, c3=34, c4=36), desc: 
     color['c0'] = 0
     color = {k: '' if v == '' else f'\033[{v}m' for k, v in color.items()}
     
-    tem = '\r{c1}' + desc + ' {c2}{percent}%{c0} - {c3}{cur}{c0}/{c3}{total}i{c0}' # ({c4}{speed}ips{c0})
+    tem = '\r{c1}' + desc + ' {c2}{percent}%{c0} - {c3}{cur}{c0}/{c3}{total}{c0}' # ({c4}{speed}ips{c0})
     done = False
     start = time.time()
     

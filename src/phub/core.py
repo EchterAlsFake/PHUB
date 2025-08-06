@@ -7,9 +7,10 @@ import logging
 import random
 import httpx
 
-from typing import Iterable, Union
 from functools import cached_property
+from typing import Iterable, Union, Optional
 from base_api.base import BaseCore, setup_logger
+from base_api.modules.config import RuntimeConfig
 
 from . import utils
 from . import consts
@@ -39,7 +40,7 @@ class Client:
                  bypass_geo_blocking: bool = False,
                  change_title_language: bool = True,
                  use_webmaster_api: bool = True,
-                 core=None) -> None:
+                 core: Optional[BaseCore] = None) -> None:
         '''
         Initialises a new client.
         
@@ -57,9 +58,8 @@ class Client:
         '''
 
         self.logger = setup_logger(name="PHUB API - [Client]", log_file=None, level=logging.ERROR)
-        self.core = core or BaseCore()
-        self.core.config.cookies = consts.COOKIES
-        self.core.config.headers = consts.HEADERS
+        self.core = core or BaseCore(config=RuntimeConfig())
+        self.core.initialize_session(headers=consts.HEADERS, cookies=consts.COOKIES)
         # Applying PornHub specific cookies and headers to base API
         self.logger.debug('Initialised new Client %s', self)
 
@@ -71,8 +71,7 @@ class Client:
 
         self.reset()
 
-        self.core.config.headers.update({"Accept-Language": language})
-        self.core.update_headers({"Accept-Language": language})
+        self.core.session.headers.update({"Accept-Language": language})
         self.credentials = {'email': email,
                             'password': password}
 
@@ -102,11 +101,11 @@ class Client:
             language_code = "fr"
 
             # Faking the X-Forwarded-For header (Fake IP source)
-            self.core.config.headers.update({"X-Forwarded-For": f"{ip}"})
+            self.core.session.headers.update({"X-Forwarded-For": f"{ip}"})
             # Setting the Accept-Language tag to French, because the faked IP comes from france
-            self.core.config.headers.update({"Accept-Language": f"{language_code}"})
+            self.core.session.headers.update({"Accept-Language": f"{language_code}"})
             # Setting the country code also to french
-            self.core.config.headers.update({"CF-IPCountry": f"{language_code}"})
+            self.core.session.headers.update({"CF-IPCountry": f"{language_code}"})
             logging.debug(f"Using faked headers for geo-bypass: {self.core.config.session.headers}")
 
     def call(self,
@@ -139,7 +138,7 @@ class Client:
         self.logger.log(logging.DEBUG if silent else logging.INFO, 'Fetching %s', func or '/')
 
         if headers:
-            self.core.config.headers = headers
+            self.core.session.headers = headers
 
         if not self.language == "en":
             host = consts.LANGUAGE_MAPPING.get(self.language)
