@@ -59,7 +59,9 @@ class Client:
 
         self.logger = setup_logger(name="PHUB API - [Client]", log_file=None, level=logging.ERROR)
         self.core = core or BaseCore(config=RuntimeConfig())
-        self.core.initialize_session(headers=consts.HEADERS, cookies=consts.COOKIES)
+        self.core.initialize_session()
+        self.core.session.headers.update(consts.HEADERS)
+        self.core.session.cookies.update(consts.HEADERS)
         # Applying PornHub specific cookies and headers to base API
         self.logger.debug('Initialised new Client %s', self)
 

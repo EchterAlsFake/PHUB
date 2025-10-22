@@ -1,3 +1,4 @@
 httpx[brotli,socks]>=0.27.0
 ffmpeg-progress-yield>=0.7.8
 eaf_base_api
+h2
