@@ -4,8 +4,9 @@ PHUB built-in CLI.
 
 import os
 import argparse
-import re
 
+from typing import Union
+from base_api import BaseCore
 from phub import Client, Video
 
 
@@ -22,7 +23,7 @@ def text_progress_bar(downloaded, total, title=False):
         print(f"\r | {title} | -->: [{bar}] {percents}%", end='')
 
 
-def download_video(client: Client, url: [str, Video], output: str, quality: str, downloader: str):
+def download_video(client: Client, url: Union[str | Video], output: str, quality: str, downloader: str, use_video_id=False):
     if not isinstance(url, Video):
         video = client.get(url)
 
@@ -33,10 +34,15 @@ def download_video(client: Client, url: [str, Video], output: str, quality: str,
     else:
         raise "Some error happened here, please report on GitHub, thank you :) "
 
-    title =  re.sub(r'[<>:"/\\|?*]', '', video.title)
+    if use_video_id:
+        title = video.id
+
+    else:
+        title = BaseCore().strip_title(title=video.title)
+
     final_output_path = os.path.join(output, title + ".mp4")
 
-    print(f"Downloading: {title} to: {final_output_path}")
+    print(f"Downloading: {video.title} to: {final_output_path}")
     video.download(path=final_output_path, quality=quality, downloader=downloader, display=text_progress_bar)
     print(f"Successfully downloaded: {title}")
 
@@ -47,6 +53,7 @@ def main():
     group.add_argument("-url", type=str, help="a PornHub Video URL", default="")
     group.add_argument("-model", type=str, help="a Pornhub Model URL", default="")
     parser.add_argument("-video_limit", type=int, help="the maximum number of videos to download from a model (Default: all)", default=100000)
+    parser.add_argument("--use-video-id", action="store_true", help="uses video ID as the title instead of the original video title")
     group.add_argument("-file", type=str, help="List to a file with Video URLs (separated by new lines)", default="")
     parser.add_argument("-downloader", type=str, help="The threading (download backend) to use", choices=[
         "threaded", "default", "ffmpeg"], default="threaded")
@@ -64,11 +71,12 @@ def main():
     model = args.model
     video_limit = args.video_limit
     file = args.file
+    use_video_id = args.use_video_id
 
     client = Client()
 
     if len(url) >= 3:  # Comparison with not == "" doesn't work, don't ask me why I have no fucking idea...
-        download_video(client=client, url=url, output=output, quality=quality, downloader=downloader)
+        download_video(client=client, url=url, output=output, quality=quality, downloader=downloader, use_video_id=use_video_id)
 
     elif len(model) >= 3:
         model_videos = client.get_user(model).videos
@@ -78,7 +86,7 @@ def main():
             if idx >= video_limit:
                 break
 
-            download_video(client=client, url=video, output=output, quality=quality, downloader=downloader)
+            download_video(client=client, url=video, output=output, quality=quality, downloader=downloader, use_video_id=use_video_id)
             idx += 1
 
     elif len(file) >= 1:
@@ -95,7 +103,7 @@ def main():
 
         for idx, url in enumerate(urls, start=1):
             print(f"[{idx}|{len(urls)}] Downloading: {url}")
-            download_video(client=client, url=url, output=output, quality=quality, downloader=downloader)
+            download_video(client=client, url=url, output=output, quality=quality, downloader=downloader, use_video_id=use_video_id)
 
 
 if __name__ == '__main__':

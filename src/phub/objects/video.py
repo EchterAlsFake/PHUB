@@ -262,7 +262,7 @@ class Video:
                                       remux=remux, callback_remux=display_remux)
 
         except Exception as e:
-            self.logger.error(f"An error occured while downloading video {e}")
+            self.logger.error(f"An error occurred while downloading video {e}")
 
         return path
 
