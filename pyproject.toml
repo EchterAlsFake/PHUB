@@ -1,6 +1,6 @@
 [project]
 name = "phub"
-version = "4.8.3"
+version = "4.8.4"
 description = "An API for Pornhub"
 authors = [
   {name = 'Egsagon', email = "egsagon.git@gmail.com"},
@@ -13,7 +13,7 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"
 ]
-dependencies = ["httpx[brotli,socks]", "eaf_base_api"]
+dependencies = ["httpx[brotli,socks]", "eaf_base_api", "h2"]
 requires-python = ">=3.9"
 
 
