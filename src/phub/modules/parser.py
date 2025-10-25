@@ -80,6 +80,6 @@ def challenge(client: Client, challenge: str, token: str) -> None:
     # Build and inject cookie
     cookie = f'{n}*{p // n}:{s}:{token}:1'
     client.core.config.cookies = {'KEY': cookie}
-    client.core.update_cookies()
+    client.core.session.cookies.update({'KEY': cookie})
     logger.info('Injected cookie %s', cookie)
 # EOF

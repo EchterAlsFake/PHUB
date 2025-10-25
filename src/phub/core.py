@@ -61,7 +61,7 @@ class Client:
         self.core = core or BaseCore(config=RuntimeConfig())
         self.core.initialize_session()
         self.core.session.headers.update(consts.HEADERS)
-        self.core.session.cookies.update(consts.HEADERS)
+        self.core.session.cookies.update(consts.COOKIES)
         # Applying PornHub specific cookies and headers to base API
         self.logger.debug('Initialised new Client %s', self)
 
