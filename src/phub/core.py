@@ -361,7 +361,7 @@ class Client:
             AssertioneError: If one or more filters don't match their literals.
         '''
         
-        query = query.strip()
+        query = query.strip().lower()
         
         assert query, 'Query must be a non-empty string'
         
@@ -370,7 +370,7 @@ class Client:
         literals.ass('exclude_category', exclude_category, literals.category  )
         literals.ass('sort'            , sort            , literals.sort      )
         literals.ass('period'          , period          , literals.period    )
-        
+        s = f'search "{query}"'
         return queries.VideoQuery(
             client = self,
             func = 'video/search',
@@ -383,8 +383,7 @@ class Client:
                 't': literals.map.period.get(period),
                 'hd': literals._craft_boolean(hd)
             },
-            query_repr = query
-        )
+            query_repr = s)
     
     def get_playlist(self, playlist: Union[str, int, Playlist]) -> Playlist:
         '''

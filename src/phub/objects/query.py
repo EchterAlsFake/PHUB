@@ -5,6 +5,7 @@ import logging
 from base_api.base import setup_logger
 from functools import cache, cached_property
 from typing import TYPE_CHECKING, Iterator, Any, Callable, Union
+from urllib.parse import urlencode, urlsplit, parse_qsl, urlunsplit
 
 from . import Video, User, FeedItem
 
@@ -93,7 +94,6 @@ class Query:
         self._query_repr = query_repr
         
         # Build URL
-        args |= {'page': '{page}'}
         self.url = utils.concat(self.BASE, func, utils.urlify(args))
         
         self.suppress_spicevids = True
@@ -181,14 +181,17 @@ class Query:
         Returns:
             str: The raw page content.
         '''
-        
+
         assert isinstance(index, int)
-        url = self.url.format(page = index + 1)
+        parts = list(urlsplit(self.url))
+        q = dict(parse_qsl(parts[3], keep_blank_values=True))
+        q['page'] = str(index + 1)  # PH uses 1-based pages; omit or set "1" for page 1
+        parts[3] = urlencode(q)
+        url = urlunsplit(parts)
+
         req = self.client.call(url, get_response=True, throw=False)
-        
         if req.status_code == 404:
             raise errors.NoResult()
-        
         return req.text
     
     @cache
