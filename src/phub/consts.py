@@ -227,7 +227,7 @@ class re:
     container                = find( engine.DOTALL,              r'class=\"container(.*)'                                                      ) # Get the page container
     document                 = find( engine.DOTALL,              r'.*'                                                                         ) # Match a whole document
     get_playlist_unavailable = find( engine.DOTALL,              r': (\d+)</h5'                                                                ) # Get playlist unavailable videos amount
-    get_playlist_size        = find( engine.DOTALL,              r'var itemsCount = (.*?) ||'                                                 ) # Get playlist video amount
+    get_playlist_size        = find( engine.DOTALL,              r'var itemsCount = (.*?) ||'                                                  ) # Get playlist video amount
     get_playlist_likes       = find( engine.DOTALL,              r'<span class="votesUp">(.*?)</span>'                                         ) # Get playlist likes
     get_playlist_dislikes    = find( engine.DOTALL,              r'<span class="votesDown">(.*?)</span>'                                       ) # Get playlist dislikes
     get_playlist_ratings     = find( engine.DOTALL,              r'<span class="percent">(.*?)%</span>'                                        ) # Get paylist like/dislike ratio
