@@ -5,6 +5,8 @@ import re
 import time
 import logging
 import random
+import traceback
+
 import httpx
 
 from functools import cached_property
@@ -117,6 +119,7 @@ class Client:
              headers: dict = None,
              throw: bool = True,
              silent: bool = False,
+             params: dict = None,
              get_response = True) -> httpx.Response:
         '''
         Used internally to send a request or an API call.
@@ -156,6 +159,7 @@ class Client:
                     method = method,
                     url = url,
                     data = data,
+                    params = params,
                     get_response=get_response)
 
                 # Silent 429 errors
@@ -175,6 +179,7 @@ class Client:
                 break
 
             except Exception as err:
+                print(traceback.format_exc())
                 self.logger.log(logging.DEBUG if silent else logging.WARNING,
                            f'Call failed: {repr(err)}. Retrying (attempt {i + 1}/{self.core.config.max_retries})')
                 continue
