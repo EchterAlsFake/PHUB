@@ -5,7 +5,7 @@
 <div align="center">
     <a href="https://pepy.tech/project/phub"><img src="https://static.pepy.tech/badge/phub" alt="Downloads"></a>
     <a href="https://badge.fury.io/py/phub"><img src="https://badge.fury.io/py/phub.svg" alt="PyPI version" height="18"></a>
-    <a href="https://echteralsfake.duckdns.org/ci/PHUB/badge.svg"><img src="https://echteralsfake.duckdns.org/ci/PHUB/badge.svg" alt="API Tests"/></a>
+    <a href="https://echteralsfake.me/ci/PHUB/badge.svg"><img src="https://echteralsfake.me/ci/PHUB/badge.svg" alt="API Tests"/></a>
 </div>
 
 <br>
