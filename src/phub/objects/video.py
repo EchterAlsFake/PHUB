@@ -5,9 +5,13 @@ import os
 import random
 import logging
 from functools import cached_property
+
+import httpx
 from base_api.base import setup_logger
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Iterator, Literal, Callable, Any, Union
+
+from httpx import request
 
 from . import Tag, Like, User, Image
 from .. import utils
@@ -383,7 +387,7 @@ class Video:
 
         self._assert_internal_success(res.json())
 
-    def watch_later(self, toggle: bool = True) -> None:
+    def watch_later(self, toggle: bool = True) -> bool:
         '''
         Add or remove the video to the watch later playlist.
 
@@ -391,14 +395,22 @@ class Video:
             toggle (bool): The toggle value.
         '''
 
-        mod = 'add' if toggle else 'remove'
+        if toggle:
+            res = self.client.call(f'api/v1/playlist/video_add_watchlater', 'POST', dict(
+                vid=self.id,
+                token=self.client._granted_token
+            ))
+            return res.is_success
 
-        res = self.client.call(f'playlist/video_{mod}_watchlater', 'POST', dict(
-            vid=self.id,
-            token=self.client._granted_token
-        ))
+        else:
+            res = self.client.call(
+                "api/v1/playlist/video_remove_watchlater",
+                method="DELETE",
+                params={"vid": str(self.id), "token": str(self.client._granted_token)},
+                headers={"Accept": "application/json"},
+            )
+            return res.is_success
 
-        self._assert_internal_success(res.json())
 
     # === Data properties === #
 
