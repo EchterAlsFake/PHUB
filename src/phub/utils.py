@@ -254,4 +254,8 @@ def fix_url(url: str):
             url = url.replace(language, "www", 1)
             return url
 
+
+    if "#" in url: # Some URLs have a # at the end and some number, idk why but yeah, fixing that here...
+        url = url.split("#")[0]
+
     return url  # Sometimes URL doesn't need to be changed. In this case, just return it.
