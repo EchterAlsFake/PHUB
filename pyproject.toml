@@ -1,21 +1,33 @@
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
 [project]
 name = "phub"
-version = "4.8.7"
+version = "4.8.8"
 description = "An API for Pornhub"
 authors = [
   {name = 'Egsagon', email = "egsagon.git@gmail.com"},
   {name = "EchterAlsFake", email = "EchterAlsFake@proton.me"}
 ]
-license = {file = "LICENSE"}
-readme = {file = "pypi.md", content-type = "text/markdown"}
+requires-python = ">=3.9"
+license = "LGPL-3.0-only"
+license-files = ["LICENSE"]
 keywords = ["pornhub", "phub", "porn", "api", "web scrapper", "api wrapper"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"
 ]
-dependencies = ["httpx[brotli,socks]", "eaf_base_api", "h2"]
-requires-python = ">=3.9"
+dependencies = [
+  "eaf_base_api",
+  "m3u8",
+  "lxml"
 
+  ]
+
+[project.optional-dependencies]
+av = ["av; python_version >= '3.10'"]
+full = ["httpx[http2]", "httpx[socks]"] # H2 for HTTP 2.0 support, LXML for faster parsing speed, though optional :)
 
 [project.scripts]
 phub = "phub.__main__:main"
@@ -24,10 +36,6 @@ phub = "phub.__main__:main"
 Documentation = "https://phub.readthedocs.io"
 Documentation_Updated = "https://github.com/EchterAlsFake/API_Docs/blob/master/Porn_APIs/PHUB.md"
 Repository = "https://github.com/EchterAlsFake/PHUB"
-
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -4,6 +4,7 @@ import html
 import os
 import random
 import logging
+import traceback
 from functools import cached_property
 
 import httpx
@@ -266,7 +267,8 @@ class Video:
                                       remux=remux, callback_remux=display_remux)
 
         except Exception as e:
-            self.logger.error(f"An error occurred while downloading video {e}")
+            error = traceback.format_exc()
+            self.logger.error(f"An error occurred while downloading video {error}")
 
         return path
 
