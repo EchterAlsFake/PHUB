@@ -4,22 +4,20 @@ import html
 import os
 import random
 import logging
-import traceback
+import threading
+from typing import Optional
 from functools import cached_property
 
-import httpx
 from base_api.base import setup_logger
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Iterator, Literal, Callable, Any, Union
-
-from httpx import request
+from typing import TYPE_CHECKING, Iterator, Literal, Any
 
 from . import Tag, Like, User, Image
 from .. import utils
 from .. import errors
 from .. import consts
 from .. import literals
-from ..modules import parser, display
+from ..modules import parser
 
 if TYPE_CHECKING:
     from ..core import Client
@@ -233,44 +231,35 @@ class Video:
         segments = self.client.core.get_segments(m3u8_url_master=self.m3u8_base_url, quality=quality)
         return segments
 
-    def download(self,
-                 path: Union[str, os.PathLike],
-                 downloader: Union[Callable, str] = "threaded",
-                 quality: str = 'best',
-                 remux: bool = False,
-                 display_remux: Callable[[int, int], None] = None,
-                 *,
-                 display: Callable[[int, int], None] = display.default()) -> str:
-        '''
-        Download the video to a file.
+    def download(self, quality, path="./", callback=None, no_title=False, remux: bool = False,
+                 callback_remux=None, start_segment: int = 0, stop_event: Optional[threading.Event] = None,
+                 segment_state_path: Optional[str] = None, segment_dir: Optional[str] = None,
+                 return_report: bool = False, cleanup_on_stop: bool = True, keep_segment_dir: bool = False
+                 ) -> bool:
+        """
+        :param callback:
+        :param quality:
+        :param path:
+        :param no_title:
+        :param remux:
+        :param callback_remux:
+        :param start_segment:
+        :param stop_event:
+        :param segment_state_path:
+        :param segment_dir:
+        :param return_report:
+        :param cleanup_on_stop:
+        :param keep_segment_dir:
+        :return:
+        """
+        if not no_title:
+            path = os.path.join(path, f"{self.title}.mp4")
 
-        Args:
-            path (PathLike): The download path.
-            quality (Quality | str | int): The video quality.
-            downloader (Callable): The download backend.
-            display (Callable): The progress display.
-            remux (bool): Whether to remux the video from MPEG-TS to MP4 (h264)
-            display_remux (Callable[[int, int], None], optional): The display backend for remuxing.
-
-        Returns:
-            str: The downloader video path.
-        '''
-
-        # Add a name if the path is a directory
-        if os.path.isdir(path):
-            path = utils.concat(path, self.key + '.mp4')
-
-        self.logger.info('Starting download for %s at %s', self, path)
-
-        try:
-            self.client.core.download(video=self, quality=quality, path=path, callback=display, downloader=downloader,
-                                      remux=remux, callback_remux=display_remux)
-
-        except Exception as e:
-            error = traceback.format_exc()
-            self.logger.error(f"An error occurred while downloading video {error}")
-
-        return path
+        return self.client.core.download(video=self, quality=quality, path=path, callback=callback, remux=remux,
+                                  callback_remux=callback_remux, start_segment=start_segment, stop_event=stop_event,
+                                  segment_state_path=segment_state_path, segment_dir=segment_dir,
+                                  return_report=return_report,
+                                  cleanup_on_stop=cleanup_on_stop, keep_segment_dir=keep_segment_dir)
 
     # === Interaction methods === #
 

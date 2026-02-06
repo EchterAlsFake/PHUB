@@ -7,7 +7,7 @@ except (ModuleNotFoundError, ImportError):
 
 config.request_delay = 0
 core = BaseCore(config=config)
-client = Client(language="en", core=core)  # Make a delay, so that PornHub isn't stressed too much
+client = Client(language="en", core=core)
 url = "https://de.pornhub.com/view_video.php?viewkey=ph60f99fa4b5cd7"
 video = client.get(url)
 
@@ -23,8 +23,6 @@ def test_video_information():
     embed = video.embed
     image = video.image.url
     id = video.id
-    assert isinstance(video.download(path="./", quality="worst", remux=True), str)
-    assert isinstance(video.download(path="./", quality="worst"), str)
     assert isinstance(title, str) and len(title) > 3
     assert isinstance(likes, int) and len(str(likes)) >= 1
     assert isinstance(dislikes, int) and len(str(dislikes)) >= 1
@@ -35,3 +33,9 @@ def test_video_information():
     assert isinstance(embed, str) and len(embed) >= 3
     assert isinstance(image, str) and len(image) >= 3
     assert isinstance(id, (str, int))
+
+def test_download():
+    stuff = video.download(quality="best", return_report=True)
+    assert stuff["status"] == "completed"
+
+
