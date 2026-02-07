@@ -1,50 +1,61 @@
 """
 PHUB built-in CLI.
 """
-
 import os
+import logging
 import argparse
 
+from phub import Client
 from typing import Union
 from base_api import BaseCore
-from phub import Client, Video
+
+def quality_type(s: str):
+    # Small helper for argparse type hinting
+    if s.isdigit():
+        return int(s)
+    return s  # e.g. "best", "half", "worst
+
+downloaded: int = 0 # Keeps track of total downloaded videos
+client: Client = Client() # For type hinting (don't ask)
+
+map_log = {
+    "ERROR": logging.ERROR,
+    "WARNING": logging.WARNING,
+    "INFO": logging.INFO,
+    "DEBUG": logging.DEBUG,
+    "CRITICAL": logging.CRITICAL,
+}
 
 
-def text_progress_bar(downloaded, total, title=False):
-    """Thanks, ChatGPT, I still suck at math <3"""
-    bar_length = 50
-    filled_length = int(round(bar_length * downloaded / float(total)))
-    percents = round(100.0 * downloaded / float(total), 1)
-    bar = '#' * filled_length + '-' * (bar_length - filled_length)
-    if title is False:
-        print(f"\r[{bar}] {percents}%", end='')
+def configure(args):
+    core = BaseCore()
+    core.enable_logging(level=map_log[args.log_level])
+    core.config.proxy = args.proxy if args.proxy else None
+    core.config.max_workers = args.max_workers if args.max_workers else 20
+    core.initialize_session() # Start the session with our configuration
 
-    else:
-        print(f"\r | {title} | -->: [{bar}] {percents}%", end='')
+    global client
+    client = Client(core=core)
+    client.enable_logging(level=map_log[args.log_level])
 
+def download_video(video, quality: Union[str, int], output: str, no_title: bool = False,
+                   use_video_id: bool = False):
 
-def download_video(client: Client, url: Union[str | Video], output: str, quality: str, use_video_id=False):
-    if not isinstance(url, Video):
-        video = client.get(url)
-
-
-    elif isinstance(url, Video):
-        video = url
-
-    else:
-        raise "Some error happened here, please report on GitHub, thank you :) "
+    global downloaded
+    title = video.title
 
     if use_video_id:
         title = video.id
 
-    else:
-        title = BaseCore().strip_title(title=video.title)
+    if not no_title:
+        output = os.path.join(output, title + ".mp4")
 
-    final_output_path = os.path.join(output, title + ".mp4")
 
-    print(f"Downloading: {video.title} to: {final_output_path}")
-    video.download(path=final_output_path, quality=quality, callback=text_progress_bar)
-    print(f"Successfully downloaded: {title}")
+    print(f"Downloading to -->: {output}")
+    report = video.download(quality=quality, path=output, no_title=no_title, return_report=True)
+    downloaded += 1
+    return report # Doesn't hurt, maybe someone uses this for batch processing idk
+
 
 
 def main():
@@ -54,9 +65,13 @@ def main():
     group.add_argument("-model", type=str, help="a Pornhub Model URL", default="")
     parser.add_argument("-video_limit", type=int, help="the maximum number of videos to download from a model (Default: all)", default=100000)
     parser.add_argument("--use-video-id", action="store_true", help="uses video ID as the title instead of the original video title")
-    group.add_argument("-file", type=str, help="List to a file with Video URLs (separated by new lines)", default="")
-    parser.add_argument("-quality", type=str, help="The video quality", choices=["best", "half", "worst"],
+    parser.add_argument("-quality", type=quality_type, help="The video quality", choices=[144, 240, 360, 480, 720, 1080, 1440, 2160, "best", "half", "worst"],
                       default="best")
+    parser.add_argument("-no-title", help="Whether to automatically include the title in the output path or not", action="store_true", default=True)
+    parser.add_argument("-max-workers", type=int, help="The maximum amount of concurrent threads that fetch segments", default=20)
+    parser.add_argument("--proxy", type=str, help="A proxy in <protocol><ip><port> format")
+    parser.add_argument("--log-level", type=str, help="The logging level (default: ERROR)", default="ERROR",
+                        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
 
     parser.add_argument("-output", type=str, help="The output path", default="./")
 
@@ -66,43 +81,26 @@ def main():
     url = args.url
     model = args.model
     video_limit = args.video_limit
-    file = args.file
     use_video_id = args.use_video_id
 
-    client = Client()
+    configure(args)
 
-    if len(url) >= 3:  # Comparison with not == "" doesn't work, don't ask me why I have no fucking idea...
-        download_video(client=client, url=url, output=output, quality=quality, use_video_id=use_video_id)
+    if url:
+        video = client.get(url)
+        download_video(video, quality, output, no_title=args.no_title, use_video_id=use_video_id)
 
-    elif len(model) >= 3:
-        model_videos = client.get_user(model).videos
-        idx = 0
+    elif model:
+        model = client.get_user(model)
+        print(f"Downloading model -->: {model.name}")
 
-        for video in model_videos:
-            if idx >= video_limit:
-                break
+        for video in model.videos:
+            if downloaded >= video_limit:
+                return
 
-            download_video(client=client, url=video, output=output, quality=quality, use_video_id=use_video_id)
-            idx += 1
+            download_video(video, quality, output, no_title=args.no_title, use_video_id=use_video_id)
 
-    elif len(file) >= 1:
-        try:
-            with open(file, "r") as f:
-                urls = f.read().splitlines()
-
-        except PermissionError:
-            raise "You do not have the necessary permissions to read the file!"
-
-        except FileNotFoundError:
-            raise f"The file does not exist at your given location: {file}"
+    print("Finished :)")
 
 
-        for idx, url in enumerate(urls, start=1):
-            print(f"[{idx}|{len(urls)}] Downloading: {url}")
-            download_video(client=client, url=url, output=output, quality=quality, use_video_id=use_video_id)
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-
-# EOF
