@@ -581,7 +581,7 @@ wheels = [
 
 [[package]]
 name = "phub"
-version = "4.8.9"
+version = "4.9.0"
 source = { editable = "." }
 dependencies = [
     { name = "eaf-base-api" },

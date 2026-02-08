@@ -205,17 +205,51 @@ class Video:
             str: The M3U url.
         '''
 
-        raw_qualities = self.fetch('page@mediaDefinitions')
+        raw_qualities = self.fetch('page@mediaDefinitions') or []
         quality_urls = {}
+        is_vertical = bool(self.data.get('page@isVertical'))
+
+        def parse_quality(value: Any) -> int:
+            if isinstance(value, int):
+                return value
+            if isinstance(value, str):
+                digits = ''.join(ch for ch in value if ch.isdigit())
+                if digits:
+                    return int(digits)
+            return 0
+
+        def parse_quality_from_url(url: str) -> int:
+            for part in url.split('/'):
+                if 'P_' in part or 'p_' in part:
+                    prefix = part.split('P_', 1)[0].split('p_', 1)[0]
+                    return parse_quality(prefix)
+            return 0
+
+        def estimate_width(height: int) -> int:
+            if height <= 0:
+                return 0
+            if is_vertical:
+                return int(height * 9 / 16)
+            return int(height * 16 / 9)
 
         for q in raw_qualities:
             if q.get('format') != 'hls' or not q.get('videoUrl'):
                 continue
 
             try:
-                width = int(q.get('width', 0))
-                height = int(q.get('height', 0))
+                width = int(q.get('width') or 0)
+                height = int(q.get('height') or 0)
                 url = q['videoUrl']
+
+                if not height:
+                    height = parse_quality(q.get('quality')) or parse_quality_from_url(url)
+                if not width and height:
+                    width = estimate_width(height)
+
+                if not width and not height:
+                    self.logger.warning(f"Skipping invalid quality entry: {q}, missing resolution data")
+                    continue
+
                 quality_urls[(width, height)] = url
 
             except Exception as e:
