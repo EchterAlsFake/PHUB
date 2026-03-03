@@ -24,6 +24,11 @@ PH features, such as video searching, account features, video downloading, and m
 pip install --upgrade phub
 ```
 
+- Install using `pip` with full HTTP 2.0 and LXML support:
+```shell
+pip install --upgrade phub[full]
+```
+
 - Or from this repo to get the latest fixes/features:
 ```shell
 pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git
