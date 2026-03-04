@@ -50,6 +50,8 @@ def download_video(video, quality: Union[str, int], output: str, no_title: bool 
     if not no_title:
         output = os.path.join(output, title + ".mp4")
 
+    if output == './':
+        output = os.path.join(output, video.key + ".mp4")
 
     print(f"Downloading to -->: {output}")
     report = video.download(quality=quality, path=output, no_title=no_title, return_report=True)
