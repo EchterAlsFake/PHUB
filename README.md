@@ -39,7 +39,7 @@ pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git
 # Download a single video
 phub -url https://www.pornhub.com/view_video.php?viewkey=abcdef
 # Download multiple videos from a text file
-phub -file path/to/file.txt --quality best --downloader threaded --output video.mp4
+phub -file path/to/file.txt -quality best -output video.mp4
 ```
 
 # Quickstart
