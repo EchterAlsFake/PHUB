@@ -67,6 +67,7 @@ async def main():
 
     # Fetch and download a video
     video = await client.get_video('https://...')
+    await video.ensure_html() # For Downloading the HTML Code needs to be retrieved!
     await video.download(quality="best", path="my-video.mp4") # See docs for more options
 
     # Fetch user videos
