@@ -1,6 +1,4 @@
-<p align="center">
-  <img width="200" src="https://github.com/Egsagon/PHUB/blob/master/assets/logo.svg">
-</p>
+<h1 align="center">PornHub API</h1>
 
 <div align="center">
     <a href="https://pepy.tech/project/phub"><img src="https://static.pepy.tech/badge/phub" alt="Downloads"></a>
@@ -9,75 +7,100 @@
 </div>
 
 <br>
-PHUB is an easy-to-use API wrapper for Pornhub. It can access most used or useful
-PH features, such as video searching, account features, video downloading, and more.
 
-> [!WARNING]
-> This project is against PornHub's Terms of Services. Redistributing copyright protected content is a crime under DMCA. 
-> Usage of this API is intended for **PRIVATE** non-commercial purposes only. We are not responsible for damages caused by
-> this project. Please use it responsibly to ensure the continued development for everyone!
+# Disclaimer
+> [!IMPORTANT]
+> This is an unofficial and unaffiliated project. Please read the full disclaimer before use:
+> **[DISCLAIMER.md](https://github.com/EchterAlsFake/API_Docs/blob/master/Disclaimer.md)**
+>
+> By using this project you agree to comply with the target site’s rules, copyright/licensing requirements,
+> and applicable laws. Do not use it to bypass access controls or scrape at disruptive rates.
 
-# Installation
+# Features
+- Fetch videos + metadata
+- Download videos
+- Fetch Channels
+- Fetch Pornstars
+- Fetch Models
+- Fetch Users
+- Fetch Shorts
+- Fetch Playlists
+- Search for videos
+- Account Login
+- Access your feed, watched, liked and recommended
+- Asynchronous
+- Built-in caching
+- Easy interface
+- Great type hinting
 
-- Install using `pip` (python `3.9` or higher required): 
-```shell
-pip install --upgrade phub
-```
+#### Networking Features
+- HTTP 2.0 / HTTP 3.0
+- Browser impersonation
+- Custom JA3
+- All proxy types
+- Proxy authentication
+- Speed Limit
+- DNS over HTTPS
+- And even more...
+- All of this is configurable and can be adjusted as you like!
 
-- Install using `pip` with full HTTP 2.0 and LXML support:
-```shell
-pip install --upgrade phub[full]
-```
+# Supported Platforms
+This API has been tested and confirmed working on:
 
-- Or from this repo to get the latest fixes/features:
-```shell
-pip install --upgrade git+https://github.com/EchterAlsFake/PHUB.git
-```
-
-# Usage from command line
-```shell
-# Download a single video
-phub -url https://www.pornhub.com/view_video.php?viewkey=abcdef
-# Download multiple videos from a text file
-phub -file path/to/file.txt -quality best -output video.mp4
-```
+- Windows 11 (x64) 
+- macOS Sequoia (x86_64)
+- Linux (Arch) (x86_64)
+- Android 16 (aarch64)
 
 # Quickstart
 
 > [!NOTE]
-> You can find the beautiful outdated docs on this project [here](https://phub.readthedocs.io).
-> <br>Or use the ugly but **UPDATED** docs (xD) [here](https://github.com/EchterAlsFake/API_Docs/blob/master/Porn_APIs/PHUB.md)
+> Full Documentation: [here](https://github.com/EchterAlsFake/API_Docs/blob/master/Porn_APIs/PHUB.md)
 
 ```python
+import asyncio
 import phub
 
-# Initialise a client
-client = phub.Client()
+async def main():
+    # Initialize an async client
+    client = phub.Client()
 
-# Fetch and download a video
-video = client.get('https://...')
-video.download('my-video.mp4', quality="best") # See docs for more options
+    # Fetch and download a video
+    video = await client.get_video('https://...')
+    await video.download(quality="best", path="my-video.mp4") # See docs for more options
 
-# Fetch user videos
-user = client.get_user('this-user')
-for video in user.videos:
-    print(video.title)
+    # Fetch user videos
+    user = await client.get_user('this-user')
+    async for video in user.get_videos():
+        print(video.title)
 
-# Perform a research
-for video in client.search('my-query'):
-    print(video.title)
+    # Perform a search
+    async for video in client.search_videos('my-query'):
+        print(video.title)
 
-# Connect to an account
-client = phub.Client('my-email', 'my-password')
+    # Connect to an account
+    client = phub.Client(email='my-email', password='my-password', login=True)
+    await asyncio.sleep(2) # Allow login task to finish
+    
+    # Alternatively, manually await login:
+    # await client.login()
 
-# Access account history, liked and recommended stuff
-client.account.watched
-client.account.liked
-client.account.recommended
+    # Access account history, liked and recommended stuff
+    async for video in client.get_history():
+        print(video.title)
+        
+    async for video in client.get_favorites():
+        print(video.title)
+        
+    async for video in client.get_recommended():
+        print(video.title)
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 # License
-PHUB uses GPLv3. See the `LICENSE` file.
+PHUB uses LGPLv3. See the `LICENSE` file.
 
 This repository was initiated and maintained by [Egsagon](https://github.com/Egsagon)
 He doesn't have any time to maintain this and transferred me the ownership.
