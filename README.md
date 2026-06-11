@@ -57,6 +57,11 @@ This API has been tested and confirmed working on:
 > [!NOTE]
 > Full Documentation: [here](https://github.com/EchterAlsFake/API_Docs/blob/master/Porn_APIs/PHUB.md)
 
+
+> [!TIP]
+> PHUB can be run as a CLI tool. Please see the [CLI Documentation](https://github.com/EchterAlsFake/API_Docs/blob/master/Porn_APIs/CLI_PHUB.md)
+
+
 ```python
 import asyncio
 import phub
