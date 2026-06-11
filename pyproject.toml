@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "phub"
-version = "5.0"
+version = "5.1"
 description = "An API for Pornhub"
 authors = [
   {name = 'Egsagon', email = "egsagon.git@gmail.com"},
@@ -29,6 +29,9 @@ dependencies = [
 av = ["av; python_version >= '3.10'"]
 full = ["lxml"] # H2 for HTTP 2.0 support, LXML for faster parsing speed, though optional :)
 
+
+[project.scripts]
+phub = "phub.phub:cli"
 
 [project.urls]
 Documentation = "https://github.com/EchterAlsFake/API_Docs/blob/master/Porn_APIs/PHUB.md"

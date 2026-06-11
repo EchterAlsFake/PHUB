@@ -16,6 +16,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
 
+import argparse
 import os
 import logging
 import asyncio
@@ -467,7 +468,7 @@ class Short(BaseObject):
         return quality_urls
 
     async def download(self, quality, path="./", callback: callback_hint = None, no_title=False, remux: bool = False,
-                 callback_remux=None, start_segment: int = 0, stop_event: threading.Event | None = None,
+                 callback_remux: callback_hint=None, start_segment: int = 0, stop_event: asyncio.Event | None = None,
                  segment_state_path: str | None = None, segment_dir: str | None = None,
                  return_report: bool = False, cleanup_on_stop: bool = True, keep_segment_dir: bool = False
                  ) -> bool | DownloadReport:
@@ -584,7 +585,7 @@ class GIF(BaseObject):
         url = self.soup.find("div", class_="bottomMargin").find("a").get("href")
         return await Video(core=self.core, url=f"https://www.pornhub.com{url}").init()
 
-    async def download(self, callback: callback_hint = None, path="./", no_title=False, stop_event: threading.Event | None = None) -> bool:
+    async def download(self, callback: callback_hint = None, path="./", no_title=False, stop_event: asyncio.Event | None = None) -> bool:
         """
         :param callback:
         :param path:
@@ -837,10 +838,11 @@ class Video(BaseObject):
 
     @cached_property
     def flashvars(self) -> dict:
-        # If we need flashvars, we MUST have HTML.
-        # This will raise AttributeError if HTML is missing, 
-        # which is correct because you should have called 'await ensure_html()'
-        stuff = REGEX_VIDEO_FLASHVARS.search(self.html_content).group(1)
+        if not self.html_content:
+            raise ValueError("You need to call: await video.ensure_html() before downloading!")
+
+        match = REGEX_VIDEO_FLASHVARS.search(self.html_content)
+        stuff = match.group(1)
         return json.loads(stuff, strict=False)
 
     @cached_property
@@ -1083,7 +1085,7 @@ class Video(BaseObject):
         }
 
     async def download(self, quality, path="./", callback: callback_hint=None, no_title=False, remux: bool = False,
-                 callback_remux=None, start_segment: int = 0, stop_event: threading.Event | None = None,
+                 callback_remux: callback_hint=None, start_segment: int = 0, stop_event: asyncio.Event | None = None,
                  segment_state_path: str | None = None, segment_dir: str | None = None,
                  return_report: bool = False, cleanup_on_stop: bool = True, keep_segment_dir: bool = False
                  ) -> bool | DownloadReport:
@@ -1577,3 +1579,149 @@ class Client(Helper):
                 # Create Video object with pre-parsed data
                 video = Video(url=data["url"], core=self.core, api_data=data)
                 yield await video.init()
+
+
+def str_to_bool(val: str) -> bool:
+    return val.lower() in ('yes', 'true', 't', '1')
+
+def can_download(state: dict) -> bool:
+    if state["limit"] is None:
+        return True
+    return state["downloaded"] < state["limit"]
+
+async def _cli_download_video_generator(generator, args, no_title: bool, state: dict):
+    async for video in generator:
+        if not can_download(state): break
+        
+        if getattr(args, "id_as_title", False) and hasattr(video, "video_id"):
+            final_path = os.path.join(args.output, f"{video.video_id}.mp4")
+            no_title_arg = True
+        else:
+            final_path = args.output
+            no_title_arg = no_title
+            
+        await video.ensure_html()
+        await video.download(quality=args.quality, path=final_path, no_title=no_title_arg)
+        state["downloaded"] += 1
+
+async def _cli_process_url(client: Client, url: str, args, no_title: bool, state: dict):
+    try:
+        if "view_video.php" in url:
+            if not can_download(state): return
+            video = await client.get_video(url)
+            
+            if getattr(args, "id_as_title", False) and hasattr(video, "video_id"):
+                final_path = os.path.join(args.output, f"{video.video_id}.mp4")
+                no_title_arg = True
+            else:
+                final_path = args.output
+                no_title_arg = no_title
+                
+            await video.ensure_html()
+            await video.download(quality=args.quality, path=final_path, no_title=no_title_arg)
+            state["downloaded"] += 1
+            
+        elif "/short/" in url:
+            if not can_download(state): return
+            short = await client.get_short(url)
+            
+            if getattr(args, "id_as_title", False) and hasattr(short, "video_id"):
+                final_path = os.path.join(args.output, f"{short.video_id}.mp4")
+                no_title_arg = True
+            else:
+                final_path = args.output
+                no_title_arg = no_title
+                
+            await short.download(quality=args.quality, path=final_path, no_title=no_title_arg)
+            state["downloaded"] += 1
+            
+        elif "/gif/" in url:
+            if not can_download(state): return
+            gif = await client.get_gif(url)
+            await gif.download(path=args.output, no_title=no_title)
+            state["downloaded"] += 1
+            
+        elif "/album/" in url:
+            album = await client.get_album(url)
+            async for photo in album.get_photos(pages=args.pages):
+                if not can_download(state): break
+                await album.download_photo(photo["download_url"], path=args.output)
+                state["downloaded"] += 1
+                
+        else:
+            if "/pornstar/" in url:
+                obj = await client.get_pornstar(url)
+            elif "/model/" in url:
+                obj = await client.get_model(url)
+            elif "/users/" in url:
+                obj = await client.get_user(url)
+            elif "/channels/" in url:
+                obj = await client.get_channel(url)
+            elif "/playlists/" in url:
+                obj = await client.get_playlist(url)
+            else:
+                print(f"Unsupported or unrecognized URL format: {url}")
+                return
+
+            await _cli_download_video_generator(obj.get_videos(pages=args.pages), args, no_title, state)
+                
+    except Exception as e:
+        print(f"Error processing {url}: {e}")
+
+async def run_main():
+    parser = argparse.ArgumentParser(description="PornHub API Command Line Interface")
+    parser.add_argument("--download", metavar="URL (str)", type=str, help="URL to download from")
+    parser.add_argument("--quality", metavar="best,half,worst", type=str, help="The video quality (best,half,worst)", required=True)
+    parser.add_argument("--file", metavar="Source to .txt file", type=str, help="(Optional) Specify a file with URLs (separated with new lines)")
+    parser.add_argument("--output", metavar="Output directory", type=str, help="The output path (with filename)", required=True)
+    parser.add_argument("--no-title", metavar="True,False", type=str, help="Whether to apply video title automatically to output path or not", required=True)
+    parser.add_argument("--pages", metavar="Pages (int)", type=int, default=1, help="Number of pages to fetch for iterables (Default: 1)")
+    parser.add_argument("--email", type=str, help="Account email for login", default=None)
+    parser.add_argument("--password", type=str, help="Account password for login", default=None)
+    parser.add_argument("--id-as-title", action="store_true", help="Use the video ID as the output title")
+    parser.add_argument("--limit", type=int, default=None, help="Maximum number of videos to download")
+    parser.add_argument("--liked", action="store_true", help="Download liked/favorite videos (requires login)")
+    parser.add_argument("--recommended", action="store_true", help="Download recommended videos (requires login)")
+    parser.add_argument("--watched", action="store_true", help="Download watched/history videos (requires login)")
+
+    args = parser.parse_args()
+    no_title = str_to_bool(args.no_title)
+
+    login = False
+    client = Client(email=args.email, password=args.password, login=False)
+    if args.email and args.password:
+        login = True
+        await client.login()
+
+    urls = []
+    if args.download:
+        urls.append(args.download)
+
+    if args.file:
+        with open(args.file, "r") as file:
+            content = file.read().splitlines()
+            urls.extend(content)
+
+    state = {"downloaded": 0, "limit": args.limit}
+
+    for url in urls:
+        await _cli_process_url(client, url, args, no_title, state)
+        if not can_download(state):
+            break
+
+    if login:
+        if getattr(args, "liked", False):
+            await _cli_download_video_generator(client.get_favorites(pages=args.pages), args, no_title, state)
+        if getattr(args, "recommended", False):
+            await _cli_download_video_generator(client.get_recommended(pages=args.pages), args, no_title, state)
+        if getattr(args, "watched", False):
+            await _cli_download_video_generator(client.get_history(pages=args.pages), args, no_title, state)
+    else:
+        if getattr(args, "liked", False) or getattr(args, "recommended", False) or getattr(args, "watched", False):
+            print("Warning: --liked, --recommended, and --watched require --email and --password to work. Skipping.")
+
+def cli():
+    asyncio.run(run_main())
+
+if __name__ == "__main__":
+    cli()
