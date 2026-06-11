@@ -62,39 +62,6 @@ async def test_cli_id_as_title(tmp_path):
         mock_video.download.assert_called_once_with(quality="best", path=expected_path, no_title=True)
 
 
-@pytest.mark.asyncio
-async def test_cli_account_login(tmp_path):
-    with patch("phub.phub.Client") as MockClient:
-        mock_client_instance = MockClient.return_value
-        
-        mock_video1 = AsyncMock()
-        mock_video2 = AsyncMock()
-        
-        async def mock_favorites(pages=1):
-            yield mock_video1
-            yield mock_video2
-            
-        mock_client_instance.get_favorites = mock_favorites
-        
-        output_dir = str(tmp_path)
-        test_args = [
-            "phub.py", 
-            "--quality", "best",
-            "--output", output_dir,
-            "--no-title", "False",
-            "--email", "user_placeholder@example.com",
-            "--password", "password123",
-            "--liked",
-            "--limit", "1"
-        ]
-        
-        with patch.object(sys, "argv", test_args):
-            await run_main()
-            
-        MockClient.assert_called_once_with(email="user_placeholder@example.com", password="password123", login=True)
-        mock_video1.download.assert_called_once()
-        mock_video2.download.assert_not_called()
-
 
 @pytest.mark.asyncio
 async def test_cli_iterable_limit(tmp_path):

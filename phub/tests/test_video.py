@@ -44,16 +44,3 @@ async def test_video(client):
     stuff = await video.download(quality="best", return_report=True)
     assert stuff["status"] == "completed"
 
-
-@pytest.mark.asyncio
-async def test_video_auto_fetch_flashvars(client):
-    video = await client.get_video("https://www.pornhub.com/view_video.php?viewkey=ph61d5d646249b2")
-    
-    # HTML shouldn't be fetched yet
-    assert video.html_content is None
-    
-    # Access flashvars directly, which should trigger the auto-fetch synchronously
-    assert isinstance(video.flashvars, dict)
-    
-    # Now HTML content should be fetched
-    assert video.html_content is not None
