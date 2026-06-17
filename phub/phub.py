@@ -21,7 +21,6 @@ import os
 import logging
 import asyncio
 import demjson3
-import threading
 
 from curl_cffi import Response, AsyncSession
 from functools import cached_property
@@ -110,7 +109,7 @@ class UserHelper(Helper, BaseObject):
         BaseObject.__init__(self, url=url, core=core, html_content=None)
         self.core = core # Keep for Helper compatibility
 
-    async def _make_video_safe(self, video_data: str | dict):
+    async def _make_video_safe(self, video_data: str | dict, **kwargs):
         """
         Ensures metadata dictionaries from extractors are handled correctly.
         """
@@ -164,7 +163,7 @@ class UserHelper(Helper, BaseObject):
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                          max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos):
-            yield await video.init()
+            yield video
 
 
 class SubscriptionHelper(Helper):
@@ -202,7 +201,7 @@ class Pornstar(UserHelper):
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                          max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos):
-            yield await video.init()
+            yield video
 
 
     async def get_gifs(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None) -> \
@@ -214,8 +213,7 @@ class Pornstar(UserHelper):
         assert videos_concurrency and pages_concurrency
         async for gif in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                        max_page_concurrency=pages_concurrency, video_link_extractor=extractor_gifs):
-            initialized_gif = await gif.init()
-            yield initialized_gif
+            yield await gif.init()
 
 
 class Model(UserHelper):
@@ -604,7 +602,7 @@ class Channel(Helper, BaseObject):
         BaseObject.__init__(self, url=url, core=core, html_content=html_content)
         self.core = core
 
-    async def _make_video_safe(self, video_data: str | dict):
+    async def _make_video_safe(self, video_data: str | dict, **kwargs):
         if isinstance(video_data, dict):
             url = video_data.pop("url")
             return Video(url, core=self.core, api_data=video_data)
@@ -663,7 +661,7 @@ class Channel(Helper, BaseObject):
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                          max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos):
-            yield await video.init()
+            yield video
 
 
 class Playlist(Helper, BaseObject):
@@ -763,7 +761,7 @@ class Playlist(Helper, BaseObject):
             # Use self.iterator with extractor_videos_playlist for chunked pages
             async for video in self.iterator(target_page_urls=chunked_page_urls, max_video_concurrency=videos_concurrency,
                                              max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos_playlist):
-                yield await video.init()
+                yield await video
 
 
 class Video(BaseObject):
@@ -1278,18 +1276,18 @@ class Client(Helper):
         """
         if not self.logged:
             self.logger.warning("Client not logged in, recommended videos might not be personalized")
-        
+
         await self.fix_recommendations()
 
         base_url = f"{HOST}recommended"
         page_urls = [f"{base_url}?page={page}" for page in range(1, pages + 1)]
-        
+
         videos_concurrency = videos_concurrency or self.core.configuration.videos_concurrency
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                        max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
-            yield await video.init()
+            yield await video
 
     async def get_history(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False) -> AsyncGenerator[Video, None]:
         """
@@ -1306,7 +1304,7 @@ class Client(Helper):
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                        max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
-            yield await video.init()
+            yield await video
 
     async def get_favorites(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False) -> AsyncGenerator[Video, None]:
         """
@@ -1324,7 +1322,7 @@ class Client(Helper):
 
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                        max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
-            yield await video.init()
+            yield await video
 
     async def get_feed(self, section: str = 'videos', pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False) -> AsyncGenerator[Video, None]:
         """
@@ -1347,7 +1345,7 @@ class Client(Helper):
 
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                          max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
-            yield await video.init()
+            yield await video
 
     async def get_subscriptions(self, pages: int = 5, pages_concurrency: int | None = None, videos_concurrency: int | None = None) -> AsyncGenerator[User, None]:
         """
@@ -1380,7 +1378,7 @@ class Client(Helper):
         finally:
             self._force_scraping = False
 
-    async def _make_video_safe(self, video_data: str | dict):
+    async def _make_video_safe(self, video_data: str | dict, **kwargs):
         """
         Overrides Helper._make_video_safe to avoid HTML fetching by default.
         Supports both raw URLs and metadata dictionaries.
@@ -1500,9 +1498,7 @@ class Client(Helper):
         assert videos_concurrency and pages_concurrency
         async for gif in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                          max_page_concurrency=pages_concurrency, video_link_extractor=extractor_gifs):
-            stuff = await gif.init()
-            yield stuff
-
+            yield await gif.init()
 
     async def search_videos(self, query: str, production_type: Literal["professional", "homemade"] | None = None,
                             sort_by: Literal["mr", "mv", "tr"] | None = None,
@@ -1533,8 +1529,7 @@ class Client(Helper):
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
                                        max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
-            stuff = await video.init()
-            yield stuff
+            yield video
 
     async def search_hubtraffic(self, query: str,
                                  category: str | None = None,

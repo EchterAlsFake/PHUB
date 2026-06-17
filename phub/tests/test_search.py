@@ -12,6 +12,7 @@ async def test_gif_from_search(client):
     idx = 0
     async for gif in client.search_gifs("fortnite"):
         idx += 1
+        assert await gif._ensure_html()
         assert isinstance(gif.title, str) and len(gif.title) > 0
         assert isinstance(gif.thumbnail, str) and len(gif.thumbnail) > 0
         assert isinstance(gif.publish_date, str) and len(gif.publish_date) > 0

@@ -100,11 +100,11 @@ wheels = [
 
 [[package]]
 name = "certifi"
-version = "2026.5.20"
+version = "2026.6.17"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f3/ce/ee2ecad540810a79593028e88299baeae54d346cc7a0d94b6199988b89b1/certifi-2026.5.20.tar.gz", hash = "sha256:69dea482ab64caa7b9f6aba1c6bf48bb6a5448d1c0f1b17ab42ad8c763a5344d", size = 135422, upload-time = "2026-05-20T11:46:50.073Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c9/c7/424b75da314c1045981bd9777432fad05a9e0c69daa4ed7e308bbaffe405/certifi-2026.6.17.tar.gz", hash = "sha256:024c88eeec92ca068db80f02b8b07c9cef7b9fe261d1d535abfd5abd6f6af432", size = 134594, upload-time = "2026-06-17T10:31:07.894Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/59/8c/57e832b7af6d7c5abe66eb3fbe3a3a32f4d11ea23a1aa7131371035be991/certifi-2026.5.20-py3-none-any.whl", hash = "sha256:3c52e209ba0a4ad7aebe60436a4ab349c39e1e602e8c134221e546902ad25897", size = 134134, upload-time = "2026-05-20T11:46:48.578Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/2f/c5464532e965badff2f4c4c1a3a83f5697f0d7c407ed0cda44aaa99bb451/certifi-2026.6.17-py3-none-any.whl", hash = "sha256:2227dcbaafe0d2f59279d1762ddddc37783ed4354594f194ffc31d20f41fc3db", size = 133289, upload-time = "2026-06-17T10:31:06.348Z" },
 ]
 
 [[package]]
@@ -230,15 +230,15 @@ sdist = { url = "https://files.pythonhosted.org/packages/f7/d2/6a81a9b5311d50542
 
 [[package]]
 name = "eaf-base-api"
-version = "3.2.2"
+version = "3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "curl-cffi" },
     { name = "tenacity" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ca/a2/f32bb093f8479bd912f4ae36a33a86fa8f0ff3795b356ca3b6293272011c/eaf_base_api-3.2.2.tar.gz", hash = "sha256:5a3e0e0c7cb5730da60899752ee2ce5e03d1e854201268efdd11fb995c195dde", size = 37173, upload-time = "2026-06-10T16:36:26.806Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f1/e9/875310221c40549b8d4471a847d46e24032aeaa761da863a3bada22ff3f4/eaf_base_api-3.3.tar.gz", hash = "sha256:789a86e5fc53dbbdbc2dd6014f5c4bb091824f462c3de046051d47b417b00ba4", size = 37692, upload-time = "2026-06-17T19:53:48.6Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/43/6b/4c7f25805e206bb054200cd5cbc650f0fe8acf2a3086fec9e2d384963f3b/eaf_base_api-3.2.2-py3-none-any.whl", hash = "sha256:a6634e44e66c94b5ce62d303e42f3fbe49ce6b5b39d43118f2fbb62b9ec0201f", size = 40230, upload-time = "2026-06-10T16:36:25.556Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/14/e244f3172b222fc4c9dee91cd90f688a7207215afe2275924a0fefd6e994/eaf_base_api-3.3-py3-none-any.whl", hash = "sha256:4e9dc159c79ad2f9f4d713bb512421a0b0e6ccf48b6f335becb7d8ba4ed8fa00", size = 40712, upload-time = "2026-06-17T19:53:47.575Z" },
 ]
 
 [[package]]
@@ -394,7 +394,7 @@ wheels = [
 
 [[package]]
 name = "phub"
-version = "5.0"
+version = "5.1"
 source = { editable = "." }
 dependencies = [
     { name = "bs4" },
