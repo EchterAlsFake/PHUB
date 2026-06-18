@@ -4,13 +4,13 @@ build-backend = "uv_build"
 
 [project]
 name = "phub"
-version = "5.1"
+version = "5.1.1"
 description = "An API for Pornhub"
 authors = [
   {name = 'Egsagon', email = "egsagon.git@gmail.com"},
   {name = "EchterAlsFake", email = "EchterAlsFake@proton.me"}
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = "LGPL-3.0-only"
 license-files = ["LICENSE"]
 keywords = ["pornhub", "phub", "porn", "api", "web scrapper", "api wrapper"]
@@ -26,7 +26,7 @@ dependencies = [
   ]
 
 [project.optional-dependencies]
-av = ["av; python_version >= '3.10'"]
+av = ["av; python_version >= '3.12'"]
 full = ["lxml"] # H2 for HTTP 2.0 support, LXML for faster parsing speed, though optional :)
 
 
