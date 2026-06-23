@@ -49,6 +49,16 @@ except (ModuleNotFoundError, ImportError):
     from .modules.type_hints import *
 
 
+async def on_error(url: str, error: Exception, attempt: int) -> bool:
+    print(f"URL: {url}, ERROR: {error}, Attempt: {attempt}")
+
+    if isinstance(error, ResourceGone):
+        return False
+
+    return True
+
+
+
 async def get_html_content(core: BaseCore, url: str) -> str | None | dict:
     # What should I do here?
     try:
@@ -154,15 +164,17 @@ class UserHelper(Helper, BaseObject):
         return return_thing_idk_bro
 
 
-    async def get_videos(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None) -> \
-    AsyncGenerator[Video, None]:
+    async def get_videos(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None,
+                         on_video_error: on_error_hint = on_error,
+                         on_page_error: on_error_hint = None) -> AsyncGenerator[Video, None]:
         page_urls = [f"{self.url}/videos?page={page}" for page in range(1, pages + 1)]
         self.logger.debug(f"Processing: {len(page_urls)} pages...")
         videos_concurrency = videos_concurrency or self.core.configuration.videos_concurrency
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos):
+                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos,
+                                         on_video_error=on_video_error, on_page_error=on_page_error):
             yield video
 
 
@@ -175,7 +187,11 @@ class SubscriptionHelper(Helper):
         user = User(url=url, core=self.core)
         return await user.init()
 
-    async def get_subscriptions(self, url: str, pages: int = 5, pages_concurrency: int | None = None, videos_concurrency: int | None = None) -> AsyncGenerator[User, None]:
+    async def get_subscriptions(self, url: str, pages: int = 5, pages_concurrency: int | None = None,
+                                videos_concurrency: int | None = None,
+                                on_video_error: on_error_hint = on_error,
+                                on_page_error: on_error_hint = None
+                                ) -> AsyncGenerator[User, None]:
         page_urls = [f"{url}?page={page}" for page in range(1, pages + 1)]
         videos_concurrency = videos_concurrency or self.core.configuration.videos_concurrency
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
@@ -183,7 +199,8 @@ class SubscriptionHelper(Helper):
         async for user in self.iterator(target_page_urls=page_urls, video_link_extractor=extractor_users,
                                         use_alternative_constructor=True,
                                         max_page_concurrency=pages_concurrency,
-                                        max_video_concurrency=videos_concurrency):
+                                        max_video_concurrency=videos_concurrency,
+                                        on_video_error=on_video_error, on_page_error=on_page_error):
             yield user
 
 
@@ -192,7 +209,9 @@ class Pornstar(UserHelper):
         # This calls UserHelper.__init__ correctly
         super().__init__(url=url, core=core)
 
-    async def get_uploads(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None) -> \
+    async def get_uploads(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None,
+                          on_video_error: on_error_hint = on_error, on_page_error: on_error_hint = None
+                          ) -> \
             AsyncGenerator[Video, None]:
         page_urls = [f"{self.url}/videos/upload?page={page}" for page in range(1, pages + 1)]
         self.logger.debug(f"Processing: {len(page_urls)} pages...")
@@ -200,11 +219,14 @@ class Pornstar(UserHelper):
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos):
+                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos,
+                                         on_video_error=on_video_error, on_page_error=on_page_error):
             yield video
 
 
-    async def get_gifs(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None) -> \
+    async def get_gifs(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None,
+                       on_video_error: on_error_hint = on_error, on_page_error: on_error_hint = None
+                       ) -> \
     AsyncGenerator[GIF, None]:
         page_urls = [f"{self.url}/gifs/video?page={page}" for page in range(1, pages + 1)]
         self.logger.debug(f"Processing: {len(page_urls)} pages...")
@@ -212,7 +234,8 @@ class Pornstar(UserHelper):
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
         async for gif in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_gifs):
+                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_gifs,
+                                       on_video_error=on_video_error, on_page_error=on_page_error):
             yield await gif.init()
 
 
@@ -653,14 +676,16 @@ class Channel(Helper, BaseObject):
         user = User(core=self.core, url=link)
         return await user.init()
 
-    async def get_videos(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None) -> \
-    AsyncGenerator[Video, None]:
+    async def get_videos(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None,
+                         on_video_error: on_error_hint = on_error, on_page_error: on_error_hint = None
+                         ) -> AsyncGenerator[Video, None]:
         page_urls = [f"{self.url}videos?page={page}" for page in range(1, pages + 1)]
         videos_concurrency = videos_concurrency or self.core.configuration.videos_concurrency
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos):
+                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos,
+                                         on_video_error=on_video_error, on_page_error=on_page_error):
             yield video
 
 
@@ -731,8 +756,8 @@ class Playlist(Helper, BaseObject):
         stuff = re.search(r'unavailable videos that are hidden:\s+(\d+)', self.html_content)
         return int(stuff.group(1))
 
-    async def get_videos(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None) -> \
-            AsyncGenerator[Video, None]:
+    async def get_videos(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None,
+                         on_video_error: on_error_hint = on_error, on_page_error: on_error_hint = None) -> AsyncGenerator[Video, None]:
 
         videos_concurrency = videos_concurrency or self.core.configuration.videos_concurrency
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
@@ -760,7 +785,8 @@ class Playlist(Helper, BaseObject):
         if chunked_page_urls:
             # Use self.iterator with extractor_videos_playlist for chunked pages
             async for video in self.iterator(target_page_urls=chunked_page_urls, max_video_concurrency=videos_concurrency,
-                                             max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos_playlist):
+                                             max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos_playlist,
+                                             on_video_error=on_video_error, on_page_error=on_page_error):
                 yield await video
 
 
@@ -1270,7 +1296,8 @@ class Client(Helper):
         except Exception:
             return False
 
-    async def get_recommended(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False) -> AsyncGenerator[Video, None]:
+    async def get_recommended(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False,
+                              on_video_error: on_error_hint = on_error, on_page_error: on_error_hint = None) -> AsyncGenerator[Video, None]:
         """
         Get recommended videos for the logged-in account.
         """
@@ -1286,10 +1313,13 @@ class Client(Helper):
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
+                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping,
+                                         on_video_error=on_video_error, on_page_error=on_page_error):
             yield await video
 
-    async def get_history(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False) -> AsyncGenerator[Video, None]:
+    async def get_history(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False,
+                          on_video_error: on_error_hint = on_error, on_page_error: on_error_hint = None
+                          ) -> AsyncGenerator[Video, None]:
         """
         Get watch history for the logged-in account.
         """
@@ -1303,10 +1333,12 @@ class Client(Helper):
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
+                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping,
+                                         on_video_error=on_video_error, on_page_error=on_page_error):
             yield await video
 
-    async def get_favorites(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False) -> AsyncGenerator[Video, None]:
+    async def get_favorites(self, pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False,
+                            on_video_error: on_error_hint = on_error,   on_page_error: on_error_hint = None) -> AsyncGenerator[Video, None]:
         """
         Get favorite videos for the logged-in account.
         """
@@ -1321,16 +1353,20 @@ class Client(Helper):
         assert videos_concurrency and pages_concurrency
 
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
+                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping,
+                                         on_video_error=on_video_error, on_page_error=on_page_error):
             yield await video
 
-    async def get_feed(self, section: str = 'videos', pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False) -> AsyncGenerator[Video, None]:
+    async def get_feed(self, section: str = 'videos', pages: int = 5, videos_concurrency: int | None = None, pages_concurrency: int | None = None, force_scraping: bool = False,
+                       on_video_error: on_error_hint = on_error, on_page_error: on_error_hint = None) -> AsyncGenerator[Video, None]:
         """
         Get the account feed.
         :param force_scraping:
         :param pages_concurrency:
         :param videos_concurrency:
         :param section: Section to filter (videos, photos, posts, etc.)
+        :param on_video_error:
+        :param on_page_error:
         :param pages: Number of pages to fetch.
         """
         if not self.logged:
@@ -1344,10 +1380,12 @@ class Client(Helper):
         assert videos_concurrency and pages_concurrency
 
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
+                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping,
+                                         on_video_error=on_video_error, on_page_error=on_page_error):
             yield await video
 
-    async def get_subscriptions(self, pages: int = 5, pages_concurrency: int | None = None, videos_concurrency: int | None = None) -> AsyncGenerator[User, None]:
+    async def get_subscriptions(self, pages: int = 5, pages_concurrency: int | None = None, videos_concurrency: int | None = None,
+                                on_video_error: on_error_hint = on_error, on_page_error: on_error_hint = None) -> AsyncGenerator[User, None]:
         """
         Get the account subscriptions.
         """
@@ -1359,7 +1397,8 @@ class Client(Helper):
         videos_concurrency = videos_concurrency or self.core.configuration.videos_concurrency
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
-        async for user in helper.get_subscriptions(url=url, pages=pages, pages_concurrency=pages_concurrency, videos_concurrency=videos_concurrency):
+        async for user in helper.get_subscriptions(url=url, pages=pages, pages_concurrency=pages_concurrency, videos_concurrency=videos_concurrency,
+                                                   on_video_error=on_video_error, on_page_error=on_page_error):
             yield user
 
     async def iterator(self, *args, force_scraping: bool = False, **kwargs):
@@ -1471,7 +1510,8 @@ class Client(Helper):
     async def search_gifs(self, query: str, category: Literal["gay", "transgender"] | None = None,
                           search_filter: Literal["mr", "mv", "tr"] | None = None,
                           pages: int = 5,
-                          pages_concurrency: int | None = None, videos_concurrency: int | None = None) -> AsyncGenerator[GIF, None]:
+                          pages_concurrency: int | None = None, videos_concurrency: int | None = None,
+                          on_video_error: on_error_hint = on_error, on_page_error: on_error_hint = None) -> AsyncGenerator[GIF, None]:
         """
         :param search_filter: [mr = Most Recent, mv = Most Viewed, tr = Top Rated] Default: Most relevant
         :param category: [gay, transgender] Default: Straight
@@ -1497,7 +1537,8 @@ class Client(Helper):
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
         async for gif in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_gifs):
+                                         max_page_concurrency=pages_concurrency, video_link_extractor=extractor_gifs,
+                                       on_video_error=on_video_error, on_page_error=on_page_error):
             yield await gif.init()
 
     async def search_videos(self, query: str, production_type: Literal["professional", "homemade"] | None = None,
@@ -1507,7 +1548,9 @@ class Client(Helper):
                             pages: int = 5,
                             videos_concurrency: int | None = None,
                             pages_concurrency: int | None = None,
-                            force_scraping: bool = False
+                            force_scraping: bool = False,
+                            on_video_error: on_error_hint = on_error,
+                            on_page_error: on_error_hint = None
                             ) -> AsyncGenerator[Video, None]:
         base_url = f"https://www.pornhub.com/video/search?search={query}"
         if production_type:
@@ -1528,7 +1571,8 @@ class Client(Helper):
         pages_concurrency = pages_concurrency or self.core.configuration.pages_concurrency
         assert videos_concurrency and pages_concurrency
         async for video in self.iterator(target_page_urls=page_urls, max_video_concurrency=videos_concurrency,
-                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping):
+                                       max_page_concurrency=pages_concurrency, video_link_extractor=extractor_videos, force_scraping=force_scraping,
+                                         on_video_error=on_video_error, on_page_error=on_page_error):
             yield video
 
     async def search_hubtraffic(self, query: str,
@@ -1536,7 +1580,7 @@ class Client(Helper):
                                  sort_by: Literal["newest", "mostviewed", "rating"] | None = None,
                                  period: Literal["weekly", "monthly", "alltime"] | None = None,
                                  pages: int = 5,
-                                 pages_concurrency: int = 5
+                                 pages_concurrency: int = 5,
                                  ) -> AsyncGenerator[Video, None]:
         """
         Search for videos using the HubTraffic API (Webmaster API).
